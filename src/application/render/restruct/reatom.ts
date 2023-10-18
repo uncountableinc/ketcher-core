@@ -201,7 +201,7 @@ class ReAtom extends ReObject {
           if (sg.atoms.includes(aid)) sgroupName = sg.data.name
         }
         const path = render.paper.text(ps.x, ps.y, sgroupName).attr({
-          'font-weight': 700,
+          'font-weight': '700',
           'font-size': 14
         })
         restruct.addReObjectPath(LayerMap.data, this.visel, path, ps, true)
@@ -409,9 +409,10 @@ class ReAtom extends ReObject {
         // of just created text
         // text -> tspan
         const color = getStereoAtomColor(render.options, stereoLabel)
-        aamPath.node.childNodes[0].setAttribute('fill', color)
+        const node = aamPath.node.childNodes[0] as unknown as HTMLElement
+        node.setAttribute('fill', color)
         const opacity = getStereoAtomOpacity(render.options, stereoLabel)
-        aamPath.node.childNodes[0].setAttribute('fill-opacity', opacity)
+        node.setAttribute('fill-opacity', opacity.toString())
       }
       const aamBox = util.relBox(aamPath.getBBox())
       draw.recenterText(aamPath, aamBox)
@@ -639,10 +640,10 @@ function buildLabel(
   options: any
 ): ElemAttr {
   // eslint-disable-line max-statements
-  let label: any = {}
+  const label: any = {}
   label.text = getLabelText(atom.a)
 
-  if (label.text === '') label = 'R#' // for structures that missed 'M  RGP' tag in molfile
+  if (label.text === '') label.text = 'R#' // for structures that missed 'M  RGP' tag in molfile
 
   if (label.text === atom.a.label) {
     const element = Elements.get(label.text)

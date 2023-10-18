@@ -13801,7 +13801,7 @@ var ReAtom = function (_ReObject) {
             _iterator.f();
           }
           var path = render.paper.text(ps.x, ps.y, sgroupName).attr({
-            'font-weight': 700,
+            'font-weight': '700',
             'font-size': 14
           });
           restruct.addReObjectPath(LayerMap.data, this.visel, path, ps, true);
@@ -13927,9 +13927,10 @@ var ReAtom = function (_ReObject) {
         });
         if (stereoLabel) {
           var color = getStereoAtomColor(render.options, stereoLabel);
-          aamPath.node.childNodes[0].setAttribute('fill', color);
+          var node = aamPath.node.childNodes[0];
+          node.setAttribute('fill', color);
           var opacity = getStereoAtomOpacity(render.options, stereoLabel);
-          aamPath.node.childNodes[0].setAttribute('fill-opacity', opacity);
+          node.setAttribute('fill-opacity', opacity.toString());
         }
         var aamBox = util.relBox(aamPath.getBBox());
         draw.recenterText(aamPath, aamBox);
@@ -14083,7 +14084,7 @@ function setHydrogenPos(struct, atom) {
 function buildLabel(atom, paper, ps, options) {
   var label = {};
   label.text = getLabelText(atom.a);
-  if (label.text === '') label = 'R#';
+  if (label.text === '') label.text = 'R#';
   if (label.text === atom.a.label) {
     var element = Elements.get(label.text);
     if (options.atomColoring && element) {

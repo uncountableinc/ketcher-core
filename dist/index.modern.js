@@ -5638,6 +5638,7 @@ function atomToStruct(source) {
   return new Atom(params);
 }
 function rglabelToStruct(source) {
+  var _source$$refs$map, _source$$refs;
   var params = {};
   params.label = 'R#';
   ifDef(params, 'pp', {
@@ -5646,9 +5647,9 @@ function rglabelToStruct(source) {
     z: source.location[2] || 0.0
   });
   ifDef(params, 'attpnt', source.attachmentPoints);
-  var rglabel = toRlabel(source.$refs.map(function (el) {
+  var rglabel = toRlabel((_source$$refs$map = (_source$$refs = source.$refs) === null || _source$$refs === void 0 ? void 0 : _source$$refs.map(function (el) {
     return parseInt(el.slice(3));
-  }));
+  })) !== null && _source$$refs$map !== void 0 ? _source$$refs$map : []);
   ifDef(params, 'rglabel', rglabel);
   return new Atom(params);
 }

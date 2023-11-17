@@ -20544,7 +20544,8 @@ function findStereoAtoms(struct, aids) {
     return [];
   }
   return aids.filter(function (aid) {
-    return struct.atoms.get(aid).stereoLabel !== null;
+    var _struct$atoms$get;
+    return ((_struct$atoms$get = struct.atoms.get(aid)) === null || _struct$atoms$get === void 0 ? void 0 : _struct$atoms$get.stereoLabel) != null;
   });
 }
 function structSelection(struct) {

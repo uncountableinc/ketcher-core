@@ -17452,8 +17452,10 @@ var Render = function () {
   }, {
     key: "view2obj",
     value: function view2obj(point, isRelative) {
+      var _this$options$externa;
       var scroll = this.scrollPos();
       point = point.scaled(1 / this.options.zoom);
+      point = point.scaled(1 / ((_this$options$externa = this.options.externalZoomScale) !== null && _this$options$externa !== void 0 ? _this$options$externa : 1.0));
       scroll = scroll.scaled(1 / this.options.zoom);
       point = isRelative ? point : point.add(scroll).sub(this.options.offset);
       return Scale.scaled2obj(point, this.options);
@@ -17461,9 +17463,11 @@ var Render = function () {
   }, {
     key: "obj2view",
     value: function obj2view(vector, isRelative) {
+      var _this$options$externa2;
       var p = Scale.obj2scaled(vector, this.options);
       p = isRelative ? p : p.add(this.options.offset).sub(this.scrollPos().scaled(1 / this.options.zoom));
       p = p.scaled(this.options.zoom);
+      p = p.scaled((_this$options$externa2 = this.options.externalZoomScale) !== null && _this$options$externa2 !== void 0 ? _this$options$externa2 : 1.0);
       return p;
     }
   }, {

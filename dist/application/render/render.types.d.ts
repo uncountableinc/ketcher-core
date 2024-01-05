@@ -32,6 +32,7 @@ export declare type RenderOptions = {
     aromaticCircle: boolean;
     scale: number;
     zoom: number;
+    externalZoomScale?: number;
     offset: Vec2;
     lineWidth: number;
     bondSpace: number;

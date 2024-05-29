@@ -29,9 +29,9 @@ declare function mergeBondsParams(struct1: Struct, bond1: BondAtoms, struct2: St
 declare const _default: {
     calcAngle: typeof calcAngle;
     fracAngle: typeof fracAngle;
-    calcNewAtomPos: typeof calcNewAtomPos;
     degrees: typeof degrees;
     setFracAngle: typeof setFracAngle;
     mergeBondsParams: typeof mergeBondsParams;
+    calcNewAtomPos: typeof calcNewAtomPos;
 };
 export default _default;

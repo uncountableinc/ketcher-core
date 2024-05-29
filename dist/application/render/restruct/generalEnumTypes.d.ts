@@ -17,6 +17,8 @@ export declare enum LayerMap {
     background = "background",
     selectionPlate = "selectionPlate",
     hovering = "hovering",
+    atom = "atom",
+    bondSkeleton = "bondSkeleton",
     warnings = "warnings",
     data = "data",
     additionalInfo = "additionalInfo",

@@ -13,6 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-export declare function fromTemplateOnCanvas(restruct: any, template: any, pos: any, angle: any): any[];
-export declare function fromTemplateOnAtom(restruct: any, template: any, aid: any, angle: any, extraBond: any): any[];
-export declare function fromTemplateOnBondAction(restruct: any, template: any, bid: any, events: any, flip: any, force: any): any[] | Promise<any>;
+import { Action } from './action';
+export declare function fromTemplateOnCanvas(restruct: any, template: any, pos: any, angle?: number, isPreview?: boolean): [Action, {
+    atoms: number[];
+    bonds: number[];
+}];
+export declare function fromTemplateOnAtom(restruct: any, template: any, aid: any, angle: any, extraBond: any, isPreview?: boolean): [Action, {
+    atoms: number[];
+    bonds: number[];
+}];
+export declare function fromTemplateOnBondAction(restruct: any, template: any, bid: any, events: any, flip: any, force: any, isPreview?: boolean): any[] | Promise<any>;

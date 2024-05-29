@@ -21,11 +21,15 @@ export declare enum ChemicalMimeType {
     DaylightSmarts = "chemical/x-daylight-smarts",
     InChI = "chemical/x-inchi",
     InChIAuxInfo = "chemical/x-inchi-aux",
+    InChIKey = "chemical/x-inchi-key",
     CDX = "chemical/x-cdx",
     CDXML = "chemical/x-cdxml",
     CML = "chemical/x-cml",
     KET = "chemical/x-indigo-ket",
-    UNKNOWN = "chemical/x-unknown"
+    UNKNOWN = "chemical/x-unknown",
+    SDF = "chemical/x-sdf",
+    FASTA = "chemical/x-fasta",
+    SEQUENCE = "chemical/x-sequence"
 }
 export interface WithStruct {
     struct: string;
@@ -35,6 +39,9 @@ export interface WithFormat {
 }
 export interface WithOutputFormat {
     output_format: ChemicalMimeType;
+}
+export interface WithInputFormat {
+    input_format?: ChemicalMimeType;
 }
 export interface WithSelection {
     selected?: Array<number>;
@@ -46,7 +53,7 @@ export interface CheckData extends WithStruct {
 export interface CheckResult {
     [key: string]: string;
 }
-export interface ConvertData extends WithStruct, WithOutputFormat {
+export interface ConvertData extends WithStruct, WithOutputFormat, WithInputFormat {
 }
 export interface ConvertResult extends WithStruct, WithFormat {
 }
@@ -70,12 +77,18 @@ export interface CalculateCipData extends WithStruct, WithOutputFormat {
 }
 export interface CalculateCipResult extends WithStruct, WithFormat {
 }
+export interface ExplicitHydrogensData extends WithStruct, WithOutputFormat {
+    mode?: 'auto' | 'fold' | 'unfold';
+}
+export interface ExplicitHydrogensResult extends WithStruct, WithFormat {
+}
 export declare type CalculateProps = 'molecular-weight' | 'most-abundant-mass' | 'monoisotopic-mass' | 'gross' | 'mass-composition';
 export interface CalculateData extends WithStruct, WithSelection {
     properties: Array<CalculateProps>;
 }
 export declare type CalculateResult = Record<CalculateProps, string | number | boolean>;
 export declare type AutomapMode = 'discard' | 'keep' | 'alter' | 'clear';
+export declare type AutoMapOptions = 'Discard' | 'Keep' | 'Alter' | 'Clear';
 export interface AutomapData extends WithStruct, WithOutputFormat {
     mode: AutomapMode;
 }
@@ -95,6 +108,7 @@ export declare type OutputFormatType = 'png' | 'svg';
 export interface GenerateImageOptions extends StructServiceOptions {
     outputFormat: OutputFormatType;
     backgroundColor?: string;
+    bondThickness: number;
 }
 export interface StructService {
     info: () => Promise<InfoResult>;
@@ -108,6 +122,7 @@ export interface StructService {
     check: (data: CheckData, options?: StructServiceOptions) => Promise<CheckResult>;
     calculate: (data: CalculateData, options?: StructServiceOptions) => Promise<CalculateResult>;
     recognize: (blob: Blob, version: string) => Promise<RecognizeResult>;
-    generateInchIKey: (struct: string) => Promise<string>;
+    getInChIKey: (struct: string) => Promise<string>;
     generateImageAsBase64: (data: string, options?: GenerateImageOptions) => Promise<string>;
+    toggleExplicitHydrogens: (data: ExplicitHydrogensData, options?: StructServiceOptions) => Promise<ExplicitHydrogensResult>;
 }

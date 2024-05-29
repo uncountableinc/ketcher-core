@@ -27,14 +27,18 @@ interface StyledPath {
 }
 declare class ReSimpleObject extends ReObject {
     private item;
+    private selectionSet;
+    private selectionPointsSet;
     constructor(simpleObject: any);
     static isSelectable(): boolean;
     calcDistance(p: Vec2, s: any): MinDistanceWithReferencePoint;
     getReferencePointDistance(p: Vec2): MinDistanceWithReferencePoint;
     getReferencePoints(onlyOnObject?: boolean): Array<Vec2>;
+    getHoverPathStyle(path: any, render: Render, isOuterShapeOfHoverPath: boolean): any;
     hoverPath(render: Render): Array<StyledPath>;
     drawHover(render: Render): Array<any>;
     makeSelectionPlate(restruct: ReStruct, paper: any, styles: any): any;
+    togglePoints(displayFlag: boolean): void;
     show(restruct: ReStruct, options: any): void;
 }
 export default ReSimpleObject;

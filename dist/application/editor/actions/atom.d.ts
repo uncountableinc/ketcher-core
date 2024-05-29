@@ -14,14 +14,9 @@
  * limitations under the License.
  ***************************************************************************/
 import { Action } from './action';
+import ReStruct from "../../render/restruct/restruct";
 export declare function fromAtomAddition(restruct: any, pos: any, atom: any): Action;
-/**
- * @param restruct { ReStruct }
- * @param ids { Array<number>|number }
- * @param attrs { object }
- * @param reset { boolean? }
- */
-export declare function fromAtomsAttrs(restruct: any, ids: any, attrs: any, reset: any): Action;
+export declare function fromAtomsAttrs(restruct: ReStruct, ids: Array<number> | number, attrs: any, reset: boolean | null): Action;
 export declare function fromStereoAtomAttrs(restruct: any, aid: any, attrs: any, withReverse: any): Action;
 export declare function fromAtomsFragmentAttr(restruct: any, aids: any, newfrid: any): Action;
 /**
@@ -31,6 +26,6 @@ export declare function fromAtomsFragmentAttr(restruct: any, aids: any, newfrid:
  * @return { Action }
  */
 export declare function fromAtomMerge(restruct: any, srcId: any, dstId: any): Action;
-export declare function mergeFragmentsIfNeeded(action: any, restruct: any, srcId: any, dstId: any): any;
+export declare function mergeFragmentsIfNeeded(action: any, restruct: any, srcId: any, dstId: any): number;
 export declare function mergeSgroups(action: any, restruct: any, srcAtoms: any, dstAtom: any): void;
 export declare function checkAtomValence(restruct: any, atomId: any): Action;

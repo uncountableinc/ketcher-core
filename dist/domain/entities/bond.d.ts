@@ -16,6 +16,7 @@
 import { Pile } from './pile';
 import { Struct } from './struct';
 import { Vec2 } from './vec2';
+import { BaseMicromoleculeEntity, initiallySelectedType } from "./BaseMicromoleculeEntity";
 declare enum CIP {
     E = "E",
     Z = "Z",
@@ -23,16 +24,19 @@ declare enum CIP {
     P = "P"
 }
 export interface BondAttributes {
-    reactingCenterStatus?: number;
-    topology?: number;
+    reactingCenterStatus?: number | null;
+    topology?: number | null;
+    customQuery?: string | null;
     stereo?: number;
     xxx?: string;
     type: number;
     end: number;
     begin: number;
     cip?: CIP | null;
+    isPreview?: boolean;
+    initiallySelected?: initiallySelectedType;
 }
-export declare class Bond {
+export declare class Bond extends BaseMicromoleculeEntity {
     static PATTERN: {
         TYPE: {
             SINGLE: number;
@@ -74,14 +78,16 @@ export declare class Bond {
         topology: number;
         reactingCenterStatus: number;
         cip: null;
+        customQuery: null;
     };
     begin: number;
     end: number;
     readonly type: number;
     readonly xxx: string;
     readonly stereo: number;
-    readonly topology: number;
-    readonly reactingCenterStatus: number;
+    readonly topology: number | null;
+    readonly reactingCenterStatus: number | null;
+    customQuery: string | null;
     len: number;
     sb: number;
     sa: number;
@@ -90,14 +96,25 @@ export declare class Bond {
     hb2?: number;
     angle: number;
     center: Vec2;
+    isPreview: boolean;
     constructor(attributes: BondAttributes);
     static getAttrHash(bond: Bond): {};
     static getBondNeighbourIds(struct: Struct, bondId: number): {
         beginBondIds: number[];
         endBondIds: number[];
     };
+    static getFusingConditions(bond: Bond, bondBegin: Bond, bondEnd: Bond): {
+        isFusingToSingleBond: boolean;
+        isFusingToDoubleBond: boolean;
+        isFusingDoubleSingleSingle: boolean;
+        isFusingSingleSingleDouble: boolean;
+        isAllSingle: boolean;
+    };
     static getBenzeneConnectingBondType(bond: Bond, bondBegin: Bond, bondEnd: Bond): number | null;
+    static getCyclopentadieneFusingBondType(bond: Bond, bondBegin: Bond, bondEnd: Bond): number | null;
+    static getCyclopentadieneDoubleBondIndexes(bond: Bond, bondBegin: Bond, bondEnd: Bond): number[];
     static attrGetDefault(attr: string): any;
+    isQuery(): boolean;
     hasRxnProps(): boolean;
     getCenter(struct: any): Vec2;
     getDir(struct: any): Vec2;

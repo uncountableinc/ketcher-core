@@ -15,6 +15,7 @@
  ***************************************************************************/
 import { Vec2 } from './vec2';
 export declare class Box2Abs {
+    #private;
     readonly p0: Vec2;
     readonly p1: Vec2;
     constructor();
@@ -31,6 +32,7 @@ export declare class Box2Abs {
     sz(): Vec2;
     centre(): Vec2;
     pos(): Vec2;
+    hasZeroArea(): boolean;
     static fromRelBox(relBox: any): Box2Abs;
     static union(b1: Box2Abs, b2: Box2Abs): Box2Abs;
     static segmentIntersection(a: Vec2, b: Vec2, c: Vec2, d: Vec2): boolean;

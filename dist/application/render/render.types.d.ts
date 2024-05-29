@@ -30,7 +30,8 @@ export declare type RenderOptions = {
     showHydrogenLabels: string;
     showValence: boolean;
     aromaticCircle: boolean;
-    scale: number;
+    microModeScale: number;
+    macroModeScale: number;
     zoom: number;
     externalZoomScale?: number;
     offset: Vec2;
@@ -44,14 +45,22 @@ export declare type RenderOptions = {
     fontRLabel: number;
     fontRLogic: number;
     lineattr: RenderOptionStyles;
+    arrowSnappingStyle: RenderOptionStyles;
+    bondSnappingStyle: RenderOptionStyles;
     selectionStyle: RenderOptionStyles;
     hoverStyle: RenderOptionStyles;
+    movingStyle: RenderOptionStyles;
     sgroupBracketStyle: RenderOptionStyles;
     lassoStyle: RenderOptionStyles;
+    selectionStyleSimpleObject: RenderOptionStyles;
     hoverStyleSimpleObject: RenderOptionStyles;
     atomSelectionPlateRadius: number;
     contractedFunctionalGroupSize: number;
     stereoLabelStyle?: StereLabelStyleType;
+    previewOpacity: number;
+    connectedMonomerAttachmentPoints?: string[];
+    currentlySelectedMonomerAttachmentPoint?: string;
+    labelInMonomerConnectionsModal?: boolean;
 };
 export interface RelativeBox {
     x: number;
@@ -64,4 +73,10 @@ export interface ArrowItem {
     pos: Vec2[];
     height: number;
 }
+export declare type ViewBox = {
+    minX: number;
+    minY: number;
+    width: number;
+    height: number;
+};
 export {};

@@ -13,13 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-import { StructService, StructServiceOptions } from "../../domain/services";
+import { ConvertData, ConvertResult, LayoutData, LayoutResult, StructService, StructServiceOptions } from "../../domain/services";
 import { StructFormatter, SupportedFormat } from './structFormatter.types';
 import { KetSerializer } from "../../domain/serializers";
 import { Struct } from "../../domain/entities";
+import { DrawingEntitiesManager } from "../../domain/entities/DrawingEntitiesManager";
+declare type ConvertPromise = (data: ConvertData, options?: StructServiceOptions) => Promise<ConvertResult>;
+declare type LayoutPromise = (data: LayoutData, options?: StructServiceOptions) => Promise<LayoutResult>;
 export declare class ServerFormatter implements StructFormatter {
     #private;
     constructor(structService: StructService, ketSerializer: KetSerializer, format: SupportedFormat, options?: StructServiceOptions);
-    getStructureFromStructAsync(struct: Struct): Promise<string>;
+    getStructureFromStructAsync(struct: Struct, drawingEntitiesManager?: DrawingEntitiesManager): Promise<string>;
+    getCallingMethod(stringifiedStruct: string, format: SupportedFormat): {
+        method: LayoutPromise | ConvertPromise;
+        struct: string;
+    };
     getStructureFromStringAsync(stringifiedStruct: string): Promise<Struct>;
 }
+export {};

@@ -16,9 +16,11 @@
 export declare function arrowToKet(arrowNode: any): {
     type: string;
     data: any;
+    selected: any;
 };
 export declare function plusToKet(plusNode: any): {
     type: string;
     location: any[];
     prop: any;
+    selected: any;
 };

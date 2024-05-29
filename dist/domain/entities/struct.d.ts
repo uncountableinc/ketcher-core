@@ -14,6 +14,7 @@
  * limitations under the License.
  ***************************************************************************/
 import { Atom } from './atom';
+import { EditorSelection } from "../../application/editor";
 import { Bond } from './bond';
 import { Fragment } from './fragment';
 import { FunctionalGroup } from './functionalGroup';
@@ -30,9 +31,14 @@ import { SimpleObject } from './simpleObject';
 import { Text } from './text';
 import { Vec2 } from './vec2';
 import { Highlight } from './highlight';
+import { RGroupAttachmentPoint } from './rgroupAttachmentPoint';
 export declare type Neighbor = {
     aid: number;
     bid: number;
+};
+export declare type StructProperty = {
+    key: string;
+    value: string;
 };
 export declare class Struct {
     atoms: Pool<Atom>;
@@ -45,6 +51,7 @@ export declare class Struct {
     rxnPluses: Pool<RxnPlus>;
     frags: Pool<Fragment | null>;
     rgroups: Pool<RGroup>;
+    rgroupAttachmentPoints: Pool<RGroupAttachmentPoint>;
     name: string;
     abbreviation?: string;
     sGroupForest: SGroupForest;
@@ -59,11 +66,11 @@ export declare class Struct {
     isRxn(): boolean;
     isBlank(): boolean;
     isSingleGroup(): boolean;
-    clone(atomSet?: Pile<number> | null, bondSet?: Pile<number> | null, dropRxnSymbols?: boolean, aidMap?: Map<number, number> | null, simpleObjectsSet?: Pile<number> | null, textsSet?: Pile<number> | null): Struct;
+    clone(atomSet?: Pile<number> | null, bondSet?: Pile<number> | null, dropRxnSymbols?: boolean, aidMap?: Map<number, number> | null, simpleObjectsSet?: Pile<number> | null, textsSet?: Pile<number> | null, rgroupAttachmentPointSet?: Pile<number> | null, bidMap?: Map<number, number> | null): Struct;
     getScaffold(): Struct;
-    getFragmentIds(fid: number): Pile<number>;
-    getFragment(fid: number): Struct;
-    mergeInto(cp: Struct, atomSet?: Pile<number> | null, bondSet?: Pile<number> | null, dropRxnSymbols?: boolean, keepAllRGroups?: boolean, aidMap?: Map<number, number> | null, simpleObjectsSet?: Pile<number> | null, textsSet?: Pile<number> | null): Struct;
+    getFragmentIds(_fid: number | number[]): Pile<number>;
+    getFragment(fid: number | number[], copyNonFragmentObjects?: boolean): Struct;
+    mergeInto(cp: Struct, atomSet?: Pile<number> | null, bondSet?: Pile<number> | null, dropRxnSymbols?: boolean, keepAllRGroups?: boolean, aidMap?: Map<number, number> | null, simpleObjectsSet?: Pile<number> | null, textsSet?: Pile<number> | null, rgroupAttachmentPointSet?: Pile<number> | null, bidMapEntity?: Map<number, number> | null): Struct;
     prepareLoopStructure(): void;
     atomAddToSGroup(sgid: any, aid: any): void;
     calcConn(atom: any): any[];
@@ -97,8 +104,8 @@ export declare class Struct {
     checkBondExists(begin: number, end: number): boolean;
     findConnectedComponent(firstaid: number): Pile<number>;
     findConnectedComponents(discardExistingFragments?: boolean): any[];
-    markFragment(idSet: Pile<number>): void;
-    markFragments(): void;
+    markFragment(idSet: Pile<number>, properties: [StructProperty]): void;
+    markFragments(properties?: any): void;
     scale(scale: number): void;
     rescale(): void;
     loopHasSelfIntersections(hbs: Array<number>): boolean;
@@ -121,6 +128,24 @@ export declare class Struct {
     getBondFragment(bid: number): number | undefined;
     bindSGroupsToFunctionalGroups(): void;
     getGroupIdFromAtomId(atomId: number): number | null;
+    getGroupFromAtomId(atomId: number | undefined): SGroup | undefined;
     getGroupIdFromBondId(bondId: number): number | null;
     getGroupsIdsFromBondId(bondId: number): number[];
+    getBondIdByHalfBond(halfBondId: number): number | undefined;
+    /**
+     * @returns visibleAtoms = selected atoms
+     *                       - atoms in contracted functional groups
+     *                       + functional groups's attachment atoms
+     */
+    getSelectedVisibleAtoms(selection: EditorSelection | null): number[];
+    getRGroupAttachmentPointsByAtomId(atomId: number): number[];
+    isAtomFromMacromolecule(atomId: number): boolean;
+    isBondFromMacromolecule(bondId: number): boolean;
+    isFunctionalGroupFromMacromolecule(functionalGroupId: number): boolean;
+    isTargetFromMacromolecule(target?: {
+        id: number;
+        map: string;
+    }): boolean | undefined;
+    disableInitiallySelected(): void;
+    enableInitiallySelected(): void;
 }

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
+import { Struct } from './struct';
 export declare class SGroupForest {
     /** node id -> parent id */
     parent: Map<number, number>;
@@ -37,4 +38,4 @@ export declare class SGroupForest {
     private resetParentLink;
     remove(id: any): void;
 }
-export declare function checkOverlapping(struct: any, atoms: any): boolean;
+export declare function checkOverlapping(struct: Struct, atoms: number[] | undefined, sGroupType: 'queryComponent' | 'common'): boolean;

@@ -1,0 +1,44 @@
+import { PolymerBondRenderer } from "./PolymerBondRenderer";
+import { Command } from "../../../domain/entities/Command";
+import { DrawingEntity } from "../../../domain/entities/DrawingEntity";
+import { BaseMonomer } from "../../../domain/entities/BaseMonomer";
+import { BaseMonomerRenderer } from "./BaseMonomerRenderer";
+import { PolymerBond } from "../../../domain/entities/PolymerBond";
+import { AttachmentPointName } from "../../../domain/types";
+export declare class RenderersManager {
+    private theme;
+    monomers: Map<number, BaseMonomerRenderer>;
+    polymerBonds: Map<number, PolymerBondRenderer>;
+    private needRecalculateMonomersEnumeration;
+    private needRecalculateMonomersBeginning;
+    constructor({ theme }: {
+        theme: any;
+    });
+    hoverDrawingEntity(drawingEntity: DrawingEntity): void;
+    selectDrawingEntity(drawingEntity: DrawingEntity): void;
+    moveDrawingEntity(drawingEntity: DrawingEntity): void;
+    private markForReEnumeration;
+    markForRecalculateBegin(): void;
+    addMonomer(monomer: BaseMonomer, callback?: () => void): void;
+    moveMonomer(monomer: BaseMonomer): void;
+    redrawDrawingEntity(drawingEntity: DrawingEntity): void;
+    deleteAllDrawingEntities(): void;
+    deleteMonomer(monomer: BaseMonomer): void;
+    addPolymerBond(polymerBond: PolymerBond): void;
+    movePolymerBond(polymerBond: PolymerBond): void;
+    showPolymerBondInformation(polymerBond: PolymerBond): void;
+    deletePolymerBond(polymerBond: PolymerBond, recalculateEnumeration?: boolean, recalculateBeginning?: boolean): void;
+    private recalculatePeptideChainEnumeration;
+    private recalculateRnaChainEnumeration;
+    private recalculatePeptideEnumeration;
+    private recalculateRnaEnumeration;
+    private recalculateMonomersEnumeration;
+    private isOnlyPartOfRnaChain;
+    private recalculateMonomersBeginning;
+    finishPolymerBondCreation(polymerBond: PolymerBond): void;
+    cancelPolymerBondCreation(polymerBond: PolymerBond, secondMonomer?: BaseMonomer): void;
+    hoverMonomer(monomer: BaseMonomer, needRedrawAttachmentPoints: any): void;
+    hoverAttachmentPoint(monomer: BaseMonomer, attachmentPointName: AttachmentPointName): void;
+    update(modelChanges?: Command): void;
+    runPostRenderMethods(): void;
+}

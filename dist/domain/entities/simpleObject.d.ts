@@ -14,6 +14,7 @@
  * limitations under the License.
  ***************************************************************************/
 import { Point, Vec2 } from './vec2';
+import { BaseMicromoleculeEntity, initiallySelectedType } from "./BaseMicromoleculeEntity";
 export declare enum SimpleObjectMode {
     ellipse = "ellipse",
     rectangle = "rectangle",
@@ -22,8 +23,9 @@ export declare enum SimpleObjectMode {
 export interface SimpleObjectAttributes {
     mode: SimpleObjectMode;
     pos?: Array<Point>;
+    initiallySelected?: initiallySelectedType;
 }
-export declare class SimpleObject {
+export declare class SimpleObject extends BaseMicromoleculeEntity {
     pos: Array<Vec2>;
     mode: SimpleObjectMode;
     constructor(attributes?: SimpleObjectAttributes);

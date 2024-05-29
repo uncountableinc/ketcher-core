@@ -13,4 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
+import { Vec2, Struct } from "../../entities";
+import { EditorSelection } from "../../../application/editor";
 export declare const getNodeWithInvertedYCoord: (node: object) => any;
+export declare const setMonomerTemplatePrefix: (templateName: string) => string;
+export declare const setMonomerPrefix: (monomerId: number) => string;
+export declare const getKetRef: (entityId: string) => {
+    $ref: string;
+};
+/**
+ *
+ * System coordinates for browser and for chemistry files format (mol, ket, etc.) area are different.
+ * It needs to rotate them by 180 degrees in y-axis.
+ *
+ * @param position - coordinates of the structure
+ *
+ */
+export declare const switchIntoChemistryCoordSystem: (position: Vec2) => Vec2;
+export declare const populateStructWithSelection: (populatedStruct: Struct, selection?: EditorSelection) => Struct;

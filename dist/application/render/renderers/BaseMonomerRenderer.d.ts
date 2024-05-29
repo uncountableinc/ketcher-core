@@ -1,0 +1,74 @@
+import { BaseRenderer } from './BaseRenderer';
+import { BaseMonomer } from "../../../domain/entities/BaseMonomer";
+import { D3SvgElementSelection } from "../types";
+import { AttachmentPoint } from "../../../domain/AttachmentPoint";
+import { Vec2 } from "../../../domain/entities/vec2";
+import { AttachmentPointName } from "../../../domain/types";
+export declare abstract class BaseMonomerRenderer extends BaseRenderer {
+    monomer: BaseMonomer;
+    private monomerSelectedElementId;
+    private monomerHoveredElementId;
+    private scale?;
+    private editorEvents;
+    private selectionCircle?;
+    private selectionBorder?;
+    private freeSectorsList;
+    private attachmentPoints;
+    private hoveredAttachmenPoint;
+    private monomerSymbolElement?;
+    monomerSize: {
+        width: number;
+        height: number;
+    };
+    private enumerationElement?;
+    enumeration: number | null;
+    private beginningElement?;
+    beginning: string | null;
+    static isSelectable(): boolean;
+    protected constructor(monomer: BaseMonomer, monomerSelectedElementId: string, monomerHoveredElementId: string, monomerSymbolElementId: string, scale?: number | undefined);
+    private isSnakeBondForAttachmentPoint;
+    get center(): Vec2;
+    get textColor(): any;
+    protected getMonomerColor(theme: any): any;
+    redrawAttachmentPoints(): void;
+    updateAttachmentPoints(): void;
+    redrawAttachmentPointsCoordinates(): void;
+    drawAttachmentPoints(): void;
+    appendAttachmentPoint(attachmentPointName: AttachmentPointName, customAngle?: number): AttachmentPoint;
+    removeAttachmentPoints(): void;
+    hoverAttachmenPoint(attachmentPointName: AttachmentPointName): void;
+    private appendRootElement;
+    private appendLabel;
+    appendHover(hoverAreaElement: D3SvgElementSelection<SVGGElement, void>): import("d3-selection").Selection<SVGUseElement, void, HTMLElement, never>;
+    removeHover(): void;
+    static getScaledMonomerPosition(positionInAngstoms: Vec2, monomerSize?: {
+        width: number;
+        height: number;
+    }): Vec2;
+    get scaledMonomerPosition(): Vec2;
+    appendSelection(): void;
+    removeSelection(): void;
+    protected abstract appendBody(rootElement: D3SvgElementSelection<SVGGElement, void>, theme?: any): any;
+    protected appendHoverAreaElement(): void;
+    private appendEvents;
+    protected abstract get enumerationElementPosition(): {
+        x: number;
+        y: number;
+    } | void;
+    protected abstract get beginningElementPosition(): {
+        x: number;
+        y: number;
+    } | void;
+    setEnumeration(enumeration: number | null): void;
+    protected appendEnumeration(): void;
+    redrawEnumeration(): void;
+    setBeginning(beginning: string | null): void;
+    protected appendChainBeginning(): void;
+    reDrawChainBeginning(): void;
+    show(theme?: any): void;
+    drawSelection(): void;
+    private raiseElement;
+    moveSelection(): void;
+    move(): void;
+    remove(): void;
+}

@@ -14,6 +14,7 @@ declare namespace _default {
     export { applyDataSGroupInfoLine };
     export { applyDataSGroupDataLine };
     export { applyDataSGroupExpand };
+    export { parseSGroupSAPLineV2000 };
 }
 export default _default;
 /**
@@ -41,4 +42,18 @@ declare function applyDataSGroupData(sg: any, data: any, finalize: any): void;
 declare function applyDataSGroupInfoLine(sGroups: any, propData: any): void;
 declare function applyDataSGroupDataLine(sGroups: any, propData: any, finalize: any): void;
 declare function applyDataSGroupExpand(sg: any, expanded: any): void;
+/**
+ * Superatom attachment point parsing for 'ctab' v2000
+ * Implemented based on: https://github.com/epam/ketcher/issues/2467
+ * @param ctabString {string} example '   1  1   2   0   '
+ *        M SAP sssnn6 iii ooo cc
+ *             ^
+ *             start position for ctabString content
+ * @returns {{sGroupId: number, attachmentPoints: SGroupAttachmentPoint[]}}
+ */
+declare function parseSGroupSAPLineV2000(ctabString: string): {
+    sGroupId: number;
+    attachmentPoints: SGroupAttachmentPoint[];
+};
 import { Pool } from "../../entities/pool";
+import { SGroupAttachmentPoint } from "../../entities/sGroupAttachmentPoint";

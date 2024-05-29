@@ -19,7 +19,7 @@ import { Pile } from './pile';
 import { Struct } from './struct';
 import { Vec2 } from './vec2';
 import { ReStruct } from '../../application/render';
-import { Pool } from "./pool";
+import { FunctionalGroup, Pool, SGroupAttachmentPoint } from "./";
 import { ReSGroup } from "../../application/render";
 export declare class SGroupBracketParams {
     readonly c: Vec2;
@@ -46,12 +46,13 @@ export declare class SGroup {
         DAT: string;
         ANY: string;
         GEN: string;
+        queryComponent: string;
     };
     type: string;
     id: number;
     label: number;
     bracketBox: any;
-    bracketDir: Vec2;
+    bracketDirection: Vec2;
     areas: any;
     hover: boolean;
     hovering: any;
@@ -67,17 +68,52 @@ export declare class SGroup {
     neiAtoms: any;
     pp: Vec2 | null;
     data: any;
-    firstSgroupAtom: any;
-    firstSgroupAtomId: number;
+    dataArea: any;
+    functionalGroup: FunctionalGroup | undefined;
+    private readonly attachmentPoints;
     constructor(type: string);
     getAttr(attr: string): any;
+    setFunctionalGroup(functionalGroup: FunctionalGroup): void;
     getAttrs(): any;
     setAttr(attr: string, value: any): any;
     checkAttr(attr: string, value: any): boolean;
     updateOffset(offset: Vec2): void;
+    isExpanded(): boolean;
+    isContracted(): boolean;
     calculatePP(struct: Struct): void;
-    getAttAtomId(struct: Struct): number;
     isGroupAttached(struct: Struct): boolean;
+    addAttachmentPoint(attachmentPoint: SGroupAttachmentPoint): void;
+    addAttachmentPoints(attachmentPoints: ReadonlyArray<SGroupAttachmentPoint> | SGroupAttachmentPoint[]): void;
+    removeAttachmentPoint(attachmentPointAtomId: number): boolean;
+    getAttachmentPoints(): ReadonlyArray<SGroupAttachmentPoint>;
+    /**
+     * Connection point - is not! the same as Attachment point.
+     * Connection point is a fact for the sgroup - is the atom that has connected bond to an external atom.
+     * So it doesn't matter how it happens (connection atom).
+     * When we talk about "Attachment point" it is a hypothetical, suitable place to connect to sgroup.
+     * But there are cases when sgroup doesn't have attachment points but have connection (read from external file)
+     */
+    private getConnectionPointsCount;
+    isNotContractible(struct: Struct): boolean;
+    /**
+     * Why only one?
+     * Currently other parts of application don't support several attachment points for sgroup.
+     * So to support it - it's required to refactor almost every peace of code with sgroups.
+     *
+     *
+     * Why return 'undefined' without fallback?
+     * If sgroup doesn't have attachment points it can't be attached, (salt and solvents for example).
+     */
+    getAttachmentAtomId(): number | undefined;
+    /**
+     * WHY? When group is contracted we need to understand the represent atom to calculate position.
+     * It is not always the attachmentPoint!! if no attachment point - use the first atom
+     */
+    getContractedPosition(struct: Struct): {
+        atomId: number;
+        position: Vec2;
+    };
+    cloneAttachmentPoints(atomIdMap: Map<number, number>): ReadonlyArray<SGroupAttachmentPoint>;
     static getOffset(sgroup: SGroup): null | Vec2;
     static isSaltOrSolvent(moleculeName: string): boolean;
     static isAtomInSaltOrSolvent(atomId: number, sgroupsOnCanvas: SGroup[]): boolean;
@@ -86,13 +122,13 @@ export declare class SGroup {
     static removeNegative(atoms: any): any[];
     static filter(_mol: any, sg: any, atomMap: any): void;
     static clone(sgroup: SGroup, aidMap: Map<number, number>): SGroup;
-    static addAtom(sgroup: SGroup, aid: number): void;
+    static addAtom(sgroup: SGroup, aid: number, struct: Struct): void;
     static removeAtom(sgroup: SGroup, aid: number): void;
     static getCrossBonds(mol: any, parentAtomSet: Pile<number>): {
-        [key: number]: Array<Bond>;
+        [key: number]: Array<number>;
     };
-    static bracketPos(sGroup: any, mol: any, crossBondsPerAtom: {
-        [key: number]: Array<Bond>;
+    static bracketPos(sGroup: any, mol: any, crossBondsPerAtom?: {
+        [key: number]: Array<number>;
     }, remol?: ReStruct, render?: any): void;
     static getBracketParameters(mol: any, crossBondsPerAtom: {
         [key: number]: Array<Bond>;
@@ -104,14 +140,9 @@ export declare class SGroup {
     static getMassCentre(mol: any, atoms: any): Vec2;
     static isAtomInContractedSGroup: (atom: any, sGroups: any) => boolean;
     static isBondInContractedSGroup(bond: Bond, sGroups: Map<number, ReSGroup> | Pool<SGroup>): boolean;
-    static isSuperAtom(sGroup: SGroup): boolean;
+    static isSuperAtom(sGroup?: SGroup): boolean;
     static isDataSGroup(sGroup: SGroup): boolean;
+    static isQuerySGroup(sGroup: SGroup): boolean;
     static isSRUSGroup(sGroup: SGroup): boolean;
     static isMulSGroup(sGroup: SGroup): boolean;
-    static isExpandedSGroup(sGroup: any): any;
-    static isContractedSGroup(sGroupId: any, sGroups: any): boolean;
-    /**
-     * @returns `undefined`: if it's salt or solvent
-     */
-    static getAttachmentAtomIdBySGroupId(sGroupId: number, struct: Struct): number | undefined;
 }

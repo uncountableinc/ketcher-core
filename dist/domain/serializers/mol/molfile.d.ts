@@ -46,5 +46,6 @@ export declare class Molfile {
     private writeBond;
     private writeAtomProps;
     private writeAtomPropList;
+    private writeSGroupAttachmentPointLine;
 }
 export {};

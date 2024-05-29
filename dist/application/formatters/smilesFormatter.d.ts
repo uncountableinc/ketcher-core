@@ -22,4 +22,5 @@ export declare class SmilesFormatter implements StructFormatter {
     constructor(smiSerializer: SmiSerializer, structService: StructService, ketSerializer: KetSerializer, format: SupportedFormat, options?: StructServiceOptions);
     getStructureFromStructAsync(struct: Struct): Promise<string>;
     getStructureFromStringAsync(stringifiedStruct: string): Promise<Struct>;
+    static isContainsCoordinates(smiles: string): boolean;
 }

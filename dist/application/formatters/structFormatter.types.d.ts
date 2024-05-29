@@ -15,10 +15,13 @@
  ***************************************************************************/
 import { MolSerializerOptions } from "../../domain/serializers";
 import { Struct } from "../../domain/entities";
+import { DrawingEntitiesManager } from "../../domain/entities/DrawingEntitiesManager";
 import { StructServiceOptions } from "../../domain/services";
+import { EditorSelection } from "../editor";
 export interface StructFormatter {
-    getStructureFromStructAsync: (struct: Struct) => Promise<string>;
+    getStructureFromStructAsync: (struct: Struct, drawingEntitiesManager?: DrawingEntitiesManager, selection?: EditorSelection) => Promise<string>;
     getStructureFromStringAsync: (stringifiedStruct: string) => Promise<Struct>;
+    parseMacromoleculeString?: (stringifiedStruct: string) => void;
 }
 export declare enum SupportedFormat {
     mol = "mol",
@@ -31,11 +34,16 @@ export declare enum SupportedFormat {
     smarts = "smarts",
     inChI = "inChI",
     inChIAuxInfo = "inChIAuxInfo",
+    inChIKey = "inChIKey",
     cml = "cml",
     ket = "ket",
     cdxml = "cdxml",
     cdx = "cdx",
     binaryCdx = "binaryCdx",
+    sdf = "sdf",
+    sdfV3000 = "sdfV3000",
+    fasta = "fasta",
+    sequence = "sequence",
     unknown = "unknown"
 }
 export declare type FormatterFactoryOptions = Partial<MolSerializerOptions & StructServiceOptions>;

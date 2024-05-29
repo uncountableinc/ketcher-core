@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
+import { ChemicalMimeType } from "../../domain/services";
 import { SupportedFormat } from './structFormatter.types';
 import { SupportedFormatProperties } from './supportedFormatProperties';
 declare type FormatPropertiesMap = {
@@ -21,4 +22,5 @@ declare type FormatPropertiesMap = {
 declare const formatProperties: FormatPropertiesMap;
 declare function getPropertiesByImgFormat(format: any): any;
 declare function getPropertiesByFormat(format: SupportedFormat): SupportedFormatProperties;
-export { formatProperties, getPropertiesByFormat, getPropertiesByImgFormat };
+declare function getFormatMimeTypeByFileName(fileName: string): ChemicalMimeType | undefined;
+export { formatProperties, getPropertiesByFormat, getPropertiesByImgFormat, getFormatMimeTypeByFileName, };

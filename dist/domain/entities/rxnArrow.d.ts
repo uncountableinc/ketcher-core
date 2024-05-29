@@ -14,6 +14,7 @@
  * limitations under the License.
  ***************************************************************************/
 import { Point, Vec2 } from './vec2';
+import { BaseMicromoleculeEntity, initiallySelectedType } from "./BaseMicromoleculeEntity";
 export declare enum RxnArrowMode {
     OpenAngle = "open-angle",
     FilledTriangle = "filled-triangle",
@@ -37,8 +38,9 @@ export interface RxnArrowAttributes {
     mode: RxnArrowMode;
     pos?: Array<Point>;
     height?: number;
+    initiallySelected?: initiallySelectedType;
 }
-export declare class RxnArrow {
+export declare class RxnArrow extends BaseMicromoleculeEntity {
     mode: RxnArrowMode;
     pos: Array<Vec2>;
     height?: number;

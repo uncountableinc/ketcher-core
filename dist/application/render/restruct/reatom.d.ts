@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-import { Atom, Box2Abs } from "../../../domain/entities";
+import { Atom, Box2Abs, Struct, Vec2 } from "../../../domain/entities";
 import ReObject from './reobject';
 import ReStruct from './restruct';
 import { Render } from '../raphaelRender';
+import { RenderOptions } from "../render.types";
 interface ElemAttr {
     text: string;
     path: any;
@@ -62,7 +63,22 @@ declare class ReAtom extends ReObject {
     getSelectionContour(render: Render): import("raphael").RaphaelElement<"SVG" | "VML", SVGRectElement | Element> | import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGCircleElement>;
     makeHoverPlate(render: Render): import("raphael").RaphaelElement<"SVG" | "VML", SVGRectElement | Element> | import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGCircleElement> | null;
     makeSelectionPlate(restruct: ReStruct): import("raphael").RaphaelElement<"SVG" | "VML", SVGRectElement | Element> | import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGCircleElement> | null;
+    /**
+     * if atom is rendered as Abbreviation: O, NH, ...
+     * In this case we need to shift the bond render start position to free space for Atom,
+     * same for the Attachment point
+     */
+    getShiftedSegmentPosition(renderOptions: RenderOptions, direction: Vec2, _atomPosition?: Vec2): Vec2;
+    hasAttachmentPoint(): boolean;
     show(restruct: ReStruct, aid: number, options: any): void;
+    getLargestSectorFromNeighbors(struct: Struct): {
+        neighborAngle: number;
+        largestAngle: number;
+    };
+    bisectLargestSector(struct: Struct): Vec2;
 }
 export declare function getColorFromStereoLabel(options: any, stereoLabel: any): any;
+export declare function getAtomType(atom: Atom): "list" | "pseudo" | "single";
+export declare function checkIsSmartPropertiesExist(atom: any): boolean;
+export declare function getAtomCustomQuery(atom: any, includeOnlyQueryAttributes?: boolean): string;
 export default ReAtom;

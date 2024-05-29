@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
+import { ReStruct } from "../../render";
+import { Vec2 } from "../../../domain/entities";
 import { Action } from './action';
 export declare function fromArrowAddition(restruct: any, pos: any, mode: any): Action;
-export declare function fromArrowResizing(restruct: any, id: any, d: any, current: any, anchor: any): Action;
+export declare function fromArrowResizing(restruct: ReStruct, id: number, d: Vec2, current: Vec2, anchor: Vec2 | null, isSnappingEnabled: boolean): Action;
 export declare function fromArrowDeletion(restruct: any, id: any): Action;
 export declare function fromPlusAddition(restruct: any, pos: any): Action;
 export declare function fromPlusDeletion(restruct: any, id: any): Action;

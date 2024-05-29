@@ -15,12 +15,13 @@
  ***************************************************************************/
 import { Vec2 } from "../entities";
 export interface ScaleOptions {
-    scale: number;
+    microModeScale: number;
+    macroModeScale: number;
 }
-declare function scaled2obj(v: Vec2, options: ScaleOptions): Vec2;
-declare function obj2scaled(v: Vec2, options: ScaleOptions): Vec2;
+declare function canvasToModel(point: Vec2, options: ScaleOptions): Vec2;
+declare function modelToCanvas(vector: Vec2, options: ScaleOptions): Vec2;
 export declare const Scale: {
-    scaled2obj: typeof scaled2obj;
-    obj2scaled: typeof obj2scaled;
+    canvasToModel: typeof canvasToModel;
+    modelToCanvas: typeof modelToCanvas;
 };
 export {};

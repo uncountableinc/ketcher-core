@@ -15,7 +15,10 @@
  ***************************************************************************/
 import { SdfItem } from './sdf.types';
 import { Serializer } from '../serializers.types';
+import { MolSerializerOptions } from '../mol';
 export declare class SdfSerializer implements Serializer<Array<SdfItem>> {
+    private readonly molSerializerOptions?;
+    constructor(options?: Partial<MolSerializerOptions>);
     deserialize(content: string): Array<SdfItem>;
     serialize(sdfItems: Array<SdfItem>): string;
 }

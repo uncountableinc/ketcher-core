@@ -1,0 +1,114 @@
+import { AttachmentPointName, MonomerItemType } from "../types";
+import { Vec2 } from "./vec2";
+import { Command } from "./Command";
+import { DrawingEntity } from "./DrawingEntity";
+import { PolymerBond } from "./PolymerBond";
+import { BaseMonomer, Chem, Peptide, Phosphate, RNABase, Struct, Sugar } from "./";
+import { ChainsCollection } from "./monomer-chains/ChainsCollection";
+declare type RnaPresetAdditionParams = {
+    sugar: MonomerItemType;
+    sugarPosition: Vec2;
+    rnaBase: MonomerItemType | undefined;
+    rnaBasePosition: Vec2 | undefined;
+    phosphate: MonomerItemType | undefined;
+    phosphatePosition: Vec2 | undefined;
+};
+declare type NucleotideOrNucleoside = {
+    sugar: Sugar;
+    phosphate?: Phosphate;
+    rnaBase: RNABase;
+    baseMonomer: Sugar | Phosphate;
+};
+export declare class DrawingEntitiesManager {
+    monomers: Map<number, BaseMonomer>;
+    polymerBonds: Map<number, PolymerBond>;
+    micromoleculesHiddenEntities: Struct;
+    get selectedEntities(): [number, DrawingEntity][];
+    get allEntities(): [number, DrawingEntity][];
+    deleteSelectedEntities(): Command;
+    deleteAllEntities(): Command;
+    addMonomerChangeModel(monomerItem: MonomerItemType, position: Vec2, _monomer?: BaseMonomer): Phosphate | BaseMonomer;
+    addMonomer(monomerItem: MonomerItemType, position: Vec2): Command;
+    deleteDrawingEntity(drawingEntity: DrawingEntity, needToDeleteConnectedEntities?: boolean): Command;
+    selectDrawingEntity(drawingEntity: DrawingEntity): Command;
+    selectDrawingEntities(drawingEntities: DrawingEntity[]): Command;
+    createDrawingEntitySelectionCommand(drawingEntity: DrawingEntity): Command;
+    unselectAllDrawingEntities(): Command;
+    unselectDrawingEntity(drawingEntity: DrawingEntity): Command;
+    selectAllDrawingEntities(): Command;
+    addDrawingEntitiesToSelection(drawingEntities: DrawingEntity[]): Command;
+    moveDrawingEntityModelChange(drawingEntity: DrawingEntity, offset?: Vec2): DrawingEntity;
+    moveSelectedDrawingEntities(partOfMovementOffset: Vec2, fullMovementOffset?: Vec2): Command;
+    createDrawingEntityMovingCommand(drawingEntity: DrawingEntity, partOfMovementOffset: Vec2, fullMovementOffset?: Vec2): Command;
+    createDrawingEntityRedrawCommand(drawingEntityRedrawModelChange: () => DrawingEntity, invertDrawingEntityRedrawModelChange: () => DrawingEntity): Command;
+    private deleteMonomerChangeModel;
+    deleteMonomer(monomer: BaseMonomer, needToDeleteConnectedBonds?: boolean): Command;
+    selectIfLocatedInRectangle(rectangleTopLeftPoint: Vec2, rectangleBottomRightPoint: Vec2, previousSelectedEntities: [number, DrawingEntity][], shiftKey?: boolean): Command;
+    startPolymerBondCreationChangeModel(firstMonomer: any, startPosition: any, endPosition: any, _polymerBond?: PolymerBond): PolymerBond;
+    startPolymerBondCreation(firstMonomer: any, startPosition: any, endPosition: any): {
+        command: Command;
+        polymerBond: any;
+    };
+    deletePolymerBondChangeModel(polymerBond: PolymerBond): void;
+    deletePolymerBond(polymerBond: PolymerBond): Command;
+    cancelPolymerBondCreation(polymerBond: PolymerBond, secondMonomer?: BaseMonomer): Command;
+    movePolymerBond(polymerBond: PolymerBond, position: Vec2): Command;
+    finishPolymerBondCreationModelChange(firstMonomer: BaseMonomer, secondMonomer: BaseMonomer, firstMonomerAttachmentPoint: string, secondMonomerAttachmentPoint: string, _polymerBond?: PolymerBond): PolymerBond;
+    finishPolymerBondCreation(polymerBond: PolymerBond, secondMonomer: BaseMonomer, firstMonomerAttachmentPoint: string, secondMonomerAttachmentPoint: string): Command;
+    createPolymerBond(firstMonomer: BaseMonomer, secondMonomer: BaseMonomer, firstMonomerAttachmentPoint: string, secondMonomerAttachmentPoint: string): Command;
+    intendToStartBondCreation(monomer: BaseMonomer): Command;
+    intendToStartAttachmenPointBondCreation(monomer: BaseMonomer, attachmentPointName: AttachmentPointName): Command;
+    intendToFinishBondCreation(monomer: BaseMonomer, bond: PolymerBond, shouldCalculateBonds: boolean): Command;
+    intendToFinishAttachmenPointBondCreation(monomer: BaseMonomer, bond: PolymerBond, attachmentPointName: AttachmentPointName, shouldCalculateBonds: boolean): Command;
+    cancelIntentionToFinishBondCreation(monomer: BaseMonomer, polymerBond?: PolymerBond): Command;
+    intendToSelectDrawingEntity(drawingEntity: DrawingEntity): Command;
+    cancelIntentionToSelectDrawingEntity(drawingEntity: DrawingEntity): Command;
+    showPolymerBondInformation(polymerBond: PolymerBond): Command;
+    hidePolymerBondInformation(polymerBond: PolymerBond): Command;
+    addRnaPreset({ sugar, sugarPosition, phosphate, phosphatePosition, rnaBase, rnaBasePosition, }: RnaPresetAdditionParams): {
+        command: Command;
+        monomers: BaseMonomer[];
+    };
+    private findChainByMonomer;
+    private rearrangeChainModelChange;
+    getNucleotideSize(nucleotide: NucleotideOrNucleoside): {
+        width: number;
+        height: number;
+    };
+    private reArrangeChain;
+    private reArrangeRnaChain;
+    private getNextMonomerPositionForSnakeLayout;
+    private setRnaBaseSideChainMonomers;
+    private addRnaOperations;
+    reArrangeChains(canvasWidth: number, isSnakeMode: boolean, needRedrawBonds?: boolean): Command;
+    private redrawBondsModelChange;
+    redrawBonds(): Command;
+    getFirstMonomersInChains(MonomerTypes: Array<typeof Peptide | typeof Chem | typeof Phosphate | typeof Sugar>, currentMonomers: BaseMonomer[]): BaseMonomer[];
+    reArrangeChainInRecursive(_monomer: BaseMonomer, _lastPosition: Vec2, canvasWidth: number, rearrangedMonomersSet: Set<number>, monomersWithSideChain: Array<BaseMonomer>, _maxVerticalDistance: number): {
+        command: Command;
+        lastPosition: Vec2;
+        maxVerticalDistance: number;
+    };
+    getNextPositionAndDistance(lastPosition: Vec2, width: number, height: number, canvasWidth: number): {
+        maxVerticalDistance: number;
+        lastPosition: Vec2;
+    };
+    private isPartOfR2R1Chain;
+    private getFirstMonomerInR2R1Chain;
+    reArrangeMonomers(canvasWidth: number, firstMonomers: BaseMonomer[], rearrangedMonomersSet: Set<number>, lastPosition: Vec2): {
+        command: Command;
+        lastPosition: Vec2;
+    };
+    setMicromoleculesHiddenEntities(struct: Struct): void;
+    clearMicromoleculesHiddenEntities(): void;
+    mergeInto(targetDrawingEntitiesManager: DrawingEntitiesManager): Command;
+    centerMacroStructure(): void;
+    getMacroStructureCenter(): Vec2;
+    applyMonomersSequenceLayout(): ChainsCollection;
+    clearCanvas(): void;
+    applyFlexLayoutMode(needRedrawBonds?: boolean): Command;
+    getAllSelectedEntities(drawingEntity: DrawingEntity, needToSelectConnectedBonds?: boolean): DrawingEntity[];
+    validateIfApplicableForFasta(): boolean;
+    moveMonomer(monomer: BaseMonomer, position: Vec2): Command;
+}
+export {};

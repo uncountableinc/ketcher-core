@@ -20,10 +20,11 @@ declare type Data = {
     begin: any;
     end: any;
     bid: any;
+    needInvalidateAtoms?: boolean;
 };
 declare class BondAdd extends BaseOperation {
     data: Data;
-    constructor(begin?: any, end?: any, bond?: any);
+    constructor(begin?: any, end?: any, bond?: any, needInvalidateAtoms?: boolean);
     execute(restruct: ReStruct): void;
     invert(): BondDelete;
 }

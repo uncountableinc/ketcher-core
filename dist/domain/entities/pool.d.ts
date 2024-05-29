@@ -21,4 +21,5 @@ export declare class Pool<TValue = any> extends Map<number, TValue> {
     find(predicate: (key: number, value: TValue) => boolean): number | null;
     filter(predicate: (key: number, value: TValue) => boolean): Pool<TValue>;
     some(predicate: (value: TValue) => boolean): boolean;
+    changeInitiallySelectedPropertiesForPool(invalidate?: boolean): void;
 }

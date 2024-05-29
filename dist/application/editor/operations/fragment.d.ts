@@ -15,11 +15,20 @@
  ***************************************************************************/
 import { ReStruct } from '../../render';
 import { BaseOperation } from './base';
+import { StructProperty } from "../../../domain/entities";
 declare class FragmentAdd extends BaseOperation {
     frid: any;
-    constructor(fragmentId?: any);
+    properties?: Array<StructProperty>;
+    constructor(fragmentId?: any, properties?: Array<StructProperty>);
     execute(restruct: ReStruct): void;
     invert(): FragmentDelete;
+}
+declare class FragmentSetProperties extends BaseOperation {
+    frid: any;
+    properties?: Array<StructProperty>;
+    constructor(fragmentId: any, properties?: Array<StructProperty>);
+    execute(restruct: ReStruct): void;
+    invert(): FragmentSetProperties;
 }
 declare class FragmentDelete extends BaseOperation {
     frid: any;
@@ -27,4 +36,4 @@ declare class FragmentDelete extends BaseOperation {
     execute(restruct: ReStruct): void;
     invert(): FragmentAdd;
 }
-export { FragmentAdd, FragmentDelete };
+export { FragmentAdd, FragmentDelete, FragmentSetProperties };

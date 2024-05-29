@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
+import { Vec2 } from "../../../domain/entities";
 import { Action } from './action';
-export declare function fromMultipleMove(restruct: any, lists: any, d: any): Action;
+export declare function fromMultipleMove(restruct: any, lists: any, d: Vec2): Action;
 export declare function fromStereoFlagUpdate(restruct: any, frid: any, flag?: null): Action;
 /**
  * @param restruct { ReStruct }

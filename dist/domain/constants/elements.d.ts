@@ -17,4 +17,5 @@ import type { Element } from './element.types';
 export declare const Elements: {
     get: (key: number | string) => Element | undefined;
     filter: (predicate: (element: Element) => boolean) => Array<Element>;
+    getAll: () => Element[];
 };

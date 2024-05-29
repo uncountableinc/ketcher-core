@@ -19,7 +19,7 @@ declare namespace Stereocenters {
         n_double_bonds: number;
         implicit_degree: number;
     }[];
-    function xyzzy(v1: any, v2: any, u: any): 2 | 1 | 4 | 8;
+    function xyzzy(v1: any, v2: any, u: any): 1 | 2 | 4 | 8;
     function sign(v1: any, v2: any, v3: any): 1 | -1;
     function isPyramidMappingRigid(mapping: any): boolean;
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  ***************************************************************************/
 import { Point, Vec2 } from './vec2';
-import { Struct } from './struct';
+import { Struct, StructProperty } from './struct';
 export declare enum StereoFlag {
     Mixed = "MIXED",
     Abs = "ABS",
@@ -24,9 +24,10 @@ export declare enum StereoFlag {
 export declare class Fragment {
     #private;
     stereoFlagPosition?: Vec2;
+    properties?: Array<StructProperty>;
     get stereoAtoms(): Array<number>;
     get enhancedStereoFlag(): StereoFlag | undefined;
-    constructor(stereoAtoms?: Array<number>, stereoFlagPosition?: Point);
+    constructor(stereoAtoms?: Array<number>, stereoFlagPosition?: Point | null, properties?: Array<StructProperty>);
     static getDefaultStereoFlagPosition(struct: Struct, fragmentId: number): Vec2 | undefined;
     clone(aidMap: Map<number, number>): Fragment;
     updateStereoFlag(struct: Struct): StereoFlag | undefined;

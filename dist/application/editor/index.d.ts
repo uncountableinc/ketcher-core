@@ -13,8 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-export declare const fracAngle: (angle: any, angle2: any) => number;
+export declare const vectorUtils: {
+    fracAngle: (angle: any, angle2: any) => number;
+    calcAngle: (pos0: import("../..").Vec2, pos1: import("../..").Vec2) => number;
+    degrees: (angle: number) => number;
+    calcNewAtomPos: (pos0: import("../..").Vec2, pos1: import("../..").Vec2, ctrlKey: boolean) => import("../..").Vec2;
+};
 export * from './operations';
 export * from './actions';
 export * from './shared/constants';
+export * from './shared/coordinates';
 export * from './editor.types';
+export * from './Editor';
+export * from './EditorHistory';
+export * from './modes';
+export * from './editorEvents';
+export * from './editorSettings';

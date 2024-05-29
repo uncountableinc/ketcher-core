@@ -31,3 +31,4 @@ export declare type GenericsType = {
     };
 };
 export declare const Generics: GenericsType;
+export declare const genericsList: any[];

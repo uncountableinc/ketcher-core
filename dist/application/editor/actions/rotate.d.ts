@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
+import { Vec2 } from "../../../domain/entities";
+import { ReStruct } from "../../render";
 import { Action } from './action';
-export declare function fromFlip(restruct: any, selection: any, dir: any, center: any): any;
+import { EditorSelection } from '../editor.types';
+export declare type FlipDirection = 'horizontal' | 'vertical';
+export declare function fromFlip(reStruct: ReStruct, selection: EditorSelection | null, flipDirection: FlipDirection, center: Vec2): Action;
 export declare function fromRotate(restruct: any, selection: any, center: any, angle: any): Action;
-export declare function fromBondAlign(restruct: any, bid: any, dir: any): any;

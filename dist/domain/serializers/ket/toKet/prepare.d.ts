@@ -19,6 +19,7 @@ declare type KetNode = {
     fragment?: Struct;
     center: Vec2;
     data?: any;
+    selected?: boolean;
 };
 export declare function prepareStructForKet(struct: Struct): KetNode[];
 export {};

@@ -13,5 +13,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-import { Struct } from "../../../entities";
-export declare function moleculeToKet(struct: Struct): any;
+import { Struct, BaseMonomer } from "../../../entities";
+export declare function moleculeToKet(struct: Struct, monomer?: BaseMonomer): any;

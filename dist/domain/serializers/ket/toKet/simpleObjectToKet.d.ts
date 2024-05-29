@@ -16,4 +16,5 @@
 export declare function simpleObjectToKet(simpleObjectNode: any): {
     type: string;
     data: any;
+    selected: any;
 };

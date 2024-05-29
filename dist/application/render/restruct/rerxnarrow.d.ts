@@ -32,15 +32,16 @@ interface MinDistanceWithReferencePoint {
 }
 declare class ReRxnArrow extends ReObject {
     item: Arrow;
+    isResizing: boolean;
     constructor(/* chem.RxnArrow */ arrow: Arrow);
     static isSelectable(): boolean;
     calcDistance(p: Vec2, s: any): MinDistanceWithReferencePoint;
     getReferencePointDistance(p: Vec2): MinDistanceWithReferencePoint;
-    hoverPath(render: Render): any;
-    drawHover(render: Render): any;
+    hoverPath(render: Render): import("raphael").RaphaelPath<"SVG" | "VML">;
+    drawHover(render: Render): import("raphael").RaphaelPath<"SVG" | "VML">;
     getReferencePoints(): Array<Vec2>;
-    makeAdditionalInfo(restruct: ReStruct): any;
-    makeSelectionPlate(restruct: ReStruct, _paper: any, styles: any): any;
+    makeAdditionalInfo(restruct: ReStruct): import("raphael").RaphaelSet<"SVG" | "VML">;
+    makeSelectionPlate(restruct: ReStruct, _paper: any, styles: any): import("raphael").RaphaelSet<"SVG" | "VML">;
     generatePath(render: Render, options: any, type: any): any;
     getArrowParams(x1: any, y1: any, x2: any, y2: any): ArrowParams;
     show(restruct: ReStruct, _id: any, options: any): void;

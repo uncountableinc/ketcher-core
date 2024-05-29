@@ -34,6 +34,7 @@ declare type RecognizeOptions = {
 declare type GenerateImageOptions = {
     outputFormat?: OutputFormatType;
     backgroundColor?: string;
+    bondThickness?: number;
 };
 export declare class Indigo {
     #private;
@@ -50,5 +51,6 @@ export declare class Indigo {
     calculate(struct: StructOrString, options?: CalculateOptions): Promise<CalculateResult>;
     recognize(image: Blob, options?: RecognizeOptions): Promise<Struct>;
     generateImageAsBase64(struct: StructOrString, options?: GenerateImageOptions): Promise<string>;
+    toggleExplicitHydrogens(struct: StructOrString): Promise<Struct>;
 }
 export {};

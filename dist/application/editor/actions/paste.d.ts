@@ -13,4 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-export declare function fromPaste(restruct: any, pstruct: any, point: any, angle?: number): any[];
+import { Action } from './action';
+export declare function fromPaste(restruct: any, pstruct: any, point: any, angle?: number, isPreview?: boolean): [Action, {
+    atoms: number[];
+    bonds: number[];
+}];

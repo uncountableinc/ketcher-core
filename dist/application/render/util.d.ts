@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-import { RaphaelAxisAlignedBoundingBox, RaphaelPaper } from 'raphael';
-import { Atom, Bond, Box2Abs, Vec2 } from "../../domain/entities";
+import { RaphaelAxisAlignedBoundingBox } from 'raphael';
+import { Atom, Bond, Box2Abs, HalfBond, Vec2 } from "../../domain/entities";
 import { ReStruct } from './restruct';
 import Visel from './restruct/visel';
-import { RelativeBox, RenderOptions } from './render.types';
+import { RelativeBox } from './render.types';
 declare function relBox(box: RaphaelAxisAlignedBoundingBox): RelativeBox;
 /**
  * Finds intersection of a ray and a box and
@@ -34,31 +34,22 @@ declare function calcCoordinates(aPoint: Vec2, bPoint: Vec2, lengthHyp: number):
         y: number;
     };
 };
-declare function getCIPValuePath({ paper, cipLabelPosition, atomOrBond, options }: {
-    paper: RaphaelPaper;
-    cipLabelPosition: Vec2;
-    atomOrBond: Atom | Bond;
-    options: RenderOptions;
-}): {
-    path: any;
-    text: any;
-    rectangle: any;
-};
-declare function drawCIPLabel({ atomOrBond, position, restruct, visel }: {
+declare function drawCIPLabel({ atomOrBond, position, restruct, visel, }: {
     atomOrBond: Bond | Atom;
     position: Vec2;
     restruct: ReStruct;
     visel: Visel;
 }): {
-    path: any;
-    text: any;
-    rectangle: any;
+    path: import("raphael").RaphaelSet<"SVG" | "VML">;
+    text: import("raphael").RaphaelElement<"SVG" | "VML", SVGTextElement | Element>;
+    rectangle: import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGRectElement>;
 };
+declare function updateHalfBondCoordinates(hb1: HalfBond, hb2: HalfBond, xShift: number): [HalfBond, HalfBond];
 declare const util: {
     relBox: typeof relBox;
     shiftRayBox: typeof shiftRayBox;
     calcCoordinates: typeof calcCoordinates;
-    getCIPValuePath: typeof getCIPValuePath;
     drawCIPLabel: typeof drawCIPLabel;
+    updateHalfBondCoordinates: typeof updateHalfBondCoordinates;
 };
 export default util;

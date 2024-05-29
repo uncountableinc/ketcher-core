@@ -14,54 +14,91 @@
  * limitations under the License.
  ***************************************************************************/
 export declare const OperationType: Readonly<{
-    ATOM_ADD: string;
-    ATOM_DELETE: string;
-    ATOM_ATTR: string;
-    ATOM_MOVE: string;
-    CALC_IMPLICIT_H: string;
-    BOND_ADD: string;
-    BOND_DELETE: string;
-    BOND_ATTR: string;
-    BOND_MOVE: string;
-    LOOP_MOVE: string;
-    S_GROUP_ATOM_ADD: string;
-    S_GROUP_ATOM_REMOVE: string;
-    S_GROUP_ATTR: string;
-    S_GROUP_CREATE: string;
-    S_GROUP_DELETE: string;
-    S_GROUP_ADD_TO_HIERACHY: string;
-    S_GROUP_REMOVE_FROM_HIERACHY: string;
-    R_GROUP_ATTR: string;
-    R_GROUP_FRAGMENT: string;
-    UPDATE_IF_THEN: string;
-    RESTORE_IF_THEN: string;
-    RXN_ARROW_ADD: string;
-    RXN_ARROW_DELETE: string;
-    RXN_ARROW_MOVE: string;
-    RXN_ARROW_ROTATE: string;
-    RXN_ARROW_RESIZE: string;
-    RXN_PLUS_ADD: string;
-    RXN_PLUS_DELETE: string;
-    RXN_PLUS_MOVE: string;
-    S_GROUP_DATA_MOVE: string;
-    CANVAS_LOAD: string;
-    ALIGN_DESCRIPTORS: string;
-    SIMPLE_OBJECT_ADD: string;
-    SIMPLE_OBJECT_DELETE: string;
-    SIMPLE_OBJECT_MOVE: string;
-    SIMPLE_OBJECT_RESIZE: string;
-    RESTORE_DESCRIPTORS_POSITION: string;
-    FRAGMENT_ADD: string;
-    FRAGMENT_DELETE: string;
-    FRAGMENT_STEREO_FLAG: string;
-    FRAGMENT_ADD_STEREO_ATOM: string;
-    FRAGMENT_DELETE_STEREO_ATOM: string;
-    ENHANCED_FLAG_MOVE: string;
-    TEXT_CREATE: string;
-    TEXT_UPDATE: string;
-    TEXT_DELETE: string;
-    TEXT_MOVE: string;
-    ADD_HIGHLIGHT: string;
-    UPDATE_HIGHLIGHT: string;
-    REMOVE_HIGHLIGHT: string;
+    ATOM_ADD: "Add atom";
+    ATOM_DELETE: "Delete atom";
+    ATOM_ATTR: "Set atom attribute";
+    ATOM_MOVE: "Move atom";
+    CALC_IMPLICIT_H: "Calculate implicit hydrogen";
+    BOND_ADD: "Add bond";
+    BOND_DELETE: "Delete bond";
+    BOND_ATTR: "Set bond attribute";
+    BOND_MOVE: "Move bond";
+    LOOP_MOVE: "Move loop";
+    S_GROUP_ATTACHMENT_POINT_ADD: "Add attachment point to s-group";
+    S_GROUP_ATTACHMENT_POINT_REMOVE: "Remove attachment point from s-group";
+    S_GROUP_ATOM_ADD: "Add atom to s-group";
+    S_GROUP_ATOM_REMOVE: "Remove atom from s-group";
+    S_GROUP_ATTR: "Set s-group attribute";
+    S_GROUP_CREATE: "Create s-group";
+    S_GROUP_DELETE: "Delete s-group";
+    S_GROUP_ADD_TO_HIERACHY: "Add s-group to hierarchy";
+    S_GROUP_REMOVE_FROM_HIERACHY: "Delete s-group from hierarchy";
+    R_GROUP_ATTR: "Set r-group attribute";
+    R_GROUP_FRAGMENT: "R-group fragment";
+    R_GROUP_ATTACHMENT_POINT_ADD: "Add R-group attachment point";
+    R_GROUP_ATTACHMENT_POINT_REMOVE: "Remove R-group attachment point";
+    UPDATE_IF_THEN: "Update";
+    RESTORE_IF_THEN: "Restore";
+    RXN_ARROW_ADD: "Add rxn arrow";
+    RXN_ARROW_DELETE: "Delete rxn arrow";
+    RXN_ARROW_MOVE: "Move rxn arrow";
+    RXN_ARROW_ROTATE: "Rotate rxn arrow";
+    RXN_ARROW_RESIZE: "Resize rxn arrow";
+    RXN_PLUS_ADD: "Add rxn plus";
+    RXN_PLUS_DELETE: "Delete rxn plus";
+    RXN_PLUS_MOVE: "Move rxn plus";
+    S_GROUP_DATA_MOVE: "Move s-group data";
+    CANVAS_LOAD: "Load canvas";
+    ALIGN_DESCRIPTORS: "Align descriptors";
+    SIMPLE_OBJECT_ADD: "Add simple object";
+    SIMPLE_OBJECT_DELETE: "Delete simple object";
+    SIMPLE_OBJECT_MOVE: "Move simple object";
+    SIMPLE_OBJECT_RESIZE: "Resize simple object";
+    RESTORE_DESCRIPTORS_POSITION: "Restore descriptors position";
+    FRAGMENT_ADD: "Add fragment";
+    FRAGMENT_DELETE: "Delete fragment";
+    FRAGMENT_SET_PROPERTIES: "Set fragment properties";
+    FRAGMENT_STEREO_FLAG: "Add fragment stereo flag";
+    FRAGMENT_ADD_STEREO_ATOM: "Add stereo atom to fragment";
+    FRAGMENT_DELETE_STEREO_ATOM: "Delete stereo atom from fragment";
+    ENHANCED_FLAG_MOVE: "Move enhanced flag";
+    TEXT_CREATE: "Add text";
+    TEXT_UPDATE: "Edit text";
+    TEXT_DELETE: "Delete text";
+    TEXT_MOVE: "Move text";
+    ADD_HIGHLIGHT: "Highlight";
+    UPDATE_HIGHLIGHT: "Update highlight";
+    REMOVE_HIGHLIGHT: "Remove highlight";
+    POLYMER_BOND_ADD: "Add polymer bond";
+    POLYMER_BOND_DELETE: "Remove polymer bond";
+    POLYMER_BOND_MOVE: "Move polymer bond";
+    POLYMER_BOND_FINISH_CREATION: "Finish polymer bond creation";
+    POLYMER_BOND_CANCEL_CREATION: "Cancel polymer bond creation";
+    PEPTIDE_ADD: "Add peptide";
+    PEPTIDE_REMOVE: "Remove peptide";
+    PEPTIDE_MOVE: "Move peptide";
+    PEPTIDE_HOVER: "Hover peptide";
+    DRAWING_ENTITY_SELECT: "Select drawing entity";
+    DRAWING_ENTITY_HOVER: "Hover drawing entity";
+    SHOW_POLYMER_BOND_INFORMATION: "Show polymer bond information";
 }>;
+export declare enum OperationPriority {
+    ATOM_ATTR = 1,
+    BOND_ADD = 1,
+    R_GROUP_ATTACHMENT_POINT_REMOVE = 1,
+    ATOM_MOVE = 2,
+    BOND_ATTR = 2,
+    BOND_MOVE = 2,
+    BOND_DELETE = 3,
+    S_GROUP_ATOM_ADD = 3,
+    S_GROUP_ATTACHMENT_POINT_ADD = 3,
+    R_GROUP_ATTACHMENT_POINT_ADD = 3,
+    S_GROUP_ATTR = 4,
+    ATOM_DELETE = 5,
+    FRAGMENT_STEREO_FLAG = 6,
+    CALC_IMPLICIT_H = 10,
+    FRAGMENT_DELETE_STEREO_ATOM = 90,
+    S_GROUP_DELETE = 95,
+    S_GROUP_ADD_TO_HIERACHY = 100,
+    FRAGMENT_ADD_STEREO_ATOM = 100
+}

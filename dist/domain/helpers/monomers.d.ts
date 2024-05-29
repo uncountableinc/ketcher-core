@@ -1,0 +1,11 @@
+import { BaseMonomer, Peptide, Phosphate, RNABase, Sugar } from "../entities";
+import { MonomerItemType } from "../types";
+export declare function getMonomerUniqueKey(monomer: MonomerItemType): string;
+export declare function checkIsR2R1Connection(monomer: BaseMonomer, nextMonomer: BaseMonomer): boolean;
+export declare function getNextMonomerInChain(monomer?: BaseMonomer, firstMonomer?: BaseMonomer | null): BaseMonomer | undefined;
+export declare function getRnaBaseFromSugar(monomer?: BaseMonomer): RNABase | undefined;
+export declare function getSugarFromRnaBase(monomer?: BaseMonomer): Sugar | undefined;
+export declare function getPhosphateFromSugar(monomer?: BaseMonomer): Phosphate | undefined;
+export declare function isMonomerBeginningOfChain(monomer: BaseMonomer, MonomerTypes: Array<typeof Peptide | typeof Phosphate | typeof Sugar>): boolean | undefined;
+export declare function isValidNucleotide(sugar: Sugar): boolean;
+export declare function isValidNucleoside(sugar: Sugar): boolean | undefined;

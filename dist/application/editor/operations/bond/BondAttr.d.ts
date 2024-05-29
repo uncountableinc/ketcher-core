@@ -19,11 +19,12 @@ declare type Data = {
     bid: any;
     attribute: any;
     value: any;
+    needInvalidateBond?: boolean;
 };
 export declare class BondAttr extends BaseOperation {
     data: Data | null;
     data2: Data | null;
-    constructor(bondId?: any, attribute?: any, value?: any);
+    constructor(bondId?: any, attribute?: any, value?: any, needInvalidateBond?: boolean);
     execute(restruct: ReStruct): void;
     isDummy(restruct: ReStruct): boolean;
     invert(): BondAttr;

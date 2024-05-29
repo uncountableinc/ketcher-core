@@ -14,10 +14,12 @@
  * limitations under the License.
  ***************************************************************************/
 import { Point, Vec2 } from './vec2';
+import { BaseMicromoleculeEntity, initiallySelectedType } from "./BaseMicromoleculeEntity";
 export interface RxnPlusAttributes {
     pp?: Point;
+    initiallySelected?: initiallySelectedType;
 }
-export declare class RxnPlus {
+export declare class RxnPlus extends BaseMicromoleculeEntity {
     pp: Vec2;
     constructor(attributes?: RxnPlusAttributes);
     clone(): RxnPlus;

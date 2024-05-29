@@ -29,20 +29,22 @@ import ReSimpleObject from './resimpleObject';
 import ReText from './retext';
 import { Render } from '../raphaelRender';
 import Visel from './visel';
+import { ReRGroupAttachmentPoint } from './rergroupAttachmentPoint';
 declare class ReStruct {
     static maps: {
-        atoms: typeof ReAtom;
-        bonds: typeof ReBond;
-        rxnPluses: typeof ReRxnPlus;
-        rxnArrows: typeof ReRxnArrow;
-        frags: typeof ReFrag;
-        rgroups: typeof ReRGroup;
-        sgroupData: typeof ReDataSGroupData;
-        enhancedFlags: typeof ReEnhancedFlag;
-        sgroups: typeof ReSGroup;
-        reloops: typeof ReLoop;
-        simpleObjects: typeof ReSimpleObject;
-        texts: typeof ReText;
+        readonly atoms: typeof ReAtom;
+        readonly bonds: typeof ReBond;
+        readonly rxnPluses: typeof ReRxnPlus;
+        readonly rxnArrows: typeof ReRxnArrow;
+        readonly frags: typeof ReFrag;
+        readonly rgroups: typeof ReRGroup;
+        readonly rgroupAttachmentPoints: typeof ReRGroupAttachmentPoint;
+        readonly sgroupData: typeof ReDataSGroupData;
+        readonly enhancedFlags: typeof ReEnhancedFlag;
+        readonly sgroups: typeof ReSGroup;
+        readonly reloops: typeof ReLoop;
+        readonly simpleObjects: typeof ReSimpleObject;
+        readonly texts: typeof ReText;
     };
     render: Render;
     molecule: Struct;
@@ -53,6 +55,7 @@ declare class ReStruct {
     rxnArrows: Map<number, ReRxnArrow>;
     frags: Pool;
     rgroups: Pool;
+    rgroupAttachmentPoints: Pool<ReRGroupAttachmentPoint>;
     sgroups: Map<number, ReSGroup>;
     sgroupData: Map<number, ReDataSGroupData>;
     enhancedFlags: Map<number, ReEnhancedFlag>;
@@ -70,7 +73,12 @@ declare class ReStruct {
     private enhancedFlagsChanged;
     private bondsChanged;
     private textsChanged;
-    constructor(molecule: any, render: Render);
+    private snappingBonds;
+    constructor(molecule: any, render: Render | {
+        skipRaphaelInitialization: boolean;
+        theme: any;
+    });
+    get visibleRGroupAttachmentPoints(): Pool<ReRGroupAttachmentPoint>;
     connectedComponentRemoveAtom(aid: number, reAtom?: ReAtom): void;
     clearConnectedComponents(): void;
     getConnectedComponent(aid: Array<number> | number, adjacentComponents: Pile): Pile;
@@ -86,7 +94,17 @@ declare class ReStruct {
     markItem(map: string, id: number, mark: number): void;
     clearVisel(visel: Visel): void;
     eachItem(func: any): void;
-    getVBoxObj(selection?: any): Box2Abs;
+    /**
+     * Why?
+     * we can't use just getVBoxObj and the center for atoms
+     * because this will lead incorrect center position for the move atom around it
+     * because of atom's vBox contain text label with is not constant after flip/rotate
+     * and this lead to unstable flip tool work
+     */
+    getSelectionBoxCenter(selection: SelectionMap): Vec2 | undefined;
+    getVBoxObj(selection?: SelectionMap): Box2Abs;
+    private getAllElementsAsSelectionMap;
+    private getBoundingBoxForSelection;
     translate(d: any): void;
     scale(s: number): void;
     clearVisels(): void;
@@ -101,10 +119,16 @@ declare class ReStruct {
     showRGroups(): void;
     loopRemove(loopId: number): void;
     verifyLoops(): void;
-    showLabels(): void;
+    getRGroupAttachmentPointsVBoxByAtomIds(atomsIds: number[]): Box2Abs | null;
+    private showRgroupAttachmentPoints;
+    private showAtoms;
     showEnhancedFlags(): void;
     showBonds(): void;
     setSelection(selection?: any): void;
     showItemSelection(item: any, selected: any): void;
+    addSnappingBonds(bondId: number): void;
+    clearSnappingBonds(): void;
+    isSnappingBond(bondId: number): boolean;
 }
+declare type SelectionMap = Partial<Record<keyof typeof ReStruct.maps, number[] | undefined>>;
 export default ReStruct;

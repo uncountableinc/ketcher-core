@@ -45,7 +45,7 @@ declare namespace fmtInfo {
     const atomListHeaderPartition: number[];
     const atomListHeaderLength: number;
     const atomListHeaderItemLength: number;
-    const chargeMap: number[];
+    const chargeMap: (number | null)[];
     const valenceMap: (number | undefined)[];
     const implicitHydrogenMap: (number | undefined)[];
     namespace v30atomPropMap {
@@ -62,7 +62,11 @@ declare namespace fmtInfo {
     const rxnItemsPartition: number[];
 }
 declare function paddedNum(number: any, width: any, precision: any): any;
-declare function parseDecimalInt(str: any): number;
+/**
+ * @param str {string}
+ * @returns {number}
+ */
+declare function parseDecimalInt(str: string): number;
 declare function partitionLine(str: any, parts: any, withspace: any): any[];
 declare function partitionLineFixed(str: any, itemLength: any, withspace: any): any[];
 declare function rxnMerge(mols: any, nReactants: any, nProducts: any, nAgents: any, shouldReactionRelayout: any): Struct;

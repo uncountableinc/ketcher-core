@@ -14,13 +14,16 @@
  * limitations under the License.
  ***************************************************************************/
 import { Action } from './action';
-export declare function fromSeveralSgroupAddition(restruct: any, type: any, atoms: any, attrs: any): any;
+import Restruct from "../../render/restruct/restruct";
+export declare function fromSeveralSgroupAddition(restruct: Restruct, type: any, atoms: any, attrs: any): any;
 export declare function fromSgroupAttrs(restruct: any, id: any, attrs: any): Action;
-export declare function setExpandSGroup(restruct: any, sgid: any, attrs: any): Action;
+export declare function setExpandSGroup(restruct: Restruct, sgid: number, attrs: {
+    expanded: boolean;
+}): Action;
 export declare function expandSGroupWithMultipleAttachmentPoint(restruct: any): Action;
 export declare function sGroupAttributeAction(id: any, attrs: any): Action;
 export declare function fromSgroupDeletion(restruct: any, id: any): Action;
-export declare function fromSgroupAddition(restruct: any, type: any, atoms: any, attrs: any, sgid: any, pp?: any, expanded?: any, name?: any): Action;
+export declare function fromSgroupAddition(restruct: any, type: any, atoms: any, attrs: any, sgid: any, attachmentPoints: any, pp?: any, expanded?: any, name?: any, oldSgroup?: any): Action;
 export declare function fromSgroupAction(context: any, restruct: any, newSg: any, sourceAtoms: any, selection: any): any;
 export declare function removeAtomFromSgroupIfNeeded(action: any, restruct: any, id: any): boolean;
 export declare function removeSgroupIfNeeded(action: any, restruct: any, atoms: any): void;

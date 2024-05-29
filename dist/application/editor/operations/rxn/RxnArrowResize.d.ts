@@ -13,19 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-import Base from '../base';
+import { ReStruct } from "../../../render";
 import { Vec2 } from "../../../../domain/entities";
+import Base from '../base';
+export declare const ARROW_MAX_SNAPPING_ANGLE: number;
 interface RxnArrowResizeData {
     id: number;
-    d: any;
+    d: Vec2;
     current: Vec2;
-    anchor: Vec2;
+    anchor: Vec2 | null;
     noinvalidate: boolean;
 }
 export declare class RxnArrowResize extends Base {
     data: RxnArrowResizeData;
-    constructor(id: number, d: any, current: Vec2, anchor: any, noinvalidate: boolean);
-    execute(restruct: any): void;
+    isSnappingEnabled: boolean;
+    constructor(id: number, d: Vec2, current: Vec2, anchor: Vec2 | null, noinvalidate: boolean, isSnappingEnabled: boolean);
+    execute(restruct: ReStruct): void;
     invert(): Base;
 }
+export declare function getSnappedArrowVector(arrow: Vec2): Vec2;
 export {};

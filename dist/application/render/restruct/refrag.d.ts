@@ -7,8 +7,8 @@ declare class ReFrag extends ReObject {
     fragGetBonds(restruct: any, fid: any): any[];
     calcBBox(restruct: any, fid: any, render: any): undefined;
     _draw(render: any, fid: any, attrs: any): any;
-    draw(render: any): null;
-    drawHover(render: any): void;
+    draw(_render: any): null;
+    drawHover(_render: any): void;
     setHover(hover: any, render: any): void;
 }
 import ReObject from "./reobject";

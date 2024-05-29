@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
+import ReObject from './reobject';
 import ReAtom from './reatom';
 import ReBond from './rebond';
 import ReEnhancedFlag from './reenhancedFlag';
@@ -26,4 +27,5 @@ import ReStruct from './restruct';
 import ReText from './retext';
 export * from './generalEnumTypes';
 export * from './reatom';
-export { ReAtom, ReBond, ReRxnPlus, ReRxnArrow, ReFrag, ReRGroup, ReEnhancedFlag, ReSGroup, ReSimpleObject, ReText, ReStruct };
+export * from './rergroupAttachmentPoint';
+export { ReObject, ReAtom, ReBond, ReRxnPlus, ReRxnArrow, ReFrag, ReRGroup, ReEnhancedFlag, ReSGroup, ReSimpleObject, ReText, ReStruct, };

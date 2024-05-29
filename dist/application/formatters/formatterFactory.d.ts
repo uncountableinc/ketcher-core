@@ -19,5 +19,5 @@ export declare class FormatterFactory {
     #private;
     constructor(structService: StructService);
     private separateOptions;
-    create(format: SupportedFormat, options?: FormatterFactoryOptions): StructFormatter;
+    create(format: SupportedFormat, options?: FormatterFactoryOptions, queryPropertiesAreUsed?: boolean): StructFormatter;
 }

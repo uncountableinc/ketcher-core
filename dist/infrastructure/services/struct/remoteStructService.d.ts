@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-import { AromatizeData, AromatizeResult, AutomapData, AutomapResult, CalculateCipData, CalculateCipResult, CalculateData, CalculateResult, CheckData, CheckResult, CleanData, CleanResult, ConvertData, ConvertResult, DearomatizeData, DearomatizeResult, GenerateImageOptions, InfoResult, LayoutData, LayoutResult, RecognizeResult, StructService, StructServiceOptions } from "../../../domain/services";
+import { AromatizeData, AromatizeResult, AutomapData, AutomapResult, CalculateCipData, CalculateCipResult, CalculateData, CalculateResult, CheckData, CheckResult, CleanData, CleanResult, ConvertData, ConvertResult, DearomatizeData, DearomatizeResult, ExplicitHydrogensData, ExplicitHydrogensResult, GenerateImageOptions, InfoResult, LayoutData, LayoutResult, RecognizeResult, StructService, StructServiceOptions } from "../../../domain/services";
 export declare class RemoteStructService implements StructService {
     private readonly apiPath;
     private readonly defaultOptions;
     private readonly customHeaders?;
     constructor(apiPath: string, defaultOptions: StructServiceOptions, customHeaders?: Record<string, string>);
-    generateInchIKey(struct: string): Promise<string>;
+    getInChIKey(struct: string): Promise<string>;
     info(): Promise<InfoResult>;
     convert(data: ConvertData, options?: StructServiceOptions): Promise<ConvertResult>;
     layout(data: LayoutData, options?: StructServiceOptions): Promise<LayoutResult>;
@@ -32,4 +32,5 @@ export declare class RemoteStructService implements StructService {
     calculate(data: CalculateData, options?: StructServiceOptions): Promise<CalculateResult>;
     recognize(blob: Blob, version: string): Promise<RecognizeResult>;
     generateImageAsBase64(data: string, options?: GenerateImageOptions): Promise<string>;
+    toggleExplicitHydrogens(data: ExplicitHydrogensData, options?: StructServiceOptions): Promise<ExplicitHydrogensResult>;
 }

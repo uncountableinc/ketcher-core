@@ -15,7 +15,34 @@
  ***************************************************************************/
 import { Struct } from "../../entities";
 import { Serializer } from '../serializers.types';
+import { IKetMacromoleculesContent, IKetMacromoleculesContentRootProperty } from "../../../application/formatters/types/ket";
+import { Command } from "../../entities/Command";
+import { EditorSelection } from "../../../application/editor/internal";
+import { DrawingEntitiesManager } from "../../entities/DrawingEntitiesManager";
+import { BaseMonomer } from "../../entities/BaseMonomer";
 export declare class KetSerializer implements Serializer<Struct> {
-    deserialize(content: string): Struct;
-    serialize(struct: Struct): string;
+    deserializeMicromolecules(content: string): Struct;
+    fillStruct(ket: any): Struct;
+    serializeMicromolecules(struct: Struct, monomer?: BaseMonomer): string;
+    private validateMonomerNodeTemplate;
+    private validateConnectionTypeAndEndpoints;
+    parseAndValidateMacromolecules(fileContent: string): {
+        error: boolean;
+        parsedFileContent?: undefined;
+    } | {
+        error: boolean;
+        parsedFileContent: IKetMacromoleculesContent;
+    };
+    deserializeToStruct(fileContent: string): Struct;
+    private filterMacromoleculesContent;
+    deserializeToDrawingEntities(fileContent: string): {
+        modelChanges: Command;
+        drawingEntitiesManager: DrawingEntitiesManager;
+    } | undefined;
+    deserialize(fileContent: string): Struct;
+    serializeMacromolecules(struct: Struct, drawingEntitiesManager: DrawingEntitiesManager): {
+        serializedMacromolecules: IKetMacromoleculesContentRootProperty;
+        micromoleculesStruct: Struct;
+    };
+    serialize(struct: Struct, drawingEntitiesManager?: DrawingEntitiesManager, selection?: EditorSelection): string;
 }

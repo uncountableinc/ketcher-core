@@ -14,6 +14,7 @@
  * limitations under the License.
  ***************************************************************************/
 import { Vec2, Point } from './vec2';
+import { BaseMicromoleculeEntity, initiallySelectedType } from "./BaseMicromoleculeEntity";
 export declare enum TextCommand {
     Bold = "BOLD",
     Italic = "ITALIC",
@@ -25,8 +26,9 @@ export interface TextAttributes {
     content: string;
     position: Point;
     pos: Array<Point>;
+    initiallySelected?: initiallySelectedType;
 }
-export declare class Text {
+export declare class Text extends BaseMicromoleculeEntity {
     content: string;
     position: Vec2;
     pos: Array<Vec2>;

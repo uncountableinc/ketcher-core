@@ -16,31 +16,41 @@
 import { Struct, Vec2 } from "../../domain/entities";
 import { RaphaelPaper } from 'raphael';
 import { ReStruct } from './restruct';
-import { RenderOptions } from './render.types';
+import { RenderOptions, ViewBox } from './render.types';
 export declare class Render {
+    skipRaphaelInitialization: boolean;
     readonly clientArea: HTMLElement;
     readonly paper: RaphaelPaper;
     sz: Vec2;
     ctab: ReStruct;
     options: RenderOptions;
+    viewBox: ViewBox;
     private readonly userOpts;
     private oldCb;
-    constructor(clientArea: HTMLElement, options: RenderOptions);
+    private scrollbar;
+    private resizeObserver;
+    constructor(clientArea: HTMLElement, options: RenderOptions, reuseRestructIfExist?: boolean);
+    observeCanvasResize: () => void;
+    unobserveCanvasResize: () => void;
     updateOptions(opts: string): false | RenderOptions;
     selectionPolygon(polygon: Vec2[]): import("raphael").RaphaelPath<"SVG" | "VML">;
     selectionLine(point0: Vec2, point1: Vec2): import("raphael").RaphaelPath<"SVG" | "VML">;
     selectionRectangle(point0: Vec2, point1: Vec2): import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGRectElement>;
-    view2obj(point: Vec2, isRelative?: boolean): Vec2;
-    obj2view(vector: Vec2, isRelative: true): Vec2;
-    scrollPos(): Vec2;
-    page2obj(event: MouseEvent): Vec2;
-    setPaperSize(newSize: Vec2): void;
-    setOffset(newOffset: Vec2): void;
-    setZoom(zoom: number): void;
-    setScrollOffset(x: number, y: number): void;
-    setViewBox(): void;
-    setMolecule(struct: Struct): void;
-    update(force?: boolean, viewSz?: Vec2 | null, options?: {
-        resizeCanvas: boolean;
-    }): void;
+    /** @deprecated recommend using `CoordinateTransformation.pageToModel` instead */
+    page2obj(event: MouseEvent | {
+        clientX: number;
+        clientY: number;
+    }): Vec2;
+    setZoom(zoom: number, event?: WheelEvent): void;
+    private getCanvasSizeVector;
+    resizeViewBox(): void;
+    private zoomOnCanvasCenter;
+    private zoomOnMouse;
+    /**
+     * @see https://developer.mozilla.org/zh-CN/docs/Web/SVG/Attribute/viewBox
+     */
+    setViewBox(func: (viewBox: ViewBox) => ViewBox): void;
+    setViewBox(viewBox: ViewBox): void;
+    setMolecule(struct: Struct, forceUpdateWithTimeout?: boolean): void;
+    update(force?: boolean, viewSz?: Vec2 | null): void;
 }

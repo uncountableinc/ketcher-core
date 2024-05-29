@@ -1,0 +1,31 @@
+import { LayoutMode } from "./";
+import { BaseMode } from "./BaseMode";
+import { BaseSequenceItemRenderer } from "../../render/renderers/sequence/BaseSequenceItemRenderer";
+import { Command } from "../../../domain/entities/Command";
+export declare class SequenceMode extends BaseMode {
+    private _isEditMode;
+    private selectionStarted;
+    private selectionStartCaretPosition;
+    constructor(previousMode?: LayoutMode);
+    get isEditMode(): boolean;
+    set isEditMode(isEditMode: boolean);
+    initialize(needScroll?: boolean): Command;
+    turnOnEditMode(sequenceItemRenderer?: BaseSequenceItemRenderer): void;
+    turnOffEditMode(): void;
+    onKeyDown(event: KeyboardEvent): Promise<void>;
+    startNewSequence(): void;
+    click(event: MouseEvent): void;
+    mousedown(event: MouseEvent): void;
+    mousemove(event: MouseEvent): void;
+    mouseup(): void;
+    private bondNodesThroughNewPhosphate;
+    private handlePeptideNodeAddition;
+    private handleRnaDnaNodeAddition;
+    private finishNodesDeletion;
+    private handleNodesDeletion;
+    private get keyboardEventHandlers();
+    private deleteSelectedDrawingEntities;
+    private getNewSequenceItemPosition;
+    private unselectAllEntities;
+    destroy(): void;
+}

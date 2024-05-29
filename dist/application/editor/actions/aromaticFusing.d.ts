@@ -15,7 +15,7 @@
  ***************************************************************************/
 /**
  * @param restruct { ReStruct }
- * @param events { Array<PipelineSubscription> }
+ * @param _events { Array<PipelineSubscription> }
  * @param bid { number }
  * @param template {{
  * 		molecule: Struct,
@@ -24,4 +24,4 @@
  * @param simpleFusing { Function }
  * @returns { Promise }
  */
-export declare function fromAromaticTemplateOnBond(restruct: any, template: any, bid: any, events: any, simpleFusing: any): Promise<any>;
+export declare function fromAromaticTemplateOnBond(restruct: any, template: any, bid: any, _events: any, simpleFusing: any): Promise<any>;

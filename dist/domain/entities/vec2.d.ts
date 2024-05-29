@@ -38,6 +38,7 @@ export declare class Vec2 {
     static lc2(v1: Vec2, f1: number, v2: Vec2, f2: number): Vec2;
     static centre(v1: Vec2, v2: Vec2): Vec2;
     static getLinePoint(lineStart: Vec2, lineEnd: Vec2, length: any): Vec2;
+    static crossProduct(v1: Vec2, v2: Vec2): number;
     length(): number;
     equals(v: Vec2): boolean;
     add(v: Vec2): Vec2;
@@ -62,4 +63,14 @@ export declare class Vec2 {
     rotateAroundOrigin(angleInDegrees: number, origin: Vec2): Vec2;
     isInsidePolygon(points: Vec2[]): boolean;
     oxAngle(): number;
+    static radiansToDegrees(radians: any): number;
+    static degrees_to_radians(degrees: any): number;
+    static oxAngleForVector(v1: Vec2, v2: Vec2): number;
+    static findSecondPoint(startPoint: {
+        x: number;
+        y: number;
+    }, lineLength: number, lineAngleRadians: number): {
+        x: number;
+        y: number;
+    };
 }

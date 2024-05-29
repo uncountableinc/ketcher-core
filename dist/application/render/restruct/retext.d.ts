@@ -14,7 +14,7 @@
  * limitations under the License.
  ***************************************************************************/
 import { RawDraftContentBlock } from 'draft-js';
-import { Text, Vec2 } from "../../../domain/entities";
+import { Box2Abs, Text, Vec2 } from "../../../domain/entities";
 import ReObject from './reobject';
 import ReStruct from './restruct';
 import { RaphaelBaseElement } from 'raphael';
@@ -24,6 +24,7 @@ declare class ReText extends ReObject {
     constructor(text: Text);
     static isSelectable(): boolean;
     getReferencePoints(): Array<Vec2>;
+    getVBoxObj(): Box2Abs;
     hoverPath(render: any): any;
     getRelBox(paths: Array<Array<RaphaelBaseElement>>): {
         p0: Vec2;

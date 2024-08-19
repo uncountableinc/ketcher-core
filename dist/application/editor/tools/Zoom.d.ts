@@ -18,6 +18,10 @@ import { BaseTool } from "./Tool";
 import { D3SvgElementSelection } from "../../render/types";
 import { Vec2 } from "../../../domain/entities/vec2";
 import { DrawingEntitiesManager } from "../../../domain/entities/DrawingEntitiesManager";
+export declare enum SCROLL_POSITION {
+    CENTER = "CENTER",
+    BOTTOM = "BOTTOM"
+}
 interface ScrollBar {
     name: string;
     offsetStart: number;
@@ -26,7 +30,7 @@ interface ScrollBar {
     maxHeight: number;
     bar?: D3SvgElementSelection<SVGRectElement, void> | undefined;
 }
-declare class ZoomTool implements BaseTool {
+export declare class ZoomTool implements BaseTool {
     canvas: D3SvgElementSelection<SVGSVGElement, void>;
     canvasWrapper: D3SvgElementSelection<SVGSVGElement, void>;
     private zoom;
@@ -67,19 +71,24 @@ declare class ZoomTool implements BaseTool {
         length: number;
     };
     dragged: (name: string) => (event: any) => void;
-    scrollTo(position: Vec2): void;
+    scrollTo(position: Vec2, stickToBottom?: boolean, xOffset?: any, yOffset?: any, isOffsetInPercents?: boolean): void;
+    scrollToVerticalCenter(structCenterY: number): void;
+    scrollToVerticalBottom(): void;
     mouseWheeled(event: any): void;
     initScrollBars(): void;
     private get zoomStep();
     zoomIn(zoomStep?: number): void;
     zoomOut(zoomStep?: number): void;
+    zoomTo(zoomLevel: number): void;
     resetZoom(): void;
-    initMenuZoom(): void;
     observeCanvasResize: () => void;
     defaultWheelDelta(event: any): number;
     scaleCoordinates(position: Vec2): Vec2;
     invertZoom(position: Vec2): Vec2;
     unzoomValue(value: number): number;
+    zoomValue(value: number): number;
     destroy(): void;
+    isFitToCanvasHeight(height: any): boolean;
+    private get canvasWrapperHeight();
 }
 export default ZoomTool;

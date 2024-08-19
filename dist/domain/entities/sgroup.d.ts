@@ -84,7 +84,7 @@ export declare class SGroup {
     isGroupAttached(struct: Struct): boolean;
     addAttachmentPoint(attachmentPoint: SGroupAttachmentPoint): void;
     addAttachmentPoints(attachmentPoints: ReadonlyArray<SGroupAttachmentPoint> | SGroupAttachmentPoint[]): void;
-    removeAttachmentPoint(attachmentPointAtomId: number): boolean;
+    removeAttachmentPoint(attachmentPoint: SGroupAttachmentPoint): boolean;
     getAttachmentPoints(): ReadonlyArray<SGroupAttachmentPoint>;
     /**
      * Connection point - is not! the same as Attachment point.
@@ -114,6 +114,7 @@ export declare class SGroup {
         position: Vec2;
     };
     cloneAttachmentPoints(atomIdMap: Map<number, number>): ReadonlyArray<SGroupAttachmentPoint>;
+    get isSuperatomWithoutLabel(): boolean;
     static getOffset(sgroup: SGroup): null | Vec2;
     static isSaltOrSolvent(moleculeName: string): boolean;
     static isAtomInSaltOrSolvent(atomId: number, sgroupsOnCanvas: SGroup[]): boolean;

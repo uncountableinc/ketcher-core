@@ -19,9 +19,9 @@ export declare abstract class BaseSequenceItemRenderer extends BaseSequenceRende
     textElement?: D3SvgElementSelection<SVGTextElement, void>;
     counterElement?: D3SvgElementSelection<SVGTextElement, void>;
     private selectionRectangle?;
-    private selectionBorder?;
     spacerElement?: D3SvgElementSelection<SVGGElement, void>;
     backgroundElement?: D3SvgElementSelection<SVGRectElement, void>;
+    caretElement?: D3SvgElementSelection<SVGLineElement, void>;
     constructor(node: SubChainNode, firstNodeInChainPosition: Vec2, monomerIndexInChain: number, isLastMonomerInChain: boolean, subChain: BaseSubChain, _isEditingSymbol: boolean, monomerSize: {
         width: number;
         height: number;
@@ -29,13 +29,16 @@ export declare abstract class BaseSequenceItemRenderer extends BaseSequenceRende
     abstract get symbolToDisplay(): string;
     get isEditingSymbol(): boolean;
     set isEditingSymbol(isEditingSymbol: boolean);
+    private get isSingleEmptyNode();
+    protected abstract drawModification(): void;
     protected appendHover(): D3SvgElementSelection<SVGUseElement, void> | void;
     protected appendHoverAreaElement(): void;
     moveSelection(): void;
     get currentSubChain(): BaseSubChain;
     get scaledMonomerPositionForSequence(): Vec2;
     get center(): Vec2;
-    private get isSequenceEditModeTurnedOn();
+    protected get isSequenceEditModeTurnedOn(): boolean | undefined;
+    protected get isSequenceEditInRnaBuilderModeTurnedOn(): boolean | undefined;
     private appendRootElement;
     private appendBackgroundElement;
     private appendSpacerElement;
@@ -44,10 +47,11 @@ export declare abstract class BaseSequenceItemRenderer extends BaseSequenceRende
     private appendCounterElement;
     private get needDisplayCounter();
     private get isBeginningOfChain();
-    appendCaretElement(): void;
-    private drawHover;
-    protected removeHover(): void;
+    showCaret(): void;
+    removeCaret(): void;
+    protected redrawBackgroundElementColor(): void;
     private appendChainStartArrow;
+    private drawGreyOverlay;
     show(): void;
     drawSelection(): void;
     appendSelection(): void;
@@ -61,5 +65,7 @@ export declare abstract class BaseSequenceItemRenderer extends BaseSequenceRende
     get enumeration(): null;
     hoverAttachmenPoint(): void;
     updateAttachmentPoints(): void;
+    private drawBackgroundElementHover;
+    private removeBackgroundElementHover;
     private appendEvents;
 }

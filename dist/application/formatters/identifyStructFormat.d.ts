@@ -14,4 +14,4 @@
  * limitations under the License.
  ***************************************************************************/
 import { SupportedFormat } from './structFormatter.types';
-export declare function identifyStructFormat(stringifiedStruct: string): SupportedFormat;
+export declare function identifyStructFormat(stringifiedStruct: string, isMacromolecules?: boolean): SupportedFormat;

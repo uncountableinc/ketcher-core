@@ -4,12 +4,14 @@ import { D3SvgElementSelection } from "../types";
 import { AttachmentPoint } from "../../../domain/AttachmentPoint";
 import { Vec2 } from "../../../domain/entities/vec2";
 import { AttachmentPointName } from "../../../domain/types";
+export declare const MONOMER_CSS_CLASS = "monomer";
 export declare abstract class BaseMonomerRenderer extends BaseRenderer {
     monomer: BaseMonomer;
     private monomerSelectedElementId;
     private monomerHoveredElementId;
     private scale?;
     private editorEvents;
+    private editor;
     private selectionCircle?;
     private selectionBorder?;
     private freeSectorsList;
@@ -38,7 +40,7 @@ export declare abstract class BaseMonomerRenderer extends BaseRenderer {
     removeAttachmentPoints(): void;
     hoverAttachmenPoint(attachmentPointName: AttachmentPointName): void;
     private appendRootElement;
-    private appendLabel;
+    protected appendLabel(rootElement: D3SvgElementSelection<SVGGElement, void>): void;
     appendHover(hoverAreaElement: D3SvgElementSelection<SVGGElement, void>): import("d3-selection").Selection<SVGUseElement, void, HTMLElement, never>;
     removeHover(): void;
     static getScaledMonomerPosition(positionInAngstoms: Vec2, monomerSize?: {

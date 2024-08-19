@@ -21,7 +21,7 @@ export declare class RenderersManager {
     markForRecalculateBegin(): void;
     addMonomer(monomer: BaseMonomer, callback?: () => void): void;
     moveMonomer(monomer: BaseMonomer): void;
-    redrawDrawingEntity(drawingEntity: DrawingEntity): void;
+    redrawDrawingEntity(drawingEntity: DrawingEntity, force?: boolean): void;
     deleteAllDrawingEntities(): void;
     deleteMonomer(monomer: BaseMonomer): void;
     addPolymerBond(polymerBond: PolymerBond): void;
@@ -41,4 +41,13 @@ export declare class RenderersManager {
     hoverAttachmentPoint(monomer: BaseMonomer, attachmentPointName: AttachmentPointName): void;
     update(modelChanges?: Command): void;
     runPostRenderMethods(): void;
+    static getRenderedStructuresBbox(): {
+        left: any;
+        right: any;
+        top: any;
+        bottom: any;
+        width: number;
+        height: number;
+    };
+    rerenderSideConnectionPolymerBonds(): void;
 }

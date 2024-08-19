@@ -40,5 +40,7 @@ declare class RnaPresetTool implements Tool {
     mousemove(): void;
     mouseLeaveClientArea(): void;
     mouseover(): void;
+    hidePreview(): void;
+    destroy(): void;
 }
 export { RnaPresetTool };

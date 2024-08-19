@@ -1,4 +1,5 @@
-import { BaseSequenceItemRenderer } from "./BaseSequenceItemRenderer";
-export declare class NucleotideSequenceItemRenderer extends BaseSequenceItemRenderer {
-    get symbolToDisplay(): string;
+import { RNASequenceItemRenderer } from './RNASequenceItemRenderer';
+export declare class NucleotideSequenceItemRenderer extends RNASequenceItemRenderer {
+    private phosphateModificationCircleElement?;
+    drawModification(): void;
 }

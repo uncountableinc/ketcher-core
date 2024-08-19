@@ -29,7 +29,8 @@ export declare class SGroupAttachmentPoint {
      * Only reading from file and saving to file.
      */
     readonly attachmentId: string | undefined;
-    constructor(atomId: number, leaveAtomId: number | undefined, attachmentId: string | undefined);
+    readonly attachmentPointNumber?: number;
+    constructor(atomId: number, leaveAtomId: number | undefined, attachmentId: string | undefined, attachmentPointNumber?: number);
     clone(atomIdMap: Map<number, number>): SGroupAttachmentPoint;
     /**
      * Trick: used for cloned struct for tooltips, for preview, for templates

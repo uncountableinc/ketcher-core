@@ -1,6 +1,7 @@
 import { EmptySubChain } from "./monomer-chains/EmptySubChain";
 import { BaseSequenceItemRenderer } from "../../application/render/renderers/sequence/BaseSequenceItemRenderer";
 import { EmptyMonomer } from "./EmptyMonomer";
+import { BaseMonomer } from "./BaseMonomer";
 export declare class EmptySequenceNode {
     renderer?: BaseSequenceItemRenderer;
     monomer: EmptyMonomer;
@@ -15,7 +16,7 @@ export declare class EmptySequenceNode {
             MonomerNaturalAnalogCode: null;
         };
     };
-    get monomers(): never[];
+    get monomers(): BaseMonomer[];
     setRenderer(renderer: any): void;
     get modified(): boolean;
 }

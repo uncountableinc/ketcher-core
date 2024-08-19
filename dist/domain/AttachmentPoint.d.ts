@@ -1,7 +1,8 @@
 import { PolymerBond } from "./entities/PolymerBond";
 import { D3SvgElementSelection } from "../application/render/types";
 import { Selection } from 'd3';
-import { AttachmentPointConstructorParams } from './types';
+import { BaseMonomer } from './entities/BaseMonomer';
+import { AttachmentPointConstructorParams, AttachmentPointName } from './types';
 export declare class AttachmentPoint {
     static attachmentPointVector: number;
     static attachmentPointLength: number;
@@ -21,7 +22,7 @@ export declare class AttachmentPoint {
     };
     private rootElement;
     private attachmentPoint;
-    private monomer;
+    monomer: BaseMonomer;
     private bodyWidth;
     private bodyHeight;
     private attachmentPointName;
@@ -31,22 +32,22 @@ export declare class AttachmentPoint {
     private hoverableArea;
     private initialAngle;
     private isUsed;
-    private fill;
-    private stroke;
     private isSnake;
     private editorEvents;
     constructor(constructorParams: AttachmentPointConstructorParams);
+    private get fill();
+    private get stroke();
     removeAttachmentPoint(): void;
     private renderAttachmentPointByCoordinates;
     private renderHoverableArea;
-    appendAttachmentPoint(): D3SvgElementSelection<SVGGElement, void>;
+    appendAttachmentPoint(): D3SvgElementSelection<SVGGElement, this>;
     updateAttachmentPointStyleForHover(): void;
     rotateToAngle(polymerBond: PolymerBond, flip?: boolean): number;
     private getCoordinates;
     updateCoords(): void;
     private catchThePoint;
-    getElement(): Selection<SVGGElement, void, HTMLElement, never> | undefined;
-    getAttachmentPointName(): string;
-    getHoverableArea(): Selection<SVGGElement, void, HTMLElement, never> | undefined;
+    getElement(): Selection<SVGGElement, this, HTMLElement, never> | undefined;
+    getAttachmentPointName(): AttachmentPointName;
+    getHoverableArea(): Selection<SVGGElement, this, HTMLElement, never> | undefined;
     getAngle(): number;
 }

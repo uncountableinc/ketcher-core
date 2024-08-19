@@ -1,4 +1,5 @@
 import { BaseMonomer } from "../entities";
+import { AttachmentPointName } from "../types";
 export declare type Coordinates = {
     x: number;
     y: number;
@@ -74,4 +75,6 @@ export declare enum attachmentPointNumberToAngle {
 }
 export declare const sectorsList: number[];
 export declare function checkFor0and360(sectorsList: number[]): number[];
-export declare function convertAttachmentPointNumberToLabel(attachmentPointNumber: number): string;
+export declare function getAttachmentPointLabelWithBinaryShift(attachmentPointNumber: number): string;
+export declare function getAttachmentPointLabel(attachmentPointNumber: number): AttachmentPointName;
+export declare function getAttachmentPointNumberFromLabel(attachmentPointLabel: AttachmentPointName): number;

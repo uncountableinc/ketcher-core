@@ -21,5 +21,5 @@ export declare class MolSerializer implements Serializer<Struct> {
     readonly options: MolSerializerOptions;
     constructor(options?: Partial<MolSerializerOptions>);
     deserialize(content: string): Struct;
-    serialize(struct: Struct): string;
+    serialize(_struct: Struct): string;
 }

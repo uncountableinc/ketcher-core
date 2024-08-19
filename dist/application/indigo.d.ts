@@ -18,6 +18,7 @@ import { StructOrString } from "./indigo.types";
 import { Struct } from "../domain/entities";
 declare type ConvertOptions = {
     outputFormat?: ChemicalMimeType;
+    inputFormat?: ChemicalMimeType;
 };
 declare type AutomapOptions = {
     mode?: AutomapMode;

@@ -37,6 +37,7 @@ declare class ReBond extends ReObject {
     };
     constructor(bond: Bond);
     static isSelectable(): boolean;
+    private static getAtomPositionForBond;
     static bondRecalc(bond: ReBond, restruct: ReStruct, options: any): void;
     drawHover(render: Render): import("raphael").RaphaelPath<"SVG" | "VML"> | null;
     getSelectionPoints(render: Render): Vec2[];

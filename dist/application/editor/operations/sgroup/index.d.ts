@@ -41,3 +41,4 @@ export * from './sgroupAtom';
 export * from './SGroupAttr';
 export * from './SGroupDataMove';
 export * from './sgroupHierarchy';
+export * from './sgroupAttachmentPoints';

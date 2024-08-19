@@ -10,6 +10,7 @@ export declare abstract class BaseRenderer implements IBaseRenderer {
     bodyElement?: D3SvgElementSelection<SVGElement, this>;
     protected hoverElement?: D3SvgElementSelection<SVGUseElement & SVGGElement, void>;
     protected hoverAreaElement?: D3SvgElementSelection<SVGGElement | SVGLineElement, void>;
+    protected hoverCircleAreaElement?: D3SvgElementSelection<SVGGElement | SVGCircleElement, void>;
     protected canvasWrapper: D3SvgElementSelection<SVGSVGElement, void>;
     protected canvas: D3SvgElementSelection<SVGSVGElement, void>;
     protected constructor(drawingEntity: DrawingEntity);
@@ -18,11 +19,12 @@ export declare abstract class BaseRenderer implements IBaseRenderer {
         macroModeScale: number;
     };
     get rootBBox(): DOMRect | undefined;
+    get rootBoundingClientRect(): DOMRect | undefined;
     get width(): number;
     get height(): number;
     get x(): number;
     get y(): number;
-    abstract show(theme: any): void;
+    abstract show(theme: any, force?: boolean): void;
     abstract drawSelection(): void;
     abstract moveSelection(): void;
     protected abstract appendHover(hoverArea: any): D3SvgElementSelection<SVGUseElement, void> | void;

@@ -21,6 +21,7 @@ interface SavedSettings {
 }
 interface SavedOptions {
     ignoreChiralFlag?: boolean;
+    disableQueryElements?: string[] | null;
 }
 export declare class SettingsManager {
     static _disableCustomQuery?: boolean;

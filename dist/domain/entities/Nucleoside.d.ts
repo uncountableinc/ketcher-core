@@ -3,6 +3,7 @@ import { Sugar } from "./Sugar";
 import { SubChainNode } from "./monomer-chains/types";
 import { Vec2 } from "./vec2";
 import { Command } from "./Command";
+import { BaseMonomer } from "./BaseMonomer";
 export declare class Nucleoside {
     sugar: Sugar;
     rnaBase: RNABase;
@@ -15,9 +16,9 @@ export declare class Nucleoside {
     isMonomerTypeDifferentForChaining(monomerToChain: SubChainNode): boolean;
     get SubChainConstructor(): typeof import("./monomer-chains/RnaSubChain").RnaSubChain;
     get monomer(): Sugar;
-    get monomers(): (Sugar | RNABase)[];
+    get monomers(): BaseMonomer[];
     get firstMonomerInNode(): Sugar;
     get lastMonomerInNode(): Sugar;
-    get renderer(): import("../..").BaseMonomerRenderer | import("../../application/render/renderers/sequence/BaseSequenceItemRenderer").BaseSequenceItemRenderer | undefined;
+    get renderer(): import("../..").BaseMonomerRenderer | import("../..").BaseSequenceItemRenderer | undefined;
     get modified(): boolean;
 }

@@ -1,5 +1,4 @@
-/// <reference types="lodash" />
-import { SequenceType, Struct, Vec2 } from "../../domain/entities";
+import { SequenceType, Vec2 } from "../../domain/entities";
 import { BaseTool, Tool, ToolEventHandlerName } from "./tools/Tool";
 import { MonomerItemType } from "../../domain/types";
 import { RenderersManager } from "../render/renderers/RenderersManager";
@@ -7,9 +6,11 @@ import { DrawingEntitiesManager } from "../../domain/entities/DrawingEntitiesMan
 import ZoomTool from './tools/Zoom';
 import { HistoryOperationType } from './EditorHistory';
 import { BaseMode } from "./modes/internal";
+import { IKetMacromoleculesContent, IKetMonomerGroupTemplate } from "../formatters";
 interface ICoreEditorConstructorParams {
     theme: any;
     canvas: SVGSVGElement;
+    mode?: BaseMode;
 }
 export declare class CoreEditor {
     events: any;
@@ -17,8 +18,10 @@ export declare class CoreEditor {
     drawingEntitiesManager: DrawingEntitiesManager;
     lastCursorPosition: Vec2;
     lastCursorPositionOfCanvas: Vec2;
-    _monomersLibrary: MonomerItemType[];
+    private _monomersLibraryParsedJson?;
+    private _monomersLibrary;
     canvas: SVGSVGElement;
+    drawnStructuresWrapperElement: SVGGElement;
     canvasOffset: DOMRect;
     theme: any;
     zoomTool: ZoomTool;
@@ -28,39 +31,24 @@ export declare class CoreEditor {
     sequenceTypeEnterMode: SequenceType;
     private micromoleculesEditor;
     private hotKeyEventHandler;
-    constructor({ theme, canvas }: ICoreEditorConstructorParams);
+    private copyEventHandler;
+    private pasteEventHandler;
+    private keydownEventHandler;
+    constructor({ theme, canvas, mode }: ICoreEditorConstructorParams);
     static provideEditorInstance(): CoreEditor;
-    setMonomersLibrary(monomersLibrary: MonomerItemType[]): void;
-    get monomersLibrary(): import("lodash").Dictionary<{
-        label: string;
-        colorScheme?: import("../../domain/types").MonomerColorScheme | undefined;
-        favorite?: boolean | undefined;
-        struct: Struct;
-        props: {
-            id?: string | undefined;
-            MonomerNaturalAnalogCode: string;
-            MonomerName: string;
-            MonomerFullName?: string | undefined;
-            Name: string;
-            BranchMonomer?: string | undefined;
-            MonomerCaps?: {
-                [key: string]: string;
-            } | undefined;
-            MonomerCode?: string | undefined;
-            MonomerType?: string | undefined;
-            MonomerClass?: string | undefined;
-            isMicromoleculeFragment?: boolean | undefined;
-        };
-        attachmentPoints?: import("../formatters/types/ket").IKetAttachmentPoint[] | undefined;
-        seqId?: number | undefined;
-    }[]>;
+    private setMonomersLibrary;
+    get monomersLibraryParsedJson(): IKetMacromoleculesContent | undefined;
+    get monomersLibrary(): MonomerItemType[];
+    get defaultRnaPresetsLibraryItems(): IKetMonomerGroupTemplate[];
     private handleHotKeyEvents;
     private setupKeyboardEvents;
+    private setupCopyPasteEvent;
     private setupHotKeysEvents;
     private setupContextMenuEvents;
     private subscribeEvents;
     private onEditSequence;
-    private onStartNewSequence;
+    private onTurnOnSequenceEditInRNABuilderMode;
+    private onTurnOffSequenceEditInRNABuilderMode;
     private onChangeSequenceTypeEnterMode;
     private onSelectMonomer;
     private onSelectRNAPreset;
@@ -69,7 +57,10 @@ export declare class CoreEditor {
     private onCancelBondCreation;
     private onSelectMode;
     setMode(mode: BaseMode): void;
-    get isSequenceEditMode(): boolean;
+    get isSequenceMode(): boolean;
+    get isSequenceEditMode(): boolean | undefined;
+    get isSequenceEditInRNABuilderMode(): boolean | undefined;
+    get isSequenceAnyEditMode(): boolean | undefined;
     onSelectHistory(name: HistoryOperationType): void;
     selectTool(name: string, options?: any): void;
     unsubscribeEvents(): void;
@@ -84,5 +75,6 @@ export declare class CoreEditor {
     private useModeIfNeeded;
     switchToMicromolecules(): void;
     private switchToMacromolecules;
+    private rerenderSequenceMode;
 }
 export {};

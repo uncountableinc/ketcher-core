@@ -22,6 +22,7 @@ export declare class MonomerAddOperation implements Operation {
     deleteMonomerChangeModel: (monomer: BaseMonomer) => void;
     private callback?;
     monomer: BaseMonomer;
+    priority: number;
     constructor(addMonomerChangeModel: (monomer?: BaseMonomer) => BaseMonomer, deleteMonomerChangeModel: (monomer: BaseMonomer) => void, callback?: (() => void) | undefined);
     execute(renderersManager: RenderersManager): void;
     invert(renderersManager: RenderersManager): void;
@@ -53,7 +54,16 @@ export declare class MonomerDeleteOperation implements Operation {
     deleteMonomerChangeModel: (monomer: BaseMonomer) => void;
     private callback?;
     monomer: BaseMonomer;
+    priority: number;
     constructor(monomer: BaseMonomer, addMonomerChangeModel: (monomer: BaseMonomer) => BaseMonomer, deleteMonomerChangeModel: (monomer: BaseMonomer) => void, callback?: (() => void) | undefined);
     execute(renderersManager: RenderersManager): void;
     invert(renderersManager: RenderersManager): void;
+}
+export declare class MonomerItemModifyOperation implements Operation {
+    updateMonomerItem: () => BaseMonomer;
+    revertMonomerItem: () => BaseMonomer;
+    monomer: BaseMonomer;
+    constructor(monomer: BaseMonomer, updateMonomerItem: () => BaseMonomer, revertMonomerItem: () => BaseMonomer);
+    execute(): void;
+    invert(): void;
 }

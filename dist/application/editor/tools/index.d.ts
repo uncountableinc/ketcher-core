@@ -15,3 +15,5 @@
  ***************************************************************************/
 import { ToolConstructorInterface } from './Tool';
 export declare const toolsMap: Record<string, ToolConstructorInterface>;
+export * from './Tool';
+export * from './Zoom';

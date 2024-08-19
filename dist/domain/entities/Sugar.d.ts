@@ -8,5 +8,5 @@ export declare class Sugar extends BaseMonomer {
     private getValidPoint;
     get SubChainConstructor(): typeof RnaSubChain;
     isMonomerTypeDifferentForChaining(monomerToChain: SubChainNode): boolean;
-    get isPartOfRna(): boolean;
+    get isPartOfRNA(): boolean;
 }

@@ -202,6 +202,12 @@ export declare class Atom extends BaseMicromoleculeEntity {
     hasRxnProps(): boolean;
     calcValence(connectionCount: number): boolean;
     calcValenceMinusHyd(conn: number): number;
+    static getSuperAtomAttachmentPointByAttachmentAtom(struct: Struct, atomId: number): import("./sGroupAttachmentPoint").SGroupAttachmentPoint | undefined;
+    static getSuperAtomAttachmentPointByLeavingGroup(struct: Struct, atomId: number): import("./sGroupAttachmentPoint").SGroupAttachmentPoint | undefined;
+    static isSuperatomLeavingGroupAtom(struct: Struct, atomId?: number): boolean;
+    static isSuperatomAttachmentAtom(struct: Struct, atomId?: number): boolean;
+    static getAttachmentAtomExternalConnections(struct: Struct, attachmentAtomId?: number, leavingGroupAtomid?: number): import("./pool").Pool<import("./bond").Bond> | undefined;
+    static isHiddenLeavingGroupAtom(struct: Struct, atomId: number): number | false | null | undefined;
 }
 export declare function radicalElectrons(radical: any): 0 | 1 | 2;
 export {};

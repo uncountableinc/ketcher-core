@@ -22,9 +22,12 @@ import { MolfileFormat } from "../domain/serializers";
 import { Struct } from "../domain/entities";
 import { EventEmitter } from 'events';
 import { LogSettings } from "../utilities";
+import { ExportImageParams, SupportedImageFormats, SupportedModes } from "./ketcher.types";
 export declare class Ketcher {
     #private;
     logging: LogSettings;
+    structService: StructService;
+    _indigo: Indigo;
     get editor(): Editor;
     get eventBus(): EventEmitter;
     constructor(editor: Editor, structService: StructService, formatterFactory: FormatterFactory);
@@ -34,6 +37,7 @@ export declare class Ketcher {
     setSettings(settings: Record<string, string>): any;
     getSmiles(isExtended?: boolean): Promise<string>;
     getMolfile(molfileFormat?: MolfileFormat): Promise<string>;
+    getIdt(): Promise<string>;
     getRxn(molfileFormat?: MolfileFormat): Promise<string>;
     getKet(): Promise<string>;
     getFasta(): Promise<string>;
@@ -47,9 +51,17 @@ export declare class Ketcher {
     getInChIKey(): Promise<string>;
     containsReaction(): boolean;
     isQueryStructureSelected(): boolean;
-    setMolecule(structStr: string): Promise<void>;
-    addFragment(structStr: string): Promise<void>;
+    setMolecule(structStr: string): Promise<void | undefined>;
+    setHelm(helmStr: string): Promise<void | undefined>;
+    addFragment(structStr: string): Promise<void | undefined>;
     layout(): Promise<void>;
+    /**
+     * @param {number} value - in a range [ZoomTool.instance.MINZOOMSCALE, ZoomTool.instance.MAXZOOMSCALE]
+     */
+    setZoom(value: number): void;
+    setMode(mode: SupportedModes): void;
+    exportImage(format: SupportedImageFormats, params?: ExportImageParams): void;
     recognize(image: Blob, version?: string): Promise<Struct>;
     generateImage(data: string, options?: GenerateImageOptions): Promise<Blob>;
+    reinitializeIndigo(structService: StructService): void;
 }

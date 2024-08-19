@@ -1,20 +1,31 @@
 import { BaseSubChain } from "./BaseSubChain";
-import { BaseMonomer } from "./..";
+import { BaseMonomer, SubChainNode, Nucleoside, Nucleotide, MonomerSequenceNode, EmptySequenceNode } from "./..";
+import { EmptySubChain } from "./EmptySubChain";
 export declare class Chain {
     subChains: BaseSubChain[];
-    firstMonomer: BaseMonomer | null;
+    firstMonomer?: BaseMonomer;
     isCyclic: boolean;
     constructor(firstMonomer?: BaseMonomer, isCyclic?: boolean);
+    private createSubChainIfNeed;
     add(monomer: BaseMonomer): void;
+    addNode(node: SubChainNode): this;
     private fillSubChains;
     get lastSubChain(): BaseSubChain;
-    get lastNode(): import("./..").SubChainNode;
+    get nodes(): SubChainNode[];
+    get lastNode(): EmptySequenceNode | MonomerSequenceNode | Nucleoside | Nucleotide | undefined;
+    get lastNonEmptyNode(): SubChainNode | undefined;
     get firstSubChain(): BaseSubChain;
-    get firstNode(): import("./..").SubChainNode;
+    get firstNode(): SubChainNode;
     get length(): number;
     get isEmpty(): boolean;
-    forEachNode(callback: ({ node, subChain }: {
-        node: any;
-        subChain: any;
+    forEachNode(callback: ({ node, subChain, }: {
+        node: SubChainNode;
+        subChain: BaseSubChain;
     }) => void): void;
+    static createChainWithEmptyNode(): {
+        emptyChain: Chain;
+        emptySubChain: EmptySubChain;
+        emptySequenceNode: EmptySequenceNode;
+    };
+    get isNewSequenceChain(): boolean;
 }

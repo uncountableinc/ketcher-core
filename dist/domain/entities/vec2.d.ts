@@ -45,7 +45,7 @@ export declare class Vec2 {
     add_(v: Vec2): void;
     get_xy0(): Vec2;
     sub(v: Vec2): Vec2;
-    scaled(s: number): Vec2;
+    scaled(sInitial: number): Vec2;
     negated(): Vec2;
     yComplement(y1: number): Vec2;
     addScaled(v: Vec2, f: number): Vec2;
@@ -62,6 +62,7 @@ export declare class Vec2 {
     rotateSC(sin: number, cos: number): Vec2;
     rotateAroundOrigin(angleInDegrees: number, origin: Vec2): Vec2;
     isInsidePolygon(points: Vec2[]): boolean;
+    calculateDistanceToLine(line: [Vec2, Vec2]): number;
     oxAngle(): number;
     static radiansToDegrees(radians: any): number;
     static degrees_to_radians(degrees: any): number;

@@ -10,5 +10,4 @@ export declare class Phosphate extends BaseMonomer {
     private getValidPoint;
     isMonomerTypeDifferentForChaining(monomerToChain: SubChainNode): boolean;
     get SubChainConstructor(): typeof PhosphateSubChain;
-    get isPartOfRna(): any;
 }

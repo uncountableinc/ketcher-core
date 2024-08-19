@@ -45,11 +45,13 @@ declare function drawCIPLabel({ atomOrBond, position, restruct, visel, }: {
     rectangle: import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGRectElement>;
 };
 declare function updateHalfBondCoordinates(hb1: HalfBond, hb2: HalfBond, xShift: number): [HalfBond, HalfBond];
+declare function escapeHtml(str: any): any;
 declare const util: {
     relBox: typeof relBox;
     shiftRayBox: typeof shiftRayBox;
     calcCoordinates: typeof calcCoordinates;
     drawCIPLabel: typeof drawCIPLabel;
     updateHalfBondCoordinates: typeof updateHalfBondCoordinates;
+    escapeHtml: typeof escapeHtml;
 };
 export default util;

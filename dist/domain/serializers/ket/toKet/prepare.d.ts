@@ -13,13 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-import { Struct, Vec2 } from "../../../entities";
-declare type KetNode = {
-    type: string;
-    fragment?: Struct;
-    center: Vec2;
-    data?: any;
-    selected?: boolean;
-};
-export declare function prepareStructForKet(struct: Struct): KetNode[];
-export {};
+import { Struct } from "../../../entities";
+import { KetFileNode } from '../../serializers.types';
+export declare function prepareStructForKet(struct: Struct): KetFileNode<any>[];

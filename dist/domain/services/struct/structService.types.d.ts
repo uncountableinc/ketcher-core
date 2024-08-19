@@ -29,7 +29,12 @@ export declare enum ChemicalMimeType {
     UNKNOWN = "chemical/x-unknown",
     SDF = "chemical/x-sdf",
     FASTA = "chemical/x-fasta",
-    SEQUENCE = "chemical/x-sequence"
+    SEQUENCE = "chemical/x-sequence",
+    RNA = "chemical/x-rna-sequence",
+    DNA = "chemical/x-dna-sequence",
+    PEPTIDE = "chemical/x-peptide-sequence",
+    IDT = "chemical/x-idt",
+    HELM = "chemical/x-helm"
 }
 export interface WithStruct {
     struct: string;
@@ -125,4 +130,5 @@ export interface StructService {
     getInChIKey: (struct: string) => Promise<string>;
     generateImageAsBase64: (data: string, options?: GenerateImageOptions) => Promise<string>;
     toggleExplicitHydrogens: (data: ExplicitHydrogensData, options?: StructServiceOptions) => Promise<ExplicitHydrogensResult>;
+    destroy?: () => void;
 }

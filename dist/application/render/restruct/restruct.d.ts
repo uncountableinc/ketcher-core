@@ -30,8 +30,9 @@ import ReText from './retext';
 import { Render } from '../raphaelRender';
 import Visel from './visel';
 import { ReRGroupAttachmentPoint } from './rergroupAttachmentPoint';
+import { ReImage } from "./reImage";
 declare class ReStruct {
-    static maps: {
+    static readonly maps: {
         readonly atoms: typeof ReAtom;
         readonly bonds: typeof ReBond;
         readonly rxnPluses: typeof ReRxnPlus;
@@ -45,6 +46,7 @@ declare class ReStruct {
         readonly reloops: typeof ReLoop;
         readonly simpleObjects: typeof ReSimpleObject;
         readonly texts: typeof ReText;
+        readonly images: typeof ReImage;
     };
     render: Render;
     molecule: Struct;
@@ -59,7 +61,8 @@ declare class ReStruct {
     sgroups: Map<number, ReSGroup>;
     sgroupData: Map<number, ReDataSGroupData>;
     enhancedFlags: Map<number, ReEnhancedFlag>;
-    private simpleObjects;
+    simpleObjects: Map<number, ReSimpleObject>;
+    images: Map<number, ReImage>;
     texts: Map<number, ReText>;
     private initialized;
     private layers;
@@ -73,6 +76,7 @@ declare class ReStruct {
     private enhancedFlagsChanged;
     private bondsChanged;
     private textsChanged;
+    private imagesChanged;
     private snappingBonds;
     constructor(molecule: any, render: Render | {
         skipRaphaelInitialization: boolean;
@@ -124,6 +128,7 @@ declare class ReStruct {
     private showAtoms;
     showEnhancedFlags(): void;
     showBonds(): void;
+    showImages(): void;
     setSelection(selection?: any): void;
     showItemSelection(item: any, selected: any): void;
     addSnappingBonds(bondId: number): void;

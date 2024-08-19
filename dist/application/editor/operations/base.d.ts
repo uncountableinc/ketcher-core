@@ -30,7 +30,7 @@ declare class BaseOperation {
     protected static invalidateAtom(restruct: ReStruct, atomId: number, level?: any): void;
     protected static invalidateLoop(restruct: ReStruct, bondId: number): void;
     protected static invalidateBond(restruct: ReStruct, bondId: number): void;
-    protected static invalidateItem(restruct: ReStruct, map: any, id: number, level?: any): void;
+    protected static invalidateItem(restruct: ReStruct, mapName: keyof typeof ReStruct.maps, id: number, level?: any): void;
     protected static invalidateEnhancedFlag(restruct: ReStruct, fragmentId: number): void;
 }
 export { BaseOperation };

@@ -28,7 +28,7 @@ export declare class FunctionalGroup {
     get isExpanded(): boolean;
     get relatedSGroup(): SGroup;
     static isFunctionalGroup(sgroup: any): boolean;
-    static atomsInFunctionalGroup(functionalGroups: any, atom: any): number | null;
+    static atomsInFunctionalGroup(functionalGroups: any, atom: any, isNeedCheckForGroups?: boolean): number | null;
     static bondsInFunctionalGroup(molecule: any, functionalGroups: any, bond: any): number | null;
     static isRGroupAttachmentPointInsideFunctionalGroup(molecule: Struct, id: number): number | null;
     static findFunctionalGroupByAtom(functionalGroups: Pool<FunctionalGroup>, atomId: number): number | null;

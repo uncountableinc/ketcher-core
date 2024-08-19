@@ -28,4 +28,5 @@ import ReText from './retext';
 export * from './generalEnumTypes';
 export * from './reatom';
 export * from './rergroupAttachmentPoint';
+export * from './reImage';
 export { ReObject, ReAtom, ReBond, ReRxnPlus, ReRxnArrow, ReFrag, ReRGroup, ReEnhancedFlag, ReSGroup, ReSimpleObject, ReText, ReStruct, };

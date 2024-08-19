@@ -7,9 +7,8 @@ export declare class PolymerBondRenderer extends BaseRenderer {
     private selectionElement;
     private path;
     private previousStateOfIsMonomersOnSameHorisontalLine;
+    private sideConnectionBondTurnPoint?;
     constructor(polymerBond: PolymerBond);
-    get attachmentPointsForSnakeBond(): string[];
-    private isSnakeBondAvailableForMonomer;
     get isSnake(): boolean;
     get rootBBox(): DOMRect | undefined;
     get width(): number;
@@ -18,6 +17,8 @@ export declare class PolymerBondRenderer extends BaseRenderer {
     moveSelection(): void;
     appendBond(rootElement: any): D3SvgElementSelection<SVGElement, this> | undefined;
     appendSnakeBond(rootElement: any): D3SvgElementSelection<SVGElement, this> | undefined;
+    private drawPartOfSideConnection;
+    private appendSideConnectionBond;
     private getMonomerWidth;
     private getMonomerHeight;
     isMonomersOnSameHorizontalLine(): boolean;
@@ -38,7 +39,7 @@ export declare class PolymerBondRenderer extends BaseRenderer {
     private addRandomLine;
     appendBondGraph(rootElement: any): D3SvgElementSelection<SVGElement, this> | undefined;
     private appendRootElement;
-    show(): void;
+    show(_theme?: any, force?: boolean): void;
     drawSelection(): void;
     moveEnd(): void;
     private moveSnakeBondEnd;

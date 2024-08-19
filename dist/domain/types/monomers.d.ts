@@ -1,5 +1,5 @@
 import { BaseMonomer, Chem, Peptide, Phosphate, RNABase, Struct, Sugar } from "../entities";
-import { IKetAttachmentPoint } from "../../application/formatters/types/ket";
+import { IKetAttachmentPoint, IKetIdtAliases } from "../../application/formatters/types/ket";
 import { D3SvgElementSelection } from "../../application/render/types";
 export declare type MonomerColorScheme = {
     regular: string;
@@ -24,6 +24,8 @@ export declare type MonomerItemType = {
         MonomerType?: string;
         MonomerClass?: string;
         isMicromoleculeFragment?: boolean;
+        idtAliases?: IKetIdtAliases;
+        unresolved?: boolean;
     };
     attachmentPoints?: IKetAttachmentPoint[];
     seqId?: number;

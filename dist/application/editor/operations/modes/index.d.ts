@@ -16,12 +16,13 @@
 import { RenderersManager } from "../../../render/renderers/RenderersManager";
 import { Operation } from "../../../../domain/entities/Operation";
 import { SequencePointer } from "../../../render/renderers/sequence/SequenceRenderer";
-export declare class ReinitializeSequenceModeCommand implements Operation {
+export declare class ReinitializeModeOperation implements Operation {
+    priority: number;
     constructor();
     execute(_renderersManager: RenderersManager): void;
     invert(_renderersManager: RenderersManager): void;
 }
-export declare class RestoreSequenceCaretPositionCommand implements Operation {
+export declare class RestoreSequenceCaretPositionOperation implements Operation {
     private previousPosition;
     private nextPosition;
     constructor(previousPosition: SequencePointer, nextPosition: SequencePointer);

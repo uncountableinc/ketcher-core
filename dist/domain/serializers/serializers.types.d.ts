@@ -13,7 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
+import { Struct, Vec2 } from "../entities";
 export interface Serializer<T> {
     deserialize: (content: string) => T;
     serialize: (struct: T) => string;
+}
+export interface KetFileNode<T = any> {
+    type: string;
+    fragment?: Struct;
+    center: Vec2;
+    data?: T;
+    selected?: boolean;
 }

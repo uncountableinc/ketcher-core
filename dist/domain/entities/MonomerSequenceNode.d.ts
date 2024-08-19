@@ -6,6 +6,6 @@ export declare class MonomerSequenceNode {
     get firstMonomerInNode(): BaseMonomer;
     get lastMonomerInNode(): BaseMonomer;
     get monomers(): BaseMonomer[];
-    get renderer(): import("../..").BaseMonomerRenderer | import("../../application/render/renderers/sequence/BaseSequenceItemRenderer").BaseSequenceItemRenderer | undefined;
+    get renderer(): import("../..").BaseMonomerRenderer | import("../..").BaseSequenceItemRenderer | undefined;
     get modified(): boolean;
 }

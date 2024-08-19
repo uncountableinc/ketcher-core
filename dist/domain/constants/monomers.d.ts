@@ -5,3 +5,4 @@ export declare enum RNA_DNA_NON_MODIFIED_PART {
 }
 export declare const rnaDnaNaturalAnalogues: string[];
 export declare const peptideNaturalAnalogues: string[];
+export declare const NO_NATURAL_ANALOGUE = "X";

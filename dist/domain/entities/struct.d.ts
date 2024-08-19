@@ -32,6 +32,7 @@ import { Text } from './text';
 import { Vec2 } from './vec2';
 import { Highlight } from './highlight';
 import { RGroupAttachmentPoint } from './rgroupAttachmentPoint';
+import { Image } from './image';
 export declare type Neighbor = {
     aid: number;
     bid: number;
@@ -56,6 +57,7 @@ export declare class Struct {
     abbreviation?: string;
     sGroupForest: SGroupForest;
     simpleObjects: Pool<SimpleObject>;
+    images: Pool<Image>;
     texts: Pool<Text>;
     functionalGroups: Pool<FunctionalGroup>;
     highlights: Pool<Highlight>;
@@ -66,11 +68,11 @@ export declare class Struct {
     isRxn(): boolean;
     isBlank(): boolean;
     isSingleGroup(): boolean;
-    clone(atomSet?: Pile<number> | null, bondSet?: Pile<number> | null, dropRxnSymbols?: boolean, aidMap?: Map<number, number> | null, simpleObjectsSet?: Pile<number> | null, textsSet?: Pile<number> | null, rgroupAttachmentPointSet?: Pile<number> | null, bidMap?: Map<number, number> | null): Struct;
+    clone(atomSet?: Pile<number> | null, bondSet?: Pile<number> | null, dropRxnSymbols?: boolean, aidMap?: Map<number, number> | null, simpleObjectsSet?: Pile<number> | null, textsSet?: Pile<number> | null, rgroupAttachmentPointSet?: Pile<number> | null, imagesSet?: Pile<number> | null, bidMap?: Map<number, number> | null): Struct;
     getScaffold(): Struct;
     getFragmentIds(_fid: number | number[]): Pile<number>;
-    getFragment(fid: number | number[], copyNonFragmentObjects?: boolean): Struct;
-    mergeInto(cp: Struct, atomSet?: Pile<number> | null, bondSet?: Pile<number> | null, dropRxnSymbols?: boolean, keepAllRGroups?: boolean, aidMap?: Map<number, number> | null, simpleObjectsSet?: Pile<number> | null, textsSet?: Pile<number> | null, rgroupAttachmentPointSet?: Pile<number> | null, bidMapEntity?: Map<number, number> | null): Struct;
+    getFragment(fid: number | number[], copyNonFragmentObjects?: boolean, aidMap?: Map<number, number>): Struct;
+    mergeInto(cp: Struct, atomSet?: Pile<number> | null, bondSet?: Pile<number> | null, dropRxnSymbols?: boolean, keepAllRGroups?: boolean, aidMap?: Map<number, number> | null, simpleObjectsSet?: Pile<number> | null, textsSet?: Pile<number> | null, rgroupAttachmentPointSet?: Pile<number> | null, imagesSet?: Pile<number> | null, bidMapEntity?: Map<number, number> | null): Struct;
     prepareLoopStructure(): void;
     atomAddToSGroup(sgid: any, aid: any): void;
     calcConn(atom: any): any[];
@@ -130,6 +132,7 @@ export declare class Struct {
     getGroupIdFromAtomId(atomId: number): number | null;
     getGroupFromAtomId(atomId: number | undefined): SGroup | undefined;
     getGroupIdFromBondId(bondId: number): number | null;
+    getGroupFromBondId(atomId: number): SGroup | undefined;
     getGroupsIdsFromBondId(bondId: number): number[];
     getBondIdByHalfBond(halfBondId: number): number | undefined;
     /**
@@ -145,7 +148,7 @@ export declare class Struct {
     isTargetFromMacromolecule(target?: {
         id: number;
         map: string;
-    }): boolean | undefined;
+    } | null): boolean | null | undefined;
     disableInitiallySelected(): void;
     enableInitiallySelected(): void;
 }

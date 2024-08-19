@@ -23,5 +23,7 @@ export declare class PolymerBond extends DrawingEntity {
     getAnotherMonomer(monomer: BaseMonomer): BaseMonomer | undefined;
     static get backBoneChainAttachmentPoints(): AttachmentPointName[];
     get isBackBoneChainConnection(): boolean;
+    get firstMonomerAttachmentPoint(): AttachmentPointName | undefined;
+    get secondMonomerAttachmentPoint(): AttachmentPointName | undefined;
     get isSideChainConnection(): boolean;
 }

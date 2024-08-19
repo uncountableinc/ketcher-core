@@ -21,6 +21,7 @@ export declare class PolymerBondAddOperation implements Operation {
     private addPolymerBondChangeModel;
     private deletePolymerBondChangeModel;
     polymerBond: any;
+    priority: number;
     constructor(addPolymerBondChangeModel: (polymerBond?: PolymerBond) => PolymerBond, deletePolymerBondChangeModel: (polymerBond: any) => void);
     execute(renderersManager: RenderersManager): void;
     invert(renderersManager: RenderersManager): void;
@@ -29,6 +30,7 @@ export declare class PolymerBondDeleteOperation implements Operation {
     polymerBond: PolymerBond;
     private deletePolymerBondChangeModel;
     private finishPolymerBondCreationModelChange;
+    priority: number;
     constructor(polymerBond: PolymerBond, deletePolymerBondChangeModel: () => void, finishPolymerBondCreationModelChange: (polymerBond?: PolymerBond) => PolymerBond);
     execute(renderersManager: RenderersManager): void;
     invert(renderersManager: RenderersManager): void;
@@ -56,6 +58,7 @@ export declare class PolymerBondFinishCreationOperation implements Operation {
     private finishPolymerBondCreationModelChange;
     private deletePolymerBondCreationModelChange;
     polymerBond: any;
+    priority: number;
     constructor(finishPolymerBondCreationModelChange: (polymerBond?: PolymerBond) => PolymerBond, deletePolymerBondCreationModelChange: (polymerBond: any) => void);
     execute(renderersManager: RenderersManager): void;
     invert(renderersManager: RenderersManager): void;
@@ -70,4 +73,12 @@ export declare class SelectLayoutModeOperation implements Operation {
     constructor(_onExecute: () => void, _onInvert: () => void, mode: any, prevMode: any);
     execute(): void;
     invert(): void;
+}
+export declare class ReconnectPolymerBondOperation implements Operation {
+    private reconnectPolymerBondModelChange;
+    private revertReconnectPolymerBondModelChange;
+    polymerBond: any;
+    constructor(reconnectPolymerBondModelChange: () => PolymerBond, revertReconnectPolymerBondModelChange: () => PolymerBond);
+    execute(renderersManager: RenderersManager): void;
+    invert(renderersManager: RenderersManager): void;
 }

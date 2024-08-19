@@ -1,6 +1,7 @@
 import { CoreEditor, EditorHistory } from "../internal";
 import { BaseMonomer } from "../../../domain/entities/BaseMonomer";
 import { BaseTool } from "./Tool";
+import { AttachmentPointName } from "../../../domain/types";
 declare class PolymerBond implements BaseTool {
     private editor;
     private bondRenderer?;
@@ -24,8 +25,8 @@ declare class PolymerBond implements BaseTool {
     handleBondCreation: (payload: {
         firstMonomer: BaseMonomer;
         secondMonomer: BaseMonomer;
-        firstSelectedAttachmentPoint: string;
-        secondSelectedAttachmentPoint: string;
+        firstSelectedAttachmentPoint: AttachmentPointName;
+        secondSelectedAttachmentPoint: AttachmentPointName;
     }) => void;
     handleBondCreationCancellation: (secondMonomer: BaseMonomer) => void;
     destroy(): void;

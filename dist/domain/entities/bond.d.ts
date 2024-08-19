@@ -35,6 +35,8 @@ export interface BondAttributes {
     cip?: CIP | null;
     isPreview?: boolean;
     initiallySelected?: initiallySelectedType;
+    beginSuperatomAttachmentPointNumber?: number;
+    endSuperatomAttachmentPointNumber?: number;
 }
 export declare class Bond extends BaseMicromoleculeEntity {
     static PATTERN: {
@@ -97,6 +99,8 @@ export declare class Bond extends BaseMicromoleculeEntity {
     angle: number;
     center: Vec2;
     isPreview: boolean;
+    beginSuperatomAttachmentPointNumber?: number;
+    endSuperatomAttachmentPointNumber?: number;
     constructor(attributes: BondAttributes);
     static getAttrHash(bond: Bond): {};
     static getBondNeighbourIds(struct: Struct, bondId: number): {
@@ -120,5 +124,6 @@ export declare class Bond extends BaseMicromoleculeEntity {
     getDir(struct: any): Vec2;
     clone(aidMap?: Map<number, number> | null): Bond;
     getAttachedSGroups(struct: Struct): Pile<number>;
+    static isBondToHiddenLeavingGroup(struct: Struct, bond: Bond): boolean | 0 | null | undefined;
 }
 export {};

@@ -41,7 +41,7 @@ export interface Editor {
     clear: () => void;
     options: (value?: any) => any;
     setOptions: (opts: string) => any;
-    clearHistory: () => any;
+    clearHistoryStack: () => any;
     zoom: (value?: any) => any;
     structSelected: () => Struct;
     explicitSelected: () => EditorSelection;

@@ -21,6 +21,7 @@ interface SavedSettings {
 }
 interface SavedOptions {
     ignoreChiralFlag?: boolean;
+    showStereoFlags?: boolean;
     disableQueryElements?: string[] | null;
 }
 export declare class SettingsManager {

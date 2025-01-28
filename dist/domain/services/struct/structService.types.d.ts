@@ -114,6 +114,7 @@ export interface GenerateImageOptions extends StructServiceOptions {
     outputFormat: OutputFormatType;
     backgroundColor?: string;
     bondThickness: number;
+    stereoStyle?: 'ext' | 'old' | 'none';
 }
 export interface StructService {
     info: () => Promise<InfoResult>;

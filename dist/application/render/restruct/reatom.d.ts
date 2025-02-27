@@ -57,12 +57,12 @@ declare class ReAtom extends ReObject {
     constructor(atom: Atom);
     static isSelectable(): true;
     getVBoxObj(render: Render): Box2Abs | null;
-    drawHover(render: Render): any;
-    getLabeledSelectionContour(render: Render): any;
-    getUnlabeledSelectionContour(render: Render): any;
-    getSelectionContour(render: Render): any;
-    makeHoverPlate(render: Render): any;
-    makeSelectionPlate(restruct: ReStruct): any;
+    drawHover(render: Render): import("raphael").RaphaelElement<"SVG" | "VML", SVGRectElement | Element> | import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGCircleElement> | null;
+    getLabeledSelectionContour(render: Render): import("raphael").RaphaelElement<"SVG" | "VML", SVGRectElement | Element>;
+    getUnlabeledSelectionContour(render: Render): import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGCircleElement>;
+    getSelectionContour(render: Render): import("raphael").RaphaelElement<"SVG" | "VML", SVGRectElement | Element> | import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGCircleElement>;
+    makeHoverPlate(render: Render): import("raphael").RaphaelElement<"SVG" | "VML", SVGRectElement | Element> | import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGCircleElement> | null;
+    makeSelectionPlate(restruct: ReStruct): import("raphael").RaphaelElement<"SVG" | "VML", SVGRectElement | Element> | import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGCircleElement> | null;
     /**
      * if atom is rendered as Abbreviation: O, NH, ...
      * In this case we need to shift the bond render start position to free space for Atom,

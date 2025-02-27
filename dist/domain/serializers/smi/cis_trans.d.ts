@@ -9,8 +9,8 @@ declare class CisTrans {
     each(func: any): void;
     getParity(idx: any): any;
     getSubstituents(idx: any): any;
-    sameside(beg: any, end: any, neiBeg: any, neiEnd: any): 1 | 0 | -1;
-    samesides(iBeg: any, iEnd: any, iNeiBeg: any, iNeiEnd: any): 1 | 0 | -1;
+    sameside(beg: any, end: any, neiBeg: any, neiEnd: any): 0 | 1 | -1;
+    samesides(iBeg: any, iEnd: any, iNeiBeg: any, iNeiEnd: any): 0 | 1 | -1;
     sortSubstituents(substituents: any): boolean;
     isGeomStereoBond(bondIdx: any, substituents: any): boolean;
     build(excludeBonds: any): void;

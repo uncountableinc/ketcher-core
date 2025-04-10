@@ -16,7 +16,7 @@ export declare abstract class Scrollbar {
     protected redraw(): any;
     protected updateAttr(): any;
     protected hide(): null;
-    protected draw(): import("raphael").RaphaelElement<"SVG" | "VML", SVGRectElement | Element>;
+    protected draw(): any;
     protected onDragStart(_x: number, _y: number, event: MouseEvent): void;
     protected onDragEnd(event: MouseEvent): void;
     abstract hasOffset(): boolean;

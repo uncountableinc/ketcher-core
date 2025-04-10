@@ -1,7 +1,7 @@
 import { ReObject, ReStruct } from "./";
 import { Image, ImageReferencePositionInfo } from "../../../domain/entities/image";
 import { RenderOptions } from "../render.types";
-import { RaphaelPaper, RaphaelSet } from 'raphael';
+import { RaphaelPaper } from 'raphael';
 import { Box2Abs, Vec2 } from "../../../domain/entities";
 import { Render } from "./..";
 interface ClosestReferencePosition {
@@ -20,8 +20,8 @@ export declare class ReImage extends ReObject {
     private drawSelectionLine;
     private drawSelectionPoints;
     show(restruct: ReStruct, renderOptions: RenderOptions): void;
-    drawHover(render: Render): import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGRectElement>;
-    makeSelectionPlate(reStruct: ReStruct, paper: RaphaelPaper, options: RenderOptions): RaphaelSet<"SVG" | "VML">;
+    drawHover(render: Render): any;
+    makeSelectionPlate(reStruct: ReStruct, paper: RaphaelPaper, options: RenderOptions): RaphaelSet;
     getVBoxObj(): Box2Abs | null;
     togglePoints(displayFlag: boolean): void;
     calculateDistanceToPoint(point: Vec2, renderOptions: RenderOptions): number;

@@ -41,6 +41,7 @@ export declare class SequenceRenderer {
     }) => void): void;
     static setCaretPositionBySequenceItemRenderer(sequenceItemRenderer: BaseSequenceItemRenderer): void;
     static setCaretPositionByMonomer(monomer: BaseMonomer): void;
+    static setCaretPositionNextToMonomer(monomer: BaseMonomer): void;
     static setCaretPositionByNode(nodeToCompare: SubChainNode): void;
     static getMonomersByCaretPositionRange(startCaretPosition: SequencePointer, endCaretPosition: any): BaseMonomer[];
     static resetLastUserDefinedCaretPosition(): void;
@@ -89,4 +90,6 @@ export declare class SequenceRenderer {
     };
     static getRendererByMonomer(monomer: BaseMonomer): any;
     static showNewSequenceButton(indexOfRowBefore: number): void;
+    static isEmptyCanvas(): boolean;
+    static get isCaretAtChainEnd(): boolean;
 }

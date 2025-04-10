@@ -17,6 +17,8 @@ declare class SelectRectangle implements BaseTool {
     mouseup(event: any): void;
     mouseOverDrawingEntity(event: any): void;
     mouseLeaveDrawingEntity(event: any): void;
+    mouseOverPolymerBond(event: any): void;
+    mouseLeavePolymerBond(event: any): void;
     setSelectedEntities(): void;
     destroy(): void;
 }

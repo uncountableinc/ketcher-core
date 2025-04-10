@@ -5,6 +5,8 @@ export declare class ChemRenderer extends BaseMonomerRenderer {
     monomer: Chem;
     constructor(monomer: Chem, scale?: number);
     protected appendBody(rootElement: Selection<SVGGElement, void, HTMLElement, never>, theme: any): Selection<SVGUseElement, this, HTMLElement, never>;
-    protected get enumerationElementPosition(): undefined;
-    protected get beginningElementPosition(): undefined;
+    get enumerationElementPosition(): undefined;
+    get beginningElementPosition(): undefined;
+    show(theme?: any): void;
+    protected get modificationConfig(): undefined;
 }

@@ -82,8 +82,8 @@ export declare class SGroup {
     isContracted(): boolean;
     calculatePP(struct: Struct): void;
     isGroupAttached(struct: Struct): boolean;
-    addAttachmentPoint(attachmentPoint: SGroupAttachmentPoint): void;
-    addAttachmentPoints(attachmentPoints: ReadonlyArray<SGroupAttachmentPoint> | SGroupAttachmentPoint[]): void;
+    addAttachmentPoint(attachmentPoint: SGroupAttachmentPoint, validateUniqueness?: boolean): void;
+    addAttachmentPoints(attachmentPoints: ReadonlyArray<SGroupAttachmentPoint> | SGroupAttachmentPoint[], validateUniqueness?: boolean): void;
     removeAttachmentPoint(attachmentPoint: SGroupAttachmentPoint): boolean;
     getAttachmentPoints(): ReadonlyArray<SGroupAttachmentPoint>;
     /**
@@ -115,6 +115,7 @@ export declare class SGroup {
     };
     cloneAttachmentPoints(atomIdMap: Map<number, number>): ReadonlyArray<SGroupAttachmentPoint>;
     get isSuperatomWithoutLabel(): boolean;
+    get isMonomer(): boolean;
     static getOffset(sgroup: SGroup): null | Vec2;
     static isSaltOrSolvent(moleculeName: string): boolean;
     static isAtomInSaltOrSolvent(atomId: number, sgroupsOnCanvas: SGroup[]): boolean;
@@ -134,7 +135,7 @@ export declare class SGroup {
     static getBracketParameters(mol: any, crossBondsPerAtom: {
         [key: number]: Array<Bond>;
     }, atomSet: Pile<number>, bb: any, d: any, n: any): Array<any>;
-    static getObjBBox(atoms: any, mol: any): Box2Abs;
+    static getObjBBox(atoms: any, mol: any, useCollapsedSgroupsPosition?: boolean): Box2Abs;
     static getAtoms(mol: any, sg: any): Array<any>;
     static getBonds(mol: any, sg: any): Array<any>;
     static prepareMulForSaving(sgroup: any, mol: any): void;

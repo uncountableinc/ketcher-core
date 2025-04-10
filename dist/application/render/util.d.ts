@@ -17,7 +17,7 @@ import { RaphaelAxisAlignedBoundingBox } from 'raphael';
 import { Atom, Bond, Box2Abs, HalfBond, Vec2 } from "../../domain/entities";
 import { ReStruct } from './restruct';
 import Visel from './restruct/visel';
-import { RelativeBox } from './render.types';
+import { RelativeBox, UsageInMacromolecule } from './render.types';
 declare function relBox(box: RaphaelAxisAlignedBoundingBox): RelativeBox;
 /**
  * Finds intersection of a ray and a box and
@@ -46,6 +46,11 @@ declare function drawCIPLabel({ atomOrBond, position, restruct, visel, }: {
 };
 declare function updateHalfBondCoordinates(hb1: HalfBond, hb2: HalfBond, xShift: number): [HalfBond, HalfBond];
 declare function escapeHtml(str: any): any;
+declare function useLabelStyles(attachmentPointSelected: boolean, attachmentPointUsed: boolean, usageInMacromolecule: UsageInMacromolecule): {
+    color: string;
+    fill: string;
+    stroke: string;
+};
 declare const util: {
     relBox: typeof relBox;
     shiftRayBox: typeof shiftRayBox;
@@ -53,5 +58,6 @@ declare const util: {
     drawCIPLabel: typeof drawCIPLabel;
     updateHalfBondCoordinates: typeof updateHalfBondCoordinates;
     escapeHtml: typeof escapeHtml;
+    useLabelStyles: typeof useLabelStyles;
 };
 export default util;

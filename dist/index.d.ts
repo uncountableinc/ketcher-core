@@ -27,4 +27,5 @@ export * from "./application/ketcher";
 export * from "./application/ketcher.types";
 export * from "./application/ketcherBuilder";
 export * from "./application/utils";
+export * from "./domain/helpers/monomers";
 export * from "./utilities";

@@ -1,15 +1,24 @@
-import { AttachmentPointName, MonomerItemType } from "../types";
+import { AmbiguousMonomerType, AttachmentPointName, MonomerItemType, MonomerOrAmbiguousType } from "../types";
 import { Vec2 } from "./vec2";
 import { Command } from "./Command";
 import { DrawingEntity } from "./DrawingEntity";
 import { PolymerBond } from "./PolymerBond";
-import { BaseMonomer, Phosphate, RNABase, Struct, Sugar } from "./";
+import { BaseMonomer, Chem, LinkerSequenceNode, Phosphate, RNABase, Struct, Sugar } from "./";
 import { ChainsCollection } from "./monomer-chains/ChainsCollection";
 import { Nucleoside } from './Nucleoside';
+import { Nucleotide } from './Nucleotide';
 import { CanvasMatrix } from "./canvas-matrix/CanvasMatrix";
 import { Matrix } from "./canvas-matrix/Matrix";
 import { Cell } from "./canvas-matrix/Cell";
-export declare const SNAKE_LAYOUT_CELL_WIDTH = 60;
+import { AmbiguousMonomer } from "./AmbiguousMonomer";
+import { Atom, AtomProperties } from "./CoreAtom";
+import { Bond } from "./CoreBond";
+import { MonomerToAtomBond } from "./MonomerToAtomBond";
+import { AtomLabel } from "../constants";
+import { HydrogenBond } from "./HydrogenBond";
+import { MACROMOLECULES_BOND_TYPES } from "../../application/editor/tools/Bond";
+export declare const CELL_WIDTH = 60;
+export declare const SNAKE_LAYOUT_Y_OFFSET_BETWEEN_CHAINS: number;
 export declare const MONOMER_START_X_POSITION: number;
 export declare const MONOMER_START_Y_POSITION: number;
 declare type RnaPresetAdditionParams = {
@@ -19,16 +28,14 @@ declare type RnaPresetAdditionParams = {
     rnaBasePosition: Vec2 | undefined;
     phosphate: MonomerItemType | undefined;
     phosphatePosition: Vec2 | undefined;
-};
-declare type NucleotideOrNucleoside = {
-    sugar: Sugar;
-    phosphate?: Phosphate;
-    rnaBase: RNABase;
-    baseMonomer: Sugar | Phosphate;
+    existingNode?: Nucleotide | Nucleoside | LinkerSequenceNode;
 };
 export declare class DrawingEntitiesManager {
     monomers: Map<number, BaseMonomer>;
-    polymerBonds: Map<number, PolymerBond>;
+    polymerBonds: Map<number, PolymerBond | HydrogenBond>;
+    atoms: Map<number, Atom>;
+    bonds: Map<number, Bond>;
+    monomerToAtomBonds: Map<number, MonomerToAtomBond>;
     micromoleculesHiddenEntities: Struct;
     canvasMatrix?: CanvasMatrix;
     snakeLayoutMatrix?: Matrix<Cell>;
@@ -36,11 +43,15 @@ export declare class DrawingEntitiesManager {
     get selectedEntitiesArr(): DrawingEntity[];
     get selectedEntities(): [number, DrawingEntity][];
     get allEntities(): [number, DrawingEntity][];
+    get hasDrawingEntities(): boolean;
+    get hasMonomers(): boolean;
+    get allBondsToMonomers(): ([number, PolymerBond] | [number, MonomerToAtomBond])[];
     deleteSelectedEntities(): Command;
     deleteAllEntities(): Command;
-    addMonomerChangeModel(monomerItem: MonomerItemType, position: Vec2, _monomer?: BaseMonomer): BaseMonomer;
+    addMonomerChangeModel(monomerItem: MonomerItemType, position: Vec2, _monomer?: BaseMonomer): BaseMonomer | AmbiguousMonomer;
+    createMonomer(monomerItem: MonomerOrAmbiguousType, position: Vec2): AmbiguousMonomer | Chem | Sugar | import("./").Peptide | RNABase | Phosphate;
     updateMonomerItem(monomer: BaseMonomer, monomerItemNew: MonomerItemType): BaseMonomer;
-    addMonomer(monomerItem: MonomerItemType, position: Vec2): Command;
+    addMonomer(monomerItem: MonomerItemType, position: Vec2, _monomer?: BaseMonomer): Command;
     deleteDrawingEntity(drawingEntity: DrawingEntity, needToDeleteConnectedEntities?: boolean): Command;
     selectDrawingEntity(drawingEntity: DrawingEntity): Command;
     selectDrawingEntities(drawingEntities: DrawingEntity[]): Command;
@@ -59,18 +70,18 @@ export declare class DrawingEntitiesManager {
     modifyMonomerItem(monomer: BaseMonomer, monomerItemNew: MonomerItemType): Command;
     selectIfLocatedInRectangle(rectangleTopLeftPoint: Vec2, rectangleBottomRightPoint: Vec2, previousSelectedEntities: [number, DrawingEntity][], shiftKey?: boolean): Command;
     private checkBondSelectionForSequenceMode;
-    startPolymerBondCreationChangeModel(firstMonomer: any, startPosition: any, endPosition: any, _polymerBond?: PolymerBond): PolymerBond;
-    startPolymerBondCreation(firstMonomer: any, startPosition: any, endPosition: any): {
+    startPolymerBondCreationChangeModel(firstMonomer: any, startPosition: any, endPosition: any, bondType?: MACROMOLECULES_BOND_TYPES, _polymerBond?: PolymerBond | HydrogenBond): PolymerBond | HydrogenBond;
+    startPolymerBondCreation(firstMonomer: BaseMonomer, startPosition: Vec2, endPosition: Vec2, bondType: MACROMOLECULES_BOND_TYPES): {
         command: Command;
         polymerBond: any;
     };
-    deletePolymerBondChangeModel(polymerBond: PolymerBond): void;
-    deletePolymerBond(polymerBond: PolymerBond): Command;
+    deletePolymerBondChangeModel(polymerBond: PolymerBond | HydrogenBond): void;
+    deletePolymerBond(polymerBond: PolymerBond | HydrogenBond): Command;
     cancelPolymerBondCreation(polymerBond: PolymerBond, secondMonomer?: BaseMonomer): Command;
     movePolymerBond(polymerBond: PolymerBond, position: Vec2): Command;
-    finishPolymerBondCreationModelChange(firstMonomer: BaseMonomer, secondMonomer: BaseMonomer, firstMonomerAttachmentPoint: AttachmentPointName, secondMonomerAttachmentPoint: AttachmentPointName, _polymerBond?: PolymerBond): PolymerBond;
-    finishPolymerBondCreation(polymerBond: PolymerBond, secondMonomer: BaseMonomer, firstMonomerAttachmentPoint: AttachmentPointName, secondMonomerAttachmentPoint: AttachmentPointName): Command;
-    createPolymerBond(firstMonomer: BaseMonomer, secondMonomer: BaseMonomer, firstMonomerAttachmentPoint: AttachmentPointName, secondMonomerAttachmentPoint: AttachmentPointName): Command;
+    finishPolymerBondCreationModelChange(firstMonomer: BaseMonomer, secondMonomer: BaseMonomer, firstMonomerAttachmentPoint: AttachmentPointName, secondMonomerAttachmentPoint: AttachmentPointName, bondType?: MACROMOLECULES_BOND_TYPES, _polymerBond?: PolymerBond): PolymerBond | HydrogenBond;
+    finishPolymerBondCreation(polymerBond: PolymerBond, secondMonomer: BaseMonomer, firstMonomerAttachmentPoint: AttachmentPointName, secondMonomerAttachmentPoint: AttachmentPointName, bondType?: MACROMOLECULES_BOND_TYPES): Command;
+    createPolymerBond(firstMonomer: BaseMonomer, secondMonomer: BaseMonomer, firstMonomerAttachmentPoint: AttachmentPointName, secondMonomerAttachmentPoint: AttachmentPointName, bondType?: MACROMOLECULES_BOND_TYPES): Command;
     intendToStartBondCreation(monomer: BaseMonomer): Command;
     intendToStartAttachmenPointBondCreation(monomer: BaseMonomer, attachmentPointName: AttachmentPointName): Command;
     intendToFinishBondCreation(monomer: BaseMonomer, bond: PolymerBond, shouldCalculateBonds: boolean): Command;
@@ -80,25 +91,24 @@ export declare class DrawingEntitiesManager {
     cancelIntentionToSelectDrawingEntity(drawingEntity: DrawingEntity): Command;
     showPolymerBondInformation(polymerBond: PolymerBond): Command;
     hidePolymerBondInformation(polymerBond: PolymerBond): Command;
+    addRnaPresetFromNode: (node: Nucleotide | Nucleoside | LinkerSequenceNode) => Command;
     addRnaPreset({ sugar, sugarPosition, phosphate, phosphatePosition, rnaBase, rnaBasePosition, }: RnaPresetAdditionParams): {
         command: Command;
         monomers: BaseMonomer[];
     };
     rearrangeChainModelChange(monomer: BaseMonomer, newPosition: Vec2): BaseMonomer;
-    getNucleotideSize(nucleotide: NucleotideOrNucleoside): {
-        width: number;
-        height: number;
-    };
     private reArrangeChain;
     private reArrangeRnaChain;
     private getNextMonomerPositionForSnakeLayout;
     private addRnaOperations;
     private recalculateCanvasMatrixModelChange;
     recalculateCanvasMatrix(chainsCollection?: ChainsCollection, previousSnakeLayoutMatrix?: Matrix<Cell>): Command;
-    reArrangeChains(canvasWidth: number, isSnakeMode: boolean, needRedrawBonds?: boolean): Command;
+    private rearrangeAntisenseChain;
+    private calculateSnakeLayoutMatrix;
+    applySnakeLayout(canvasWidth: number, isSnakeMode: boolean, needRedrawBonds?: boolean, needRepositionMonomers?: boolean): Command;
     private redrawBondsModelChange;
     redrawBonds(): Command;
-    getNextPositionAndDistance(lastPosition: Vec2, height: number, canvasWidth: number, width?: number): {
+    getNextPositionAndDistance(lastPosition: Vec2, height: number, canvasWidth: number, width: number | undefined, restOfRowsWithAntisense: number): {
         maxVerticalDistance: number;
         lastPosition: Vec2;
     };
@@ -129,5 +139,36 @@ export declare class DrawingEntitiesManager {
     removeHoverForAllMonomers(): Command;
     private reconnectPolymerBondModelChange;
     reconnectPolymerBond(polymerBond: PolymerBond, newFirstMonomerAttachmentPoint: AttachmentPointName, newSecondMonomerAttachmentPoint: AttachmentPointName, initialFirstMonomerAttachmentPoint: AttachmentPointName, initialSecondMonomerAttachmentPoint: AttachmentPointName): Command;
+    private addAmbiguousMonomerChangeModel;
+    addAmbiguousMonomer(ambiguousMonomerItem: AmbiguousMonomerType, position: Vec2): Command;
+    private addAtomChangeModel;
+    addAtom(position: Vec2, monomer: BaseMonomer, atomIdInMicroMode: number, label: AtomLabel, properties?: AtomProperties): Command;
+    private deleteAtomChangeModel;
+    private deleteAtom;
+    private addBondChangeModel;
+    addBond(firstAtom: Atom, secondAtom: Atom, type: number, stereo: number, bondIdInMicroMode: number): Command;
+    private deleteBondChangeModel;
+    private deleteBond;
+    addMonomerToAtomBondChangeModel(monomer: BaseMonomer, atom: Atom, attachmentPoint: AttachmentPointName, _monomerToAtomBond?: MonomerToAtomBond): MonomerToAtomBond;
+    private deleteMonomerToAtomBondChangeModel;
+    private deleteMonomerToAtomBond;
+    addMonomerToAtomBond(monomer: BaseMonomer, atom: Atom, attachmentPoint: AttachmentPointName): Command;
+    static geStructureBbox(monomers: BaseMonomer[]): {
+        left: any;
+        right: any;
+        top: any;
+        bottom: any;
+        width: number;
+        height: number;
+    };
+    private get antisenseChainBasesMap();
+    markMonomerAsAntisense(monomer: BaseMonomer): Command;
+    markMonomerAsSense(monomer: BaseMonomer): Command;
+    recalculateAntisenseChains(): Command;
+    get hasAntisenseChains(): boolean;
+    private getAntisenseBaseLabel;
+    createAntisenseChain(): Command;
+    get monomersArray(): BaseMonomer[];
+    get molecules(): BaseMonomer[];
 }
 export {};

@@ -19,8 +19,8 @@ export declare class ReImage extends ReObject {
     private getSelectionReferencePositions;
     private drawSelectionLine;
     private drawSelectionPoints;
-    show(restruct: ReStruct, renderOptions: RenderOptions): void;
-    drawHover(render: Render): any;
+    show(restruct: ReStruct, renderOptions: RenderOptions, nextPath?: any): void;
+    drawHover(render: Render): any[];
     makeSelectionPlate(reStruct: ReStruct, paper: RaphaelPaper, options: RenderOptions): RaphaelSet;
     getVBoxObj(): Box2Abs | null;
     togglePoints(displayFlag: boolean): void;

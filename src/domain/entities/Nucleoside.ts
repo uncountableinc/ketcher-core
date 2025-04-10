@@ -9,17 +9,22 @@ import {
 } from 'domain/helpers/monomers';
 import { SubChainNode } from 'domain/entities/monomer-chains/types';
 import { Vec2 } from 'domain/entities/vec2';
-import { CoreEditor } from 'application/editor/internal';
+import { Coordinates, CoreEditor } from 'application/editor/internal';
 import { AttachmentPointName } from 'domain/types';
 import { Command } from 'domain/entities/Command';
-import {
-  getRnaPartLibraryItem,
-  getSugarBySequenceType,
-} from 'domain/helpers/rna';
+import { getRnaPartLibraryItem } from 'domain/helpers/rna';
 import { BaseMonomer } from 'domain/entities/BaseMonomer';
+import { AmbiguousMonomer } from 'domain/entities/AmbiguousMonomer';
+import { SugarRenderer } from 'application/render';
+import { RNA_DNA_NON_MODIFIED_PART } from 'domain/constants/monomers';
+import { CELL_WIDTH } from './DrawingEntitiesManager';
+import { KetMonomerClass } from 'application/formatters';
 
 export class Nucleoside {
-  constructor(public sugar: Sugar, public rnaBase: RNABase) {}
+  constructor(
+    public sugar: Sugar,
+    public rnaBase: RNABase | AmbiguousMonomer,
+  ) {}
 
   static fromSugar(sugar: Sugar, needValidation = true) {
     if (needValidation) {
@@ -35,24 +40,46 @@ export class Nucleoside {
     return new Nucleoside(sugar, getRnaBaseFromSugar(sugar) as RNABase);
   }
 
-  static createOnCanvas(rnaBaseName: string, position: Vec2) {
+  static createOnCanvas(
+    rnaBaseName: string,
+    position: Vec2,
+    sugarName: RNA_DNA_NON_MODIFIED_PART = RNA_DNA_NON_MODIFIED_PART.SUGAR_RNA,
+    isAntisense = false,
+  ) {
     const editor = CoreEditor.provideEditorInstance();
-    const rnaBaseLibraryItem = getRnaPartLibraryItem(editor, rnaBaseName);
-    const sugarName = getSugarBySequenceType(editor.sequenceTypeEnterMode);
-    assert(sugarName);
-
-    const sugarLibraryItem = getRnaPartLibraryItem(editor, sugarName);
+    const rnaBaseLibraryItem = getRnaPartLibraryItem(
+      editor,
+      rnaBaseName,
+      KetMonomerClass.Base,
+    );
+    const sugarLibraryItem = getRnaPartLibraryItem(
+      editor,
+      sugarName,
+      KetMonomerClass.Sugar,
+    );
 
     assert(sugarLibraryItem);
     assert(rnaBaseLibraryItem);
 
+    const topLeftItemPosition = position;
+    const bottomItemPosition = position.add(
+      Coordinates.canvasToModel(
+        new Vec2(0, CELL_WIDTH + SugarRenderer.monomerSize.height),
+      ),
+    );
     const modelChanges = new Command();
 
     modelChanges.merge(
-      editor.drawingEntitiesManager.addMonomer(sugarLibraryItem, position),
+      editor.drawingEntitiesManager.addMonomer(
+        { ...sugarLibraryItem, isAntisense },
+        isAntisense ? bottomItemPosition : topLeftItemPosition,
+      ),
     );
     modelChanges.merge(
-      editor.drawingEntitiesManager.addMonomer(rnaBaseLibraryItem, position),
+      editor.drawingEntitiesManager.addMonomer(
+        { ...rnaBaseLibraryItem, isAntisense },
+        isAntisense ? topLeftItemPosition : bottomItemPosition,
+      ),
     );
 
     const sugar = modelChanges.operations[0].monomer as Sugar;

@@ -22,4 +22,5 @@ export declare class Pool<TValue = any> extends Map<number, TValue> {
     filter(predicate: (key: number, value: TValue) => boolean): Pool<TValue>;
     some(predicate: (value: TValue) => boolean): boolean;
     changeInitiallySelectedPropertiesForPool(invalidate?: boolean): void;
+    clone(): Pool<TValue>;
 }

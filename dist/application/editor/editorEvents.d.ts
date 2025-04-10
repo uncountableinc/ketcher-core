@@ -4,6 +4,18 @@ export declare let editorEvents: any;
 export declare function resetEditorEvents(): void;
 export declare const renderersEvents: ToolEventHandlerName[];
 export declare const hotkeysConfiguration: {
+    RNASequenceType: {
+        shortcut: string[];
+        handler: (editor: CoreEditor) => void;
+    };
+    DNASequenceType: {
+        shortcut: string[];
+        handler: (editor: CoreEditor) => void;
+    };
+    PEPTIDESequenceTYpe: {
+        shortcut: string[];
+        handler: (editor: CoreEditor) => void;
+    };
     exit: {
         shortcut: string[];
         handler: (editor: CoreEditor) => void;
@@ -37,6 +49,10 @@ export declare const hotkeysConfiguration: {
         handler: () => void;
     };
     'select-all': {
+        shortcut: string;
+        handler: (editor: CoreEditor) => void;
+    };
+    hand: {
         shortcut: string;
         handler: (editor: CoreEditor) => void;
     };

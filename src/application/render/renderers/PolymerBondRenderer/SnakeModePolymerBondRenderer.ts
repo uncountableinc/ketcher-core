@@ -1,20 +1,37 @@
-import { BaseRenderer } from './BaseRenderer';
-import { PolymerBond } from 'domain/entities/PolymerBond';
-import { DrawingEntity } from 'domain/entities/DrawingEntity';
-import assert from 'assert';
-import { D3SvgElementSelection } from 'application/render/types';
 import { editorEvents } from 'application/editor/editorEvents';
-import { Vec2 } from 'domain/entities';
-import { SnakeMode } from 'application/editor/modes/';
-import { Coordinates } from 'application/editor/shared/coordinates';
 import { CoreEditor } from 'application/editor/internal';
-import { SNAKE_LAYOUT_CELL_WIDTH } from 'domain/entities/DrawingEntitiesManager';
-import { Connection } from 'domain/entities/canvas-matrix/Connection';
+import { Coordinates } from 'application/editor/shared/coordinates';
+import {
+  BaseMonomerRenderer,
+  BaseSequenceItemRenderer,
+} from 'application/render';
+import { D3SvgElementSelection } from 'application/render/types';
+import assert from 'assert';
+import { BaseMonomer, Vec2 } from 'domain/entities';
+import { Cell } from 'domain/entities/canvas-matrix/Cell';
+import {
+  Connection,
+  ConnectionDirectionInDegrees,
+  ConnectionDirectionOfLastCell,
+} from 'domain/entities/canvas-matrix/Connection';
+import { CELL_WIDTH } from 'domain/entities/DrawingEntitiesManager';
+import { DrawingEntity } from 'domain/entities/DrawingEntity';
+import { PolymerBond } from 'domain/entities/PolymerBond';
 import { getSugarFromRnaBase } from 'domain/helpers/monomers';
+import { BaseRenderer } from '../BaseRenderer';
+import { HydrogenBond } from 'domain/entities/HydrogenBond';
+import { SnakeMode } from 'application/editor';
+
+enum LineDirection {
+  Horizontal = 'Horizontal',
+  Vertical = 'Vertical',
+}
 
 const LINE_FROM_MONOMER_LENGTH = 15;
 const VERTICAL_LINE_LENGTH = 21;
 const RNA_CHAIN_VERTICAL_LINE_LENGTH = 74;
+const RNA_ANTISENSE_CHAIN_VERTICAL_LINE_LENGTH = 20;
+const RNA_SENSE_CHAIN_VERTICAL_LINE_LENGTH = 210;
 const CORNER_LENGTH = 4;
 const DOUBLE_CORNER_LENGTH = CORNER_LENGTH * 2;
 
@@ -22,55 +39,56 @@ const BOND_END_LENGTH = 15;
 const CELL_HEIGHT = 40;
 const SMOOTH_CORNER_SIZE = 5;
 const SIDE_CONNECTION_BODY_ELEMENT_CLASS = 'polymer-bond-body';
-enum LINE_DIRECTION {
-  Horizontal = 'Horizontal',
-  Vertical = 'Vertical',
-}
 
-export class PolymerBondRenderer extends BaseRenderer {
+// TODO: Need to split the class by three:
+//  - SnakeModeBackboneBondRenderer (black “snake” line)
+//  - SnakeModeSideChainBondRenderer (blue “snake” line)
+//  - SnakeModeRNABaseAndSugarBondRenderer (black straight line)
+export class SnakeModePolymerBondRenderer extends BaseRenderer {
   private editorEvents: typeof editorEvents;
+  private isSnakeBond = false; // `SnakeModeBackboneBondRenderer` or `SnakeModeRNABaseAndSugarBondRenderer`.
+  // TODO: Specify the types.
   private selectionElement;
   private path = '';
-  private previousStateOfIsMonomersOnSameHorisontalLine = false;
+  private previousStateOfIsMonomersOnSameHorizontalLine = false;
   private sideConnectionBondTurnPoint?: number;
-  constructor(public polymerBond: PolymerBond) {
+  public declare bodyElement?: D3SvgElementSelection<SVGLineElement, this>;
+
+  constructor(public readonly polymerBond: PolymerBond) {
     super(polymerBond as DrawingEntity);
     this.polymerBond.setRenderer(this);
     this.editorEvents = editorEvents;
+    this.calculateIsSnakeBond();
   }
 
-  get isSnake() {
-    if (this.polymerBond.isSideChainConnection) {
-      return false;
-    }
-
-    if (
-      getSugarFromRnaBase(this.polymerBond.firstMonomer) ||
-      getSugarFromRnaBase(this.polymerBond.secondMonomer)
-    ) {
-      return false;
-    }
-
-    const editor = CoreEditor.provideEditorInstance();
-    return editor?.mode instanceof SnakeMode;
+  // TODO: Delete.
+  public get isSnake(): true {
+    return true;
   }
 
-  public get rootBBox() {
+  private get isHydrogenBond() {
+    return this.polymerBond instanceof HydrogenBond;
+  }
+
+  public get rootBBox(): DOMRect | undefined {
     const rootNode = this.rootElement?.node();
     if (!rootNode) return;
 
     return rootNode.getBBox();
   }
 
-  public get width() {
+  public get width(): number {
     return this.rootBBox?.width || 0;
   }
 
-  public get height() {
+  public get height(): number {
     return this.rootBBox?.height || 0;
   }
 
-  private get scaledPosition() {
+  private get scaledPosition(): {
+    readonly endPosition: Vec2;
+    readonly startPosition: Vec2;
+  } {
     // we need to convert monomer coordinates(stored in angstroms) to pixels.
     // it needs to be done in view layer of application (like renderers)
     const startPositionInPixels = Coordinates.modelToCanvas(
@@ -87,9 +105,9 @@ export class PolymerBondRenderer extends BaseRenderer {
     };
   }
 
-  public moveSelection() {
+  public moveSelection(): void {
     if (
-      this.previousStateOfIsMonomersOnSameHorisontalLine !==
+      this.previousStateOfIsMonomersOnSameHorizontalLine !==
       this.isMonomersOnSameHorizontalLine()
     ) {
       this.remove();
@@ -99,20 +117,24 @@ export class PolymerBondRenderer extends BaseRenderer {
       this.moveStart();
       this.moveEnd();
     }
-    this.previousStateOfIsMonomersOnSameHorisontalLine =
+    this.previousStateOfIsMonomersOnSameHorizontalLine =
       this.isMonomersOnSameHorizontalLine();
   }
 
+  // TODO: Specify the types.
   public appendBond(rootElement) {
     const editor = CoreEditor.provideEditorInstance();
+    const matrix = editor.drawingEntitiesManager.canvasMatrix;
+    const cells = matrix?.polymerBondToCells.get(this.polymerBond);
 
     if (
-      editor?.mode instanceof SnakeMode &&
-      this.polymerBond.isSideChainConnection
+      this.polymerBond.isSideChainConnection &&
+      (!this.isHydrogenBond || editor.mode instanceof SnakeMode) &&
+      cells
     ) {
-      this.appendSideConnectionBond(rootElement);
+      this.appendSideConnectionBond(rootElement, cells);
     } else if (
-      this.isSnake &&
+      this.isSnakeBond &&
       this.polymerBond.finished &&
       !this.isMonomersOnSameHorizontalLine()
     ) {
@@ -124,6 +146,7 @@ export class PolymerBondRenderer extends BaseRenderer {
     return this.bodyElement;
   }
 
+  // TODO: Specify the types.
   public appendSnakeBond(rootElement) {
     const startPosition = this.scaledPosition.startPosition;
     const endPosition = this.scaledPosition.endPosition;
@@ -136,66 +159,100 @@ export class PolymerBondRenderer extends BaseRenderer {
       .attr('class', 'selection-area')
       .attr('d', this.path)
       .attr('fill-opacity', 0)
-      .attr('pointer-events', 'stroke');
+      .attr('pointer-events', 'stroke')
+      .attr('data-testid', 'bond')
+      .attr('data-bondtype', 'covalent')
+      .attr('data-bondid', this.polymerBond.id)
+      .attr('data-frommonomerid', this.polymerBond.firstMonomer.id)
+      .attr('data-tomonomerid', this.polymerBond.secondMonomer?.id)
+      .attr(
+        'data-fromconnectionpoint',
+        this.polymerBond.firstMonomer.getAttachmentPointByBond(
+          this.polymerBond,
+        ),
+      )
+      .attr(
+        'data-tomonomerid',
+        this.polymerBond.secondMonomer?.getAttachmentPointByBond(
+          this.polymerBond,
+        ),
+      );
     return this.bodyElement;
   }
 
-  private drawPartOfSideConnection(isHorizontal, connection, cell, direction) {
+  private drawPartOfSideConnection(
+    isHorizontal: boolean,
+    connection: Connection,
+    cell: Cell,
+    direction: ConnectionDirectionInDegrees,
+  ): string {
     const sin = Math.sin((direction * Math.PI) / 180);
     const cos = Math.cos((direction * Math.PI) / 180);
-    const xOffset = (SNAKE_LAYOUT_CELL_WIDTH / 2) * cos;
+    const xOffset = (CELL_WIDTH / 2) * cos;
     const yOffset = (CELL_HEIGHT / 2) * sin;
-    const maxXOffset = cell.connections.reduce((max, connection) => {
-      return max > connection.offset ? max : connection.offset;
-    }, 0);
-    const maxYOffset = cell.connections.reduce((max, connection) => {
-      const connectionYOffset = connection.yOffset || 0;
-      return max > connectionYOffset ? max : connectionYOffset;
-    }, 0);
+    const maxXOffset = cell.connections.reduce(
+      (max: number, connection: Connection): number => {
+        return max > connection.xOffset ? max : connection.xOffset;
+      },
+      0,
+    );
+    const maxYOffset = cell.connections.reduce(
+      (max: number, connection: Connection): number => {
+        const connectionYOffset = connection.yOffset || 0;
+        return max > connectionYOffset ? max : connectionYOffset;
+      },
+      0,
+    );
 
-    let endOfPathPart = isHorizontal
-      ? this.sideConnectionBondTurnPoint ||
-        cell.monomer.renderer?.scaledMonomerPosition.x +
-          cell.monomer.renderer?.monomerSize.width / 2 +
-          xOffset
-      : cell.monomer.renderer?.scaledMonomerPosition.y +
-        cell.monomer.renderer?.monomerSize.height / 2 +
-        yOffset;
+    let endOfPathPart: number;
+    if (isHorizontal && this.sideConnectionBondTurnPoint) {
+      endOfPathPart = this.sideConnectionBondTurnPoint;
+    } else {
+      const { monomerSize, scaledMonomerPosition } = (
+        cell.monomer as BaseMonomer
+      ).renderer as BaseMonomerRenderer | BaseSequenceItemRenderer;
+      endOfPathPart = isHorizontal
+        ? scaledMonomerPosition.x + monomerSize.width / 2 + xOffset
+        : scaledMonomerPosition.y + monomerSize.height / 2 + yOffset;
+    }
 
     this.sideConnectionBondTurnPoint = endOfPathPart;
 
     if (isHorizontal) {
       endOfPathPart +=
         -(connection.yOffset || 0) * 3 +
-        cos * -connection.offset * 3 +
+        cos * -connection.xOffset * 3 +
         cos * (maxXOffset + 1) * 3 +
         (maxYOffset + 1) * 3;
     }
     let pathPart = isHorizontal ? 'H ' : 'V ';
     pathPart += `${endOfPathPart - SMOOTH_CORNER_SIZE * cos} `;
-    pathPart += `q ${SMOOTH_CORNER_SIZE * cos},${SMOOTH_CORNER_SIZE * sin} ${
-      SMOOTH_CORNER_SIZE * cos
-    },${SMOOTH_CORNER_SIZE} `;
+    pathPart += generateBend(cos, sin, cos, 1);
 
     return pathPart;
   }
 
-  private appendSideConnectionBond(rootElement) {
-    const editor = CoreEditor.provideEditorInstance();
-    const matrix = editor.drawingEntitiesManager.canvasMatrix;
-    const cells = matrix?.polymerBondToCells.get(this.polymerBond);
-
-    if (!cells) {
-      return;
-    }
-
+  // TODO: Specify the types.
+  private appendSideConnectionBond(rootElement, cells: Cell[]) {
     const firstCell = cells[0];
-    const firstCellConnection = firstCell.connections.find((connection) => {
-      return connection.polymerBond === this.polymerBond;
-    }) as Connection;
+    const firstCellConnection = firstCell.connections.find(
+      (connection: Connection): boolean => {
+        return connection.polymerBond === this.polymerBond;
+      },
+    ) as Connection;
     const isVerticalConnection = firstCellConnection.isVertical;
     const isStraightVerticalConnection =
-      cells.length === 2 && isVerticalConnection;
+      (cells.length === 2 ||
+        cells.reduce(
+          (isStraight: boolean, cell: Cell, index: number): boolean => {
+            if (!isStraight || index === 0 || index === cells.length - 1) {
+              return isStraight;
+            }
+            return cell.x === firstCell.x && !cell.monomer;
+          },
+          true,
+        )) &&
+      isVerticalConnection;
     const isFirstMonomerOfBondInFirstCell = firstCell.node?.monomers.includes(
       this.polymerBond.firstMonomer,
     );
@@ -216,10 +273,10 @@ export class PolymerBondRenderer extends BaseRenderer {
 
     const cos = Math.cos((xDirection * Math.PI) / 180);
 
-    let previousConnection;
-    let previousCell;
+    let previousConnection: Connection;
+    let previousCell: Cell;
 
-    const horizontalPartIntersectionsOffset = firstCellConnection.offset;
+    const horizontalPartIntersectionsOffset = firstCellConnection.xOffset;
 
     const areCellsOnSameRow = cells.every((cell) => {
       return cell.y === firstCell.y;
@@ -232,9 +289,7 @@ export class PolymerBondRenderer extends BaseRenderer {
         BOND_END_LENGTH -
         horizontalPartIntersectionsOffset * 3
       } `;
-      dAttributeForPath += `q 0,-${SMOOTH_CORNER_SIZE}, ${
-        SMOOTH_CORNER_SIZE * cos
-      },-${SMOOTH_CORNER_SIZE} `;
+      dAttributeForPath += generateBend(0, -1, cos, -1);
     } else {
       dAttributeForPath += `L ${startPosition.x},${
         startPosition.y +
@@ -246,9 +301,7 @@ export class PolymerBondRenderer extends BaseRenderer {
         !isSecondCellEmpty &&
         !isTwoNeighborRowsConnection
       ) {
-        dAttributeForPath += `q 0,${SMOOTH_CORNER_SIZE} ${
-          SMOOTH_CORNER_SIZE * cos
-        },${SMOOTH_CORNER_SIZE} `;
+        dAttributeForPath += generateBend(0, 1, cos, 1);
       }
     }
 
@@ -266,21 +319,26 @@ export class PolymerBondRenderer extends BaseRenderer {
 
     let maxHorizontalOffset = 0;
 
-    cells.forEach((cell, cellIndex) => {
-      const cellConnection = cell.connections.find((connection) => {
-        return connection.polymerBond === this.polymerBond;
-      }) as Connection;
+    cells.forEach((cell: Cell, cellIndex: number): void => {
+      const cellConnection = cell.connections.find(
+        (connection: Connection): boolean => {
+          return connection.polymerBond === this.polymerBond;
+        },
+      ) as Connection;
       const isLastCell = cellIndex === cells.length - 1;
       const _xDirection = this.sideConnectionBondTurnPoint
         ? endPosition.x < this.sideConnectionBondTurnPoint
           ? 180
           : 0
         : xDirection;
-      const maxXOffset = cell.connections.reduce((max, connection) => {
-        return connection.isVertical || max > connection.offset
-          ? max
-          : connection.offset;
-      }, 0);
+      const maxXOffset = cell.connections.reduce(
+        (max: number, connection: Connection): number => {
+          return connection.isVertical || max > connection.xOffset
+            ? max
+            : connection.xOffset;
+        },
+        0,
+      );
 
       maxHorizontalOffset =
         maxHorizontalOffset > maxXOffset ? maxHorizontalOffset : maxXOffset;
@@ -290,10 +348,8 @@ export class PolymerBondRenderer extends BaseRenderer {
           return;
         }
 
-        const directionObject = cellConnection.direction as {
-          x: number;
-          y: number;
-        };
+        const directionObject =
+          cellConnection.direction as ConnectionDirectionOfLastCell;
         const yDirection = isVerticalConnection ? 90 : directionObject.y;
         const sin = Math.sin((yDirection * Math.PI) / 180);
         const cos = Math.cos((_xDirection * Math.PI) / 180);
@@ -305,18 +361,14 @@ export class PolymerBondRenderer extends BaseRenderer {
             SMOOTH_CORNER_SIZE -
             sin * (cellConnection.yOffset || 0) * 3 -
             (isTwoNeighborRowsConnection
-              ? maxHorizontalOffset - cellConnection.offset
-              : cellConnection.offset) *
+              ? maxHorizontalOffset - cellConnection.xOffset
+              : cellConnection.xOffset) *
               3
           } `;
-          dAttributeForPath += `q 0,${SMOOTH_CORNER_SIZE * sin} ${
-            SMOOTH_CORNER_SIZE * cos
-          },${SMOOTH_CORNER_SIZE} `;
+          dAttributeForPath += generateBend(0, sin, cos, 1);
         }
         dAttributeForPath += `H ${endPosition.x - SMOOTH_CORNER_SIZE * cos} `;
-        dAttributeForPath += `q ${SMOOTH_CORNER_SIZE * cos},0 ${
-          SMOOTH_CORNER_SIZE * cos
-        },${SMOOTH_CORNER_SIZE} `;
+        dAttributeForPath += generateBend(cos, 0, cos, 1);
         return;
       }
       // empty cells
@@ -337,7 +389,10 @@ export class PolymerBondRenderer extends BaseRenderer {
           isHorizontal,
           previousConnection,
           previousCell,
-          isHorizontal ? xDirection : previousConnection.direction,
+          // FIXME: Check. Is it correct to use `as ConnectionDirectionInDegrees` here?
+          isHorizontal
+            ? xDirection
+            : (previousConnection.direction as ConnectionDirectionInDegrees),
         );
       }
       previousCell = cell;
@@ -349,43 +404,62 @@ export class PolymerBondRenderer extends BaseRenderer {
     this.bodyElement = rootElement
       .append('path')
       .attr('class', `${SIDE_CONNECTION_BODY_ELEMENT_CLASS}`)
-      .attr('stroke', '#43B5C0')
+      .attr('stroke', this.isHydrogenBond ? '#333333' : '#43B5C0')
       .attr('stroke-width', 1)
       .attr('d', dAttributeForPath)
       .attr('fill', 'none')
-      .attr('pointer-events', 'stroke');
+      .attr('stroke-dasharray', this.isHydrogenBond ? '2' : '0')
+      .attr('pointer-events', 'all')
+      .attr('data-testid', 'bond')
+      .attr('data-bondtype', this.isHydrogenBond ? 'hydrogen' : 'covalent')
+      .attr('data-bondid', this.polymerBond.id)
+      .attr('data-frommonomerid', this.polymerBond.firstMonomer.id)
+      .attr('data-tomonomerid', this.polymerBond.secondMonomer?.id);
+
+    if (!this.isHydrogenBond && this.bodyElement) {
+      this.bodyElement
+        .attr(
+          'data-fromconnectionpoint',
+          this.polymerBond.firstMonomer.getAttachmentPointByBond(
+            this.polymerBond,
+          ) || '',
+        )
+        .attr(
+          'data-toconnectionpoint',
+          this.polymerBond.secondMonomer?.getAttachmentPointByBond(
+            this.polymerBond,
+          ) || '',
+        );
+    }
 
     this.path = dAttributeForPath;
 
     return this.bodyElement;
   }
 
-  private getMonomerWidth() {
+  private getMonomerWidth(): number {
     return this.polymerBond.firstMonomer.renderer?.monomerSize.width ?? 0;
   }
 
-  private getMonomerHeight() {
+  private getMonomerHeight(): number {
     return this.polymerBond.firstMonomer.renderer?.monomerSize.height ?? 0;
   }
 
-  public isMonomersOnSameHorizontalLine() {
-    return Boolean(
-      this.polymerBond.secondMonomer &&
-        this.polymerBond.firstMonomer.position.y -
-          this.polymerBond.secondMonomer.position.y <
-          0.5 &&
-        this.polymerBond.firstMonomer.position.y -
-          this.polymerBond.secondMonomer.position.y >
-          -0.5,
-    );
+  public isMonomersOnSameHorizontalLine(): boolean {
+    if (!this.polymerBond.secondMonomer) return false;
+
+    const monomer1Y = this.polymerBond.firstMonomer.position.y;
+    const monomer2Y = this.polymerBond.secondMonomer.position.y;
+    const difference = monomer1Y - monomer2Y;
+    return difference < 0.5 && difference > -0.5;
   }
 
   private updateSnakeBondPath(
     startPosition: Vec2,
     endPosition: Vec2,
-    reCheckAttachmentpoint = true,
-  ) {
-    const isR1TheCurrentAttachmentpointOfFirstMonomer =
+    reCheckAttachmentPoint = true,
+  ): void {
+    const isR1TheCurrentAttachmentPointOfFirstMonomer =
       this.polymerBond.firstMonomer.getAttachmentPointByBond(
         this.polymerBond,
       ) === 'R1' ||
@@ -396,32 +470,37 @@ export class PolymerBondRenderer extends BaseRenderer {
     // check if there is nucleotide in current row
     const isBondConnectedWithNucleotide =
       this.polymerBond.firstMonomer.isMonomerInRnaChainRow;
-
-    const verticalLineLength = isBondConnectedWithNucleotide
+    const verticalLineLength = this.polymerBond.firstMonomer.monomerItem
+      .isAntisense
+      ? RNA_ANTISENSE_CHAIN_VERTICAL_LINE_LENGTH
+      : this.polymerBond.firstMonomer.monomerItem.isSense &&
+        (this.polymerBond.restOfRowsWithAntisense || 0) > 0
+      ? RNA_SENSE_CHAIN_VERTICAL_LINE_LENGTH
+      : isBondConnectedWithNucleotide
       ? RNA_CHAIN_VERTICAL_LINE_LENGTH
       : VERTICAL_LINE_LENGTH + 5;
 
     if (this.isSecondMonomerBottomRight(startPosition, endPosition)) {
       if (
-        isR1TheCurrentAttachmentpointOfFirstMonomer &&
-        reCheckAttachmentpoint
+        isR1TheCurrentAttachmentPointOfFirstMonomer &&
+        reCheckAttachmentPoint
       ) {
         this.updateSnakeBondPath(endPosition, startPosition, false);
         return;
       }
       this.addLine(
-        LINE_DIRECTION.Horizontal,
+        LineDirection.Horizontal,
         LINE_FROM_MONOMER_LENGTH + this.getMonomerWidth() / 2,
         startPosition,
       );
       this.addLineFromLeftToBottom();
       this.addLine(
-        LINE_DIRECTION.Vertical,
+        LineDirection.Vertical,
         endPosition.y - startPosition.y - CORNER_LENGTH * 2,
       );
       this.addLineFromTopToRight();
       this.addLine(
-        LINE_DIRECTION.Horizontal,
+        LineDirection.Horizontal,
         endPosition.x -
           startPosition.x -
           CORNER_LENGTH * 2 -
@@ -430,20 +509,20 @@ export class PolymerBondRenderer extends BaseRenderer {
       );
     } else if (this.isSecondMonomerTopRight(startPosition, endPosition)) {
       if (
-        isR1TheCurrentAttachmentpointOfFirstMonomer &&
-        reCheckAttachmentpoint
+        isR1TheCurrentAttachmentPointOfFirstMonomer &&
+        reCheckAttachmentPoint
       ) {
         this.updateSnakeBondPath(endPosition, startPosition, false);
         return;
       }
       this.addLine(
-        LINE_DIRECTION.Horizontal,
+        LineDirection.Horizontal,
         LINE_FROM_MONOMER_LENGTH + this.getMonomerWidth() / 2,
         startPosition,
       );
       this.addLineFromLeftToTop();
       this.addLine(
-        LINE_DIRECTION.Vertical,
+        LineDirection.Vertical,
         endPosition.y -
           startPosition.y -
           CORNER_LENGTH * 2 +
@@ -451,7 +530,7 @@ export class PolymerBondRenderer extends BaseRenderer {
       );
       this.addLineFromBottomToRight();
       this.addLine(
-        LINE_DIRECTION.Horizontal,
+        LineDirection.Horizontal,
         endPosition.x -
           startPosition.x -
           CORNER_LENGTH * 2 -
@@ -460,22 +539,24 @@ export class PolymerBondRenderer extends BaseRenderer {
       );
     } else if (this.isSecondMonomerBottomLeft(startPosition, endPosition)) {
       if (
-        isR1TheCurrentAttachmentpointOfFirstMonomer &&
-        reCheckAttachmentpoint
+        isR1TheCurrentAttachmentPointOfFirstMonomer &&
+        reCheckAttachmentPoint
       ) {
         this.updateSnakeBondPath(endPosition, startPosition, false);
         return;
       }
       this.addLine(
-        LINE_DIRECTION.Horizontal,
-        LINE_FROM_MONOMER_LENGTH + this.getMonomerWidth() / 2,
+        LineDirection.Horizontal,
+        LINE_FROM_MONOMER_LENGTH -
+          (this.polymerBond.firstMonomer.monomerItem.isAntisense ? 10 : 0) +
+          this.getMonomerWidth() / 2,
         startPosition,
       );
       this.addLineFromLeftToBottom();
-      this.addLine(LINE_DIRECTION.Vertical, verticalLineLength);
+      this.addLine(LineDirection.Vertical, verticalLineLength);
       this.addLineFromTopToLeft();
       this.addLine(
-        LINE_DIRECTION.Horizontal,
+        LineDirection.Horizontal,
         -(
           startPosition.x -
           endPosition.x +
@@ -485,7 +566,7 @@ export class PolymerBondRenderer extends BaseRenderer {
       );
       this.addLineFromRightToBottom();
       this.addLine(
-        LINE_DIRECTION.Vertical,
+        LineDirection.Vertical,
         endPosition.y -
           startPosition.y -
           CORNER_LENGTH * 4 -
@@ -493,27 +574,27 @@ export class PolymerBondRenderer extends BaseRenderer {
       );
       this.addLineFromTopToRight();
       this.addLine(
-        LINE_DIRECTION.Horizontal,
+        LineDirection.Horizontal,
         LINE_FROM_MONOMER_LENGTH + this.getMonomerWidth() / 2,
       );
     } else if (this.isSecondMonomerTopLeft(startPosition, endPosition)) {
       if (
-        isR1TheCurrentAttachmentpointOfFirstMonomer &&
-        reCheckAttachmentpoint
+        isR1TheCurrentAttachmentPointOfFirstMonomer &&
+        reCheckAttachmentPoint
       ) {
         this.updateSnakeBondPath(endPosition, startPosition, false);
         return;
       }
       this.addLine(
-        LINE_DIRECTION.Horizontal,
+        LineDirection.Horizontal,
         LINE_FROM_MONOMER_LENGTH + this.getMonomerWidth() / 2,
         startPosition,
       );
       this.addLineFromLeftToBottom();
-      this.addLine(LINE_DIRECTION.Vertical, this.getMonomerHeight());
+      this.addLine(LineDirection.Vertical, this.getMonomerHeight());
       this.addLineFromTopToLeft();
       this.addLine(
-        LINE_DIRECTION.Horizontal,
+        LineDirection.Horizontal,
         -(
           startPosition.x -
           endPosition.x +
@@ -522,37 +603,37 @@ export class PolymerBondRenderer extends BaseRenderer {
         ),
       );
 
-      this.addLineFromRightToUp();
+      this.addLineFromRightToTop();
       this.addLine(
-        LINE_DIRECTION.Vertical,
+        LineDirection.Vertical,
         endPosition.y - startPosition.y - this.getMonomerHeight(),
       );
       this.addLineFromBottomToRight();
       this.addLine(
-        LINE_DIRECTION.Horizontal,
+        LineDirection.Horizontal,
         LINE_FROM_MONOMER_LENGTH + this.getMonomerWidth() / 2,
       );
     } else if (this.isSecondMonomerLeft(startPosition, endPosition)) {
       if (
-        isR1TheCurrentAttachmentpointOfFirstMonomer &&
-        reCheckAttachmentpoint
+        isR1TheCurrentAttachmentPointOfFirstMonomer &&
+        reCheckAttachmentPoint
       ) {
         this.updateSnakeBondPath(endPosition, startPosition, false);
         return;
       }
       this.addLine(
-        LINE_DIRECTION.Horizontal,
+        LineDirection.Horizontal,
         LINE_FROM_MONOMER_LENGTH + this.getMonomerWidth() / 2,
         startPosition,
       );
       this.addLineFromLeftToBottom();
       this.addLine(
-        LINE_DIRECTION.Vertical,
+        LineDirection.Vertical,
         endPosition.y - startPosition.y + this.getMonomerHeight(),
       );
       this.addLineFromTopToLeft();
       this.addLine(
-        LINE_DIRECTION.Horizontal,
+        LineDirection.Horizontal,
         -(
           startPosition.x -
           endPosition.x +
@@ -561,11 +642,11 @@ export class PolymerBondRenderer extends BaseRenderer {
         ),
       );
 
-      this.addLineFromRightToUp();
-      this.addLine(LINE_DIRECTION.Vertical, -this.getMonomerHeight());
+      this.addLineFromRightToTop();
+      this.addLine(LineDirection.Vertical, -this.getMonomerHeight());
       this.addLineFromBottomToRight();
       this.addLine(
-        LINE_DIRECTION.Horizontal,
+        LineDirection.Horizontal,
         LINE_FROM_MONOMER_LENGTH + this.getMonomerWidth() / 2,
       );
     } else {
@@ -573,7 +654,10 @@ export class PolymerBondRenderer extends BaseRenderer {
     }
   }
 
-  private isSecondMonomerTopRight(startPosition, endPosition): boolean {
+  private isSecondMonomerTopRight(
+    startPosition: Vec2,
+    endPosition: Vec2,
+  ): boolean {
     return (
       startPosition.y - endPosition.y > DOUBLE_CORNER_LENGTH &&
       endPosition.x - startPosition.x >
@@ -581,7 +665,10 @@ export class PolymerBondRenderer extends BaseRenderer {
     );
   }
 
-  private isSecondMonomerBottomRight(startPosition, endPosition): boolean {
+  private isSecondMonomerBottomRight(
+    startPosition: Vec2,
+    endPosition: Vec2,
+  ): boolean {
     return (
       endPosition.y - startPosition.y > DOUBLE_CORNER_LENGTH &&
       endPosition.x - startPosition.x >
@@ -601,7 +688,10 @@ export class PolymerBondRenderer extends BaseRenderer {
     );
   }
 
-  private isSecondMonomerTopLeft(startPosition, endPosition): boolean {
+  private isSecondMonomerTopLeft(
+    startPosition: Vec2,
+    endPosition: Vec2,
+  ): boolean {
     return (
       startPosition.y - endPosition.y > 0 &&
       endPosition.x - startPosition.x <=
@@ -619,50 +709,50 @@ export class PolymerBondRenderer extends BaseRenderer {
     );
   }
 
-  private addLineFromTopToRight() {
+  private addLineFromTopToRight(): void {
     this.path = `${this.path} c 0,4.418 3.582,${CORNER_LENGTH} ${CORNER_LENGTH},${CORNER_LENGTH}`;
   }
 
-  private addLineFromLeftToTop() {
+  private addLineFromLeftToTop(): void {
     this.path = `${this.path} c 4.418,0 ${CORNER_LENGTH},-3.582 ${CORNER_LENGTH},-${CORNER_LENGTH}`;
   }
 
-  private addLineFromBottomToRight() {
+  private addLineFromBottomToRight(): void {
     this.path = `${this.path} c 0,-4.418 3.582,-${CORNER_LENGTH} ${CORNER_LENGTH},-${CORNER_LENGTH}`;
   }
 
-  private addLineFromLeftToBottom() {
+  private addLineFromLeftToBottom(): void {
     this.path = `${this.path} c 4.418,0 ${CORNER_LENGTH},3.582 ${CORNER_LENGTH},${CORNER_LENGTH}`;
   }
 
-  private addLineFromTopToLeft() {
+  private addLineFromTopToLeft(): void {
     this.path = `${this.path} c 0,4.418 -3.582,${CORNER_LENGTH} -${CORNER_LENGTH},${CORNER_LENGTH}`;
   }
 
-  private addLineFromRightToUp() {
+  private addLineFromRightToTop(): void {
     this.path = `${this.path} c -4.418,0 -${CORNER_LENGTH},-3.582 -${CORNER_LENGTH},-${CORNER_LENGTH}`;
   }
 
-  private addLineFromRightToBottom() {
+  private addLineFromRightToBottom(): void {
     this.path = `${this.path} c -4.418,0 -${CORNER_LENGTH},3.582 -${CORNER_LENGTH},${CORNER_LENGTH}`;
   }
 
   private addLine(
-    isHorisontal: LINE_DIRECTION,
+    lineDirection: LineDirection,
     length: number,
     startPosition?: Vec2,
-  ) {
+  ): void {
     const start = startPosition
       ? `M ${Math.round(startPosition.x)},${Math.round(startPosition.y)}`
       : this.path;
     const line =
-      isHorisontal === LINE_DIRECTION.Horizontal
+      lineDirection === LineDirection.Horizontal
         ? `l${length}, 0`
         : `l 0, ${length}`;
     this.path = `${start} ${line}`;
   }
 
-  private addRandomLine(startPosition: Vec2, endPosition: Vec2) {
+  private addRandomLine(startPosition: Vec2, endPosition: Vec2): void {
     const start = `M ${Math.round(startPosition.x)},${Math.round(
       startPosition.y,
     )}`;
@@ -670,21 +760,45 @@ export class PolymerBondRenderer extends BaseRenderer {
     this.path = `${start} ${line}`;
   }
 
+  // TODO: Specify the types.
   public appendBondGraph(rootElement) {
     this.bodyElement = rootElement
       .append('line')
       .attr('stroke', this.polymerBond.finished ? '#333333' : '#0097A8')
       .attr('stroke-width', 1)
+      .attr('stroke-dasharray', this.isHydrogenBond ? '2' : '0')
       .attr('class', 'selection-area')
       .attr('x1', this.scaledPosition.startPosition.x)
       .attr('y1', this.scaledPosition.startPosition.y)
       .attr('x2', this.scaledPosition.endPosition.x)
       .attr('y2', this.scaledPosition.endPosition.y)
-      .attr('pointer-events', 'stroke');
+      .attr('pointer-events', this.polymerBond.finished ? 'stroke' : 'none')
+      .attr('data-testid', 'bond')
+      .attr('data-bondtype', this.isHydrogenBond ? 'hydrogen' : 'covalent')
+      .attr('data-bondid', this.polymerBond.id)
+      .attr('data-frommonomerid', this.polymerBond.firstMonomer.id)
+      .attr('data-tomonomerid', this.polymerBond.secondMonomer?.id);
+
+    if (!this.isHydrogenBond && this.bodyElement) {
+      this.bodyElement
+        .attr(
+          'data-fromconnectionpoint',
+          this.polymerBond.firstMonomer.getAttachmentPointByBond(
+            this.polymerBond,
+          ) || '',
+        )
+        .attr(
+          'data-toconnectionpoint',
+          this.polymerBond.secondMonomer?.getAttachmentPointByBond(
+            this.polymerBond,
+          ) || '',
+        );
+    }
 
     return this.bodyElement;
   }
 
+  // TODO: Specify the types.
   private appendRootElement() {
     return this.canvas
       .insert('g', `.monomer`)
@@ -693,17 +807,20 @@ export class PolymerBondRenderer extends BaseRenderer {
         this.editorEvents.mouseOverPolymerBond.dispatch(event);
         this.editorEvents.mouseOverDrawingEntity.dispatch(event);
       })
+      .on('mousemove', (event) => {
+        this.editorEvents.mouseOnMovePolymerBond.dispatch(event);
+      })
       .on('mouseout', (event) => {
         this.editorEvents.mouseLeavePolymerBond.dispatch(event);
         this.editorEvents.mouseLeaveDrawingEntity.dispatch(event);
       })
-      .attr('pointer-events', 'stroke') as never as D3SvgElementSelection<
-      SVGGElement,
-      void
-    >;
+      .attr(
+        'pointer-events',
+        this.polymerBond.finished ? 'stroke' : 'none',
+      ) as never as D3SvgElementSelection<SVGGElement, void>;
   }
 
-  public show(_theme?, force = false) {
+  public show(_theme?: unknown, force = false): void {
     if (force) {
       this.sideConnectionBondTurnPoint = undefined;
     }
@@ -713,22 +830,24 @@ export class PolymerBondRenderer extends BaseRenderer {
     this.drawSelection();
   }
 
-  public drawSelection() {
-    if (this.polymerBond.selected) {
-      const editor = CoreEditor.provideEditorInstance();
+  private get isSideConnectionBondDrawn() {
+    return this.polymerBond.isSideChainConnection && this.path;
+  }
 
+  public drawSelection(): void {
+    if (this.polymerBond.selected) {
       this.selectionElement?.remove();
       if (
-        (this.isSnake && !this.isMonomersOnSameHorizontalLine()) ||
-        (editor.mode instanceof SnakeMode &&
-          this.polymerBond.isSideChainConnection)
+        (this.isSnakeBond && !this.isMonomersOnSameHorizontalLine()) ||
+        this.isSideConnectionBondDrawn
       ) {
         this.selectionElement = this.rootElement
           ?.insert('path', ':first-child')
           .attr('stroke', '#57FF8F')
           .attr('stroke-width', 2)
           .attr('fill-opacity', 0)
-          .attr('d', this.path);
+          .attr('d', this.path)
+          .attr('class', 'dynamic-element');
       } else {
         this.selectionElement = this.rootElement
           ?.insert('line', ':first-child')
@@ -745,9 +864,9 @@ export class PolymerBondRenderer extends BaseRenderer {
     }
   }
 
-  public moveEnd() {
+  public moveEnd(): void {
     if (
-      this.isSnake &&
+      this.isSnakeBond &&
       !this.isMonomersOnSameHorizontalLine() &&
       this.polymerBond.finished
     ) {
@@ -757,7 +876,7 @@ export class PolymerBondRenderer extends BaseRenderer {
     }
   }
 
-  private moveSnakeBondEnd() {
+  private moveSnakeBondEnd(): void {
     const startPosition = this.scaledPosition.startPosition;
     const endPosition = this.scaledPosition.endPosition;
     this.updateSnakeBondPath(startPosition, endPosition);
@@ -770,7 +889,7 @@ export class PolymerBondRenderer extends BaseRenderer {
     this.selectionElement?.attr('d', this.path);
   }
 
-  private moveGraphBondEnd() {
+  private moveGraphBondEnd(): void {
     assert(this.bodyElement);
     assert(this.hoverAreaElement);
     this.bodyElement
@@ -790,15 +909,15 @@ export class PolymerBondRenderer extends BaseRenderer {
       ?.attr('y2', this.scaledPosition.endPosition.y);
   }
 
-  public moveStart() {
-    if (this.isSnake && !this.isMonomersOnSameHorizontalLine()) {
+  public moveStart(): void {
+    if (this.isSnakeBond && !this.isMonomersOnSameHorizontalLine()) {
       this.moveSnakeBondStart();
     } else {
       this.moveGraphBondStart();
     }
   }
 
-  private moveSnakeBondStart() {
+  private moveSnakeBondStart(): void {
     const startPosition = this.scaledPosition.startPosition;
     const endPosition = this.scaledPosition.endPosition;
     this.updateSnakeBondPath(startPosition, endPosition);
@@ -811,7 +930,7 @@ export class PolymerBondRenderer extends BaseRenderer {
     this.selectionElement?.attr('d', this.path);
   }
 
-  private moveGraphBondStart() {
+  private moveGraphBondStart(): void {
     assert(this.bodyElement);
     assert(this.hoverAreaElement);
     this.bodyElement
@@ -827,13 +946,10 @@ export class PolymerBondRenderer extends BaseRenderer {
       ?.attr('y1', this.scaledPosition.startPosition.y);
   }
 
-  protected appendHoverAreaElement() {
-    const editor = CoreEditor.provideEditorInstance();
-
+  protected appendHoverAreaElement(): void {
     if (
-      (this.isSnake && !this.isMonomersOnSameHorizontalLine()) ||
-      (editor?.mode instanceof SnakeMode &&
-        this.polymerBond.isSideChainConnection)
+      (this.isSnakeBond && !this.isMonomersOnSameHorizontalLine()) ||
+      this.isSideConnectionBondDrawn
     ) {
       (<D3SvgElementSelection<SVGPathElement, void> | undefined>(
         this.hoverAreaElement
@@ -862,28 +978,29 @@ export class PolymerBondRenderer extends BaseRenderer {
         .attr('cursor', 'pointer')
         .attr('r', '1')
         .attr('fill', 'transparent')
+        .attr('pointer-events', 'none')
         .attr('stroke-width', '10')
         .attr('cx', this.scaledPosition.endPosition.x)
         .attr('cy', this.scaledPosition.endPosition.y);
     }
   }
 
-  public appendHover() {
+  public appendHover(): void {
     assert(this.bodyElement);
 
     const editor = CoreEditor.provideEditorInstance();
 
-    if (
-      editor.mode instanceof SnakeMode &&
-      this.polymerBond.isSideChainConnection
-    ) {
+    if (this.polymerBond.isSideChainConnection) {
       const allSideConnectionBondsBodyElements = editor.canvas.querySelectorAll(
         `.${SIDE_CONNECTION_BODY_ELEMENT_CLASS}`,
       );
 
       Array.from(allSideConnectionBondsBodyElements).forEach(
         (bondBodyElement) => {
-          bondBodyElement.setAttribute('stroke', '#C0E2E6');
+          bondBodyElement.setAttribute(
+            'stroke',
+            this.isHydrogenBond ? 'lightgrey' : '#C0E2E6',
+          );
         },
       );
     }
@@ -895,28 +1012,26 @@ export class PolymerBondRenderer extends BaseRenderer {
     }
   }
 
+  // TODO: Specify the types.
   public removeHover() {
     assert(this.bodyElement);
     assert(this.hoverAreaElement);
 
     const editor = CoreEditor.provideEditorInstance();
 
-    if (
-      editor.mode instanceof SnakeMode &&
-      this.polymerBond.isSideChainConnection
-    ) {
+    if (this.polymerBond.isSideChainConnection) {
       const allSideConnectionBondsBodyElements = editor.canvas.querySelectorAll(
         `.${SIDE_CONNECTION_BODY_ELEMENT_CLASS}`,
       );
 
       Array.from(allSideConnectionBondsBodyElements).forEach(
         (bondBodyElement) => {
-          const renderer = bondBodyElement.__data__ as PolymerBondRenderer;
+          const renderer =
+            bondBodyElement.__data__ as SnakeModePolymerBondRenderer;
 
           bondBodyElement.setAttribute(
             'stroke',
-            editor.mode instanceof SnakeMode &&
-              renderer.polymerBond.isSideChainConnection
+            renderer.polymerBond.isSideChainConnection && !this.isHydrogenBond
               ? '#43B5C0'
               : '#333333',
           );
@@ -927,8 +1042,7 @@ export class PolymerBondRenderer extends BaseRenderer {
     this.bodyElement
       .attr(
         'stroke',
-        editor.mode instanceof SnakeMode &&
-          this.polymerBond.isSideChainConnection
+        this.polymerBond.isSideChainConnection && !this.isHydrogenBond
           ? '#43B5C0'
           : '#333333',
       )
@@ -940,4 +1054,39 @@ export class PolymerBondRenderer extends BaseRenderer {
 
     return this.hoverAreaElement.attr('stroke', 'transparent');
   }
+
+  private calculateIsSnakeBond(): void {
+    if (this.polymerBond.isSideChainConnection) {
+      this.isSnakeBond = false;
+      return;
+    }
+
+    if (
+      getSugarFromRnaBase(this.polymerBond.firstMonomer) ||
+      getSugarFromRnaBase(this.polymerBond.secondMonomer)
+    ) {
+      this.isSnakeBond = false;
+      return;
+    }
+
+    this.isSnakeBond = true;
+  }
+
+  public remove(): void {
+    super.remove();
+    if (this.polymerBond.hovered) {
+      this.editorEvents.mouseLeaveMonomer.dispatch();
+    }
+  }
+}
+
+function generateBend(
+  dx1: number,
+  dy1: number,
+  dx: number,
+  dy: number,
+): string {
+  return `q ${SMOOTH_CORNER_SIZE * dx1},${SMOOTH_CORNER_SIZE * dy1} ${
+    SMOOTH_CORNER_SIZE * dx
+  },${SMOOTH_CORNER_SIZE * dy} `;
 }

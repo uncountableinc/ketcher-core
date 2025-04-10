@@ -3,6 +3,7 @@ import { BaseMode } from 'application/editor/modes/internal';
 import { CoreEditor } from '../Editor';
 import { Coordinates } from '../internal';
 import { Command } from 'domain/entities/Command';
+
 export class FlexMode extends BaseMode {
   constructor(previousMode?: LayoutMode) {
     super('flex-layout-mode', previousMode);
@@ -19,16 +20,41 @@ export class FlexMode extends BaseMode {
 
     editor.renderersContainer.update(modelChanges);
 
+    if (this.previousMode === 'sequence-layout-mode') {
+      editor.scrollToTopLeftCorner();
+    }
+
     return command;
   }
 
   getNewNodePosition() {
     const editor = CoreEditor.provideEditorInstance();
+
     return Coordinates.canvasToModel(editor.lastCursorPositionOfCanvas);
   }
 
   applyAdditionalPasteOperations() {
-    return new Command();
+    const command = new Command();
+    const editor = CoreEditor.provideEditorInstance();
+
+    editor.drawingEntitiesManager.recalculateAntisenseChains();
+
+    if (!editor.drawingEntitiesManager.hasAntisenseChains) {
+      return command;
+    }
+
+    command.merge(
+      editor.drawingEntitiesManager.applySnakeLayout(
+        editor.canvas.width.baseVal.value,
+        true,
+        true,
+        true,
+      ),
+    );
+
+    command.setUndoOperationsByPriority();
+
+    return command;
   }
 
   isPasteAllowedByMode(): boolean {

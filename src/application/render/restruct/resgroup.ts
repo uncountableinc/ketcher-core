@@ -21,6 +21,7 @@ import {
   SGroup,
   Vec2,
   Struct,
+  MonomerMicromolecule,
 } from 'domain/entities';
 import { SgContexts } from 'application/editor/shared/constants';
 import ReDataSGroupData from './redatasgroupdata';
@@ -128,7 +129,8 @@ class ReSGroup extends ReObject {
       ];
       if (
         sgroupTypesWithBrackets.includes(sgroup.type) &&
-        !sgroup.isSuperatomWithoutLabel
+        !sgroup.isSuperatomWithoutLabel &&
+        !(sgroup instanceof MonomerMicromolecule)
       ) {
         SGroupdrawBrackets(SGroupdrawBracketsOptions);
       }
@@ -169,10 +171,10 @@ class ReSGroup extends ReObject {
 
   getContractedSelectionContour(render: Render): any {
     const { paper, options } = render;
-    const { fontsz, radiusScaleFactor } = options;
-    const radius = fontsz * radiusScaleFactor * 2;
+    const { fontszInPx, radiusScaleFactor } = options;
+    const radius = fontszInPx * radiusScaleFactor * 2;
     const { startX, startY, width, height } = this.getTextHighlightDimensions(
-      fontsz / 2,
+      fontszInPx / 2,
       render,
     );
     return paper.rect(startX, startY, width, height, radius);
@@ -217,8 +219,6 @@ class ReSGroup extends ReObject {
         sGroupItem.hovering = paper
           .path(
             'M{0},{1}L{2},{3}L{4},{5}L{6},{7}L{0},{1}',
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore: raphael typing issues
             tfx(a0.x),
             tfx(a0.y),
             tfx(a1.x),
@@ -233,13 +233,9 @@ class ReSGroup extends ReObject {
       set.push(sGroupItem.hovering);
 
       SGroup.getAtoms(render.ctab.molecule, sGroupItem).forEach((aid) => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore: raphael typing issues
         set.push(render?.ctab?.atoms?.get(aid)?.makeHoverPlate(render));
       }, this);
       SGroup.getBonds(render.ctab.molecule, sGroupItem).forEach((bid) => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore: raphael typing issues
         set.push(render?.ctab?.bonds?.get(bid)?.makeHoverPlate(render));
       }, this);
       render.ctab.addReObjectPath(LayerMap.hovering, this.visel, set);
@@ -350,7 +346,7 @@ function SGroupdrawBrackets({
     const indexPos = new Vec2(path.x, path.y);
     const indexPath = render.paper.text(indexPos.x, indexPos.y, text).attr({
       font: render.options.font,
-      'font-size': render.options.fontszsub,
+      'font-size': render.options.fontszsubInPx,
     });
     if (indexAttribute) indexPath.attr(indexAttribute);
     const indexBox = Box2Abs.fromRelBox(util.relBox(indexPath.getBBox()));
@@ -363,8 +359,6 @@ function SGroupdrawBrackets({
         ),
         3,
       ) + 2;
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore: raphael typing issues
     indexPath.translateAbs(
       t * bracketR.bracketAngleDirection.x,
       t * bracketR.bracketAngleDirection.y,
@@ -383,11 +377,9 @@ function showValue(
   sgroup: SGroup,
   options: RenderOptions,
 ): any {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore: raphael typing issues
   const text = paper.text(pos?.x, pos?.y, sgroup.data.fieldValue).attr({
     font: options.font,
-    'font-size': options.fontsz,
+    'font-size': options.fontszsubInPx,
   });
   const box = text.getBBox();
   let rect = paper.rect(
@@ -396,8 +388,6 @@ function showValue(
     box.width + 2,
     box.height + 2,
     3,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore: raphael typing issues
     3,
   );
   rect = sgroup.selected

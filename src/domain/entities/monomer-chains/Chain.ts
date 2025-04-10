@@ -12,6 +12,7 @@ import {
   MonomerSequenceNode,
   EmptySequenceNode,
   LinkerSequenceNode,
+  AmbiguousMonomer,
 } from 'domain/entities';
 import {
   getNextMonomerInChain,
@@ -19,6 +20,7 @@ import {
   isValidNucleotide,
 } from 'domain/helpers/monomers';
 import { EmptySubChain } from 'domain/entities/monomer-chains/EmptySubChain';
+import { AmbiguousMonomerSequenceNode } from 'domain/entities/AmbiguousMonomerSequenceNode';
 
 export class Chain {
   public subChains: BaseSubChain[] = [];
@@ -61,6 +63,11 @@ export class Chain {
       return;
     }
 
+    if (monomer instanceof AmbiguousMonomer) {
+      this.lastSubChain.add(new AmbiguousMonomerSequenceNode(monomer));
+      return;
+    }
+
     if (monomer instanceof Sugar) {
       if (isValidNucleoside(monomer, this.firstMonomer)) {
         this.lastSubChain.add(Nucleoside.fromSugar(monomer, false));
@@ -81,7 +88,9 @@ export class Chain {
     };
     if (
       monomer instanceof Phosphate &&
-      (!this.lastNode || this.lastNode instanceof Nucleoside) &&
+      (!this.lastNode ||
+        this.lastNode instanceof Nucleoside ||
+        this.lastNode.lastMonomerInNode instanceof UnsplitNucleotide) &&
       (!nextMonomer || isNextMonomerNucleosideOrNucleotideOrPeptide())
     ) {
       this.lastSubChain.add(new MonomerSequenceNode(monomer));
@@ -168,6 +177,10 @@ export class Chain {
     );
   }
 
+  public get isAntisense() {
+    return this.nodes.some((node) => node.monomer.monomerItem.isAntisense);
+  }
+
   public forEachNode(
     callback: ({
       node,
@@ -175,11 +188,15 @@ export class Chain {
     }: {
       node: SubChainNode;
       subChain: BaseSubChain;
+      nodeIndex: number;
     }) => void,
   ) {
+    let nodeIndex = 0;
+
     this.subChains.forEach((subChain) => {
       subChain.nodes.forEach((node) => {
-        callback({ node, subChain });
+        callback({ node, subChain, nodeIndex });
+        nodeIndex++;
       });
     });
   }
@@ -197,5 +214,12 @@ export class Chain {
 
   public get isNewSequenceChain() {
     return this.length === 1 && this.firstNode instanceof EmptySequenceNode;
+  }
+
+  public get monomers() {
+    return this.nodes.reduce(
+      (monomers: BaseMonomer[], node) => [...monomers, ...node.monomers],
+      [],
+    );
   }
 }

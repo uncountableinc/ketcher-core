@@ -85,6 +85,13 @@ export declare const OperationType: Readonly<{
     IMAGE_DELETE: "Delete image";
     IMAGE_MOVE: "Move image";
     IMAGE_RESIZE: "Resize image";
+    MULTITAIL_ARROW_UPSERT: "Upsert multitail arrow";
+    MULTITAIL_ARROW_DELETE: "Delete multitail arrow";
+    MULTITAIL_ARROW_MOVE: "Move multitail arrow";
+    MULTITAIL_ARROW_ADD_TAIL: "Add multitail arrow tail";
+    MULTITAIL_ARROW_REMOVE_TAIL: "Remove multitail arrow tail";
+    MULTITAIL_ARROW_RESIZE_HEAD_TAIL: "Resize head tail";
+    MULTITAIL_ARROW_MOVE_HEAD_TAIL: "Move head tail";
 }>;
 export declare enum OperationPriority {
     ATOM_ATTR = 1,

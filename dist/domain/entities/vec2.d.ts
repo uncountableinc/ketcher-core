@@ -64,8 +64,8 @@ export declare class Vec2 {
     isInsidePolygon(points: Vec2[]): boolean;
     calculateDistanceToLine(line: [Vec2, Vec2]): number;
     oxAngle(): number;
-    static radiansToDegrees(radians: any): number;
-    static degrees_to_radians(degrees: any): number;
+    static radiansToDegrees(radians: number): number;
+    static degrees_to_radians(degrees: number): number;
     static oxAngleForVector(v1: Vec2, v2: Vec2): number;
     static findSecondPoint(startPoint: {
         x: number;

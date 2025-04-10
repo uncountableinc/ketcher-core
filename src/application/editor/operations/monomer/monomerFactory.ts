@@ -1,24 +1,31 @@
 import {
-  PeptideRenderer,
-  ChemRenderer,
+  AmbiguousMonomerRenderer,
   BaseMonomerRenderer,
+  ChemRenderer,
+  PeptideRenderer,
+  PhosphateRenderer,
   RNABaseRenderer,
   SugarRenderer,
-  PhosphateRenderer,
   UnresolvedMonomerRenderer,
   UnsplitNucleotideRenderer,
 } from 'application/render/renderers';
-import { MonomerItemType } from 'domain/types';
+import { MonomerOrAmbiguousType } from 'domain/types';
 import {
-  Peptide,
+  AmbiguousMonomer,
   Chem,
-  Sugar,
+  Peptide,
   Phosphate,
   RNABase,
+  Sugar,
   UnresolvedMonomer,
   UnsplitNucleotide,
 } from 'domain/entities';
 import { KetMonomerClass } from 'application/formatters/types/ket';
+import { isAmbiguousMonomerLibraryItem } from 'domain/helpers/monomers';
+import {
+  rnaDnaNaturalAnalogues,
+  unknownNaturalAnalogues,
+} from 'domain/constants/monomers';
 
 type DerivedClass<T> = new (...args: unknown[]) => T;
 export const MONOMER_CONST = {
@@ -43,7 +50,7 @@ type Monomer =
   | typeof Phosphate;
 
 export const monomerFactory = (
-  monomer: MonomerItemType,
+  monomer: MonomerOrAmbiguousType,
 ): [
   Monomer: Monomer,
   MonomerRenderer: DerivedClass<BaseMonomerRenderer>,
@@ -53,44 +60,58 @@ export const monomerFactory = (
   let MonomerRenderer;
   let ketMonomerClass: KetMonomerClass;
 
-  if (monomer.props.unresolved) {
+  if (isAmbiguousMonomerLibraryItem(monomer)) {
+    Monomer = AmbiguousMonomer;
+    MonomerRenderer = AmbiguousMonomerRenderer;
+    ketMonomerClass = AmbiguousMonomer.getMonomerClass(monomer.monomers);
+  } else if (monomer.props.unresolved) {
     Monomer = UnresolvedMonomer;
     MonomerRenderer = UnresolvedMonomerRenderer;
     ketMonomerClass = KetMonomerClass.CHEM;
   } else if (
-    monomer.props.MonomerType === MONOMER_CONST.CHEM ||
-    (monomer.props.MonomerType === MONOMER_CONST.RNA &&
-      (monomer.props.MonomerClass === MONOMER_CONST.MODDNA ||
-        monomer.props.MonomerClass === MONOMER_CONST.DNA))
-  ) {
-    Monomer = Chem;
-    MonomerRenderer = ChemRenderer;
-    ketMonomerClass = KetMonomerClass.CHEM;
-  } else if (
-    monomer.props.MonomerClass === MONOMER_CONST.RNA ||
-    monomer.props.MonomerClass === MONOMER_CONST.DNA
+    monomer.props.MonomerClass === KetMonomerClass.RNA ||
+    monomer.props.MonomerClass === KetMonomerClass.DNA
   ) {
     Monomer = UnsplitNucleotide;
     MonomerRenderer = UnsplitNucleotideRenderer;
     ketMonomerClass = KetMonomerClass.RNA;
-  } else if (monomer.props.MonomerType === MONOMER_CONST.PEPTIDE) {
+  } else if (
+    monomer.props.MonomerClass === KetMonomerClass.AminoAcid ||
+    monomer.props.MonomerType === MONOMER_CONST.PEPTIDE
+  ) {
     Monomer = Peptide;
     MonomerRenderer = PeptideRenderer;
     ketMonomerClass = KetMonomerClass.AminoAcid;
+  } else if (
+    monomer.props.MonomerClass === KetMonomerClass.Sugar ||
+    (monomer.props.MonomerType === MONOMER_CONST.RNA &&
+      monomer.props.MonomerNaturalAnalogCode === MONOMER_CONST.R)
+  ) {
+    Monomer = Sugar;
+    MonomerRenderer = SugarRenderer;
+    ketMonomerClass = KetMonomerClass.Sugar;
+  } else if (
+    monomer.props.MonomerClass === KetMonomerClass.Phosphate ||
+    (monomer.props.MonomerType === MONOMER_CONST.RNA &&
+      monomer.props.MonomerNaturalAnalogCode === MONOMER_CONST.P)
+  ) {
+    Monomer = Phosphate;
+    MonomerRenderer = PhosphateRenderer;
+    ketMonomerClass = KetMonomerClass.Phosphate;
+  } else if (
+    monomer.props.MonomerClass === KetMonomerClass.Base ||
+    (monomer.props.MonomerType === MONOMER_CONST.RNA &&
+      [...rnaDnaNaturalAnalogues, ...unknownNaturalAnalogues].includes(
+        monomer.props.MonomerNaturalAnalogCode,
+      ))
+  ) {
+    Monomer = RNABase;
+    MonomerRenderer = RNABaseRenderer;
+    ketMonomerClass = KetMonomerClass.Base;
   } else {
-    if (monomer.props.MonomerNaturalAnalogCode === MONOMER_CONST.R) {
-      Monomer = Sugar;
-      MonomerRenderer = SugarRenderer;
-      ketMonomerClass = KetMonomerClass.Sugar;
-    } else if (monomer.props.MonomerNaturalAnalogCode === MONOMER_CONST.P) {
-      Monomer = Phosphate;
-      MonomerRenderer = PhosphateRenderer;
-      ketMonomerClass = KetMonomerClass.Phosphate;
-    } else {
-      Monomer = RNABase;
-      MonomerRenderer = RNABaseRenderer;
-      ketMonomerClass = KetMonomerClass.Base;
-    }
+    Monomer = Chem;
+    MonomerRenderer = ChemRenderer;
+    ketMonomerClass = KetMonomerClass.CHEM;
   }
 
   return [Monomer, MonomerRenderer, ketMonomerClass];

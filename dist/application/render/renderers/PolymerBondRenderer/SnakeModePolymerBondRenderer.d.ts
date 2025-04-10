@@ -1,22 +1,25 @@
-import { BaseRenderer } from './BaseRenderer';
-import { PolymerBond } from "../../../domain/entities/PolymerBond";
-import { D3SvgElementSelection } from "../types";
-export declare class PolymerBondRenderer extends BaseRenderer {
-    polymerBond: PolymerBond;
+import { D3SvgElementSelection } from "../../types";
+import { PolymerBond } from "../../../../domain/entities/PolymerBond";
+import { BaseRenderer } from '../BaseRenderer';
+export declare class SnakeModePolymerBondRenderer extends BaseRenderer {
+    readonly polymerBond: PolymerBond;
     private editorEvents;
+    private isSnakeBond;
     private selectionElement;
     private path;
-    private previousStateOfIsMonomersOnSameHorisontalLine;
+    private previousStateOfIsMonomersOnSameHorizontalLine;
     private sideConnectionBondTurnPoint?;
+    bodyElement?: D3SvgElementSelection<SVGLineElement, this>;
     constructor(polymerBond: PolymerBond);
-    get isSnake(): boolean;
+    get isSnake(): true;
+    private get isHydrogenBond();
     get rootBBox(): DOMRect | undefined;
     get width(): number;
     get height(): number;
     private get scaledPosition();
     moveSelection(): void;
-    appendBond(rootElement: any): D3SvgElementSelection<SVGElement, this> | undefined;
-    appendSnakeBond(rootElement: any): D3SvgElementSelection<SVGElement, this> | undefined;
+    appendBond(rootElement: any): D3SvgElementSelection<SVGLineElement, this> | undefined;
+    appendSnakeBond(rootElement: any): D3SvgElementSelection<SVGLineElement, this> | undefined;
     private drawPartOfSideConnection;
     private appendSideConnectionBond;
     private getMonomerWidth;
@@ -33,13 +36,14 @@ export declare class PolymerBondRenderer extends BaseRenderer {
     private addLineFromBottomToRight;
     private addLineFromLeftToBottom;
     private addLineFromTopToLeft;
-    private addLineFromRightToUp;
+    private addLineFromRightToTop;
     private addLineFromRightToBottom;
     private addLine;
     private addRandomLine;
-    appendBondGraph(rootElement: any): D3SvgElementSelection<SVGElement, this> | undefined;
+    appendBondGraph(rootElement: any): D3SvgElementSelection<SVGLineElement, this> | undefined;
     private appendRootElement;
-    show(_theme?: any, force?: boolean): void;
+    show(_theme?: unknown, force?: boolean): void;
+    private get isSideConnectionBondDrawn();
     drawSelection(): void;
     moveEnd(): void;
     private moveSnakeBondEnd;
@@ -49,5 +53,7 @@ export declare class PolymerBondRenderer extends BaseRenderer {
     private moveGraphBondStart;
     protected appendHoverAreaElement(): void;
     appendHover(): void;
-    removeHover(): D3SvgElementSelection<SVGGElement | SVGLineElement, void>;
+    removeHover(): D3SvgElementSelection<SVGLineElement | SVGGElement, void>;
+    private calculateIsSnakeBond;
+    remove(): void;
 }

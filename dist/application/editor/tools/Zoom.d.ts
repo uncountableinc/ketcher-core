@@ -18,6 +18,7 @@ import { BaseTool } from "./Tool";
 import { D3SvgElementSelection } from "../../render/types";
 import { Vec2 } from "../../../domain/entities/vec2";
 import { DrawingEntitiesManager } from "../../../domain/entities/DrawingEntitiesManager";
+import { StructureBbox } from "../../render/renderers/types";
 export declare enum SCROLL_POSITION {
     CENTER = "CENTER",
     BOTTOM = "BOTTOM"
@@ -72,6 +73,7 @@ export declare class ZoomTool implements BaseTool {
     };
     dragged: (name: string) => (event: any) => void;
     scrollTo(position: Vec2, stickToBottom?: boolean, xOffset?: any, yOffset?: any, isOffsetInPercents?: boolean): void;
+    scrollBy(x: number, y: number): void;
     scrollToVerticalCenter(structCenterY: number): void;
     scrollToVerticalBottom(): void;
     mouseWheeled(event: any): void;
@@ -79,6 +81,7 @@ export declare class ZoomTool implements BaseTool {
     private get zoomStep();
     zoomIn(zoomStep?: number): void;
     zoomOut(zoomStep?: number): void;
+    zoomToLeftTopCorner(_newZoomLevel: number): void;
     zoomTo(zoomLevel: number): void;
     resetZoom(): void;
     observeCanvasResize: () => void;
@@ -89,6 +92,8 @@ export declare class ZoomTool implements BaseTool {
     zoomValue(value: number): number;
     destroy(): void;
     isFitToCanvasHeight(height: any): boolean;
+    zoomStructureToFitHalfOfCanvas(structureBbox: StructureBbox): void;
     private get canvasWrapperHeight();
+    private get canvasWrapperSize();
 }
 export default ZoomTool;

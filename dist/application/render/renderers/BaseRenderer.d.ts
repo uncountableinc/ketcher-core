@@ -7,8 +7,8 @@ export interface IBaseRenderer {
 export declare abstract class BaseRenderer implements IBaseRenderer {
     drawingEntity: DrawingEntity;
     protected rootElement?: D3SvgElementSelection<SVGGElement, void>;
-    bodyElement?: D3SvgElementSelection<SVGElement, this>;
-    protected hoverElement?: D3SvgElementSelection<SVGUseElement & SVGGElement, void>;
+    bodyElement?: D3SvgElementSelection<SVGUseElement, this> | D3SvgElementSelection<SVGLineElement, this> | D3SvgElementSelection<SVGPathElement, this> | D3SvgElementSelection<SVGCircleElement, this>;
+    protected hoverElement?: D3SvgElementSelection<SVGUseElement, void> | D3SvgElementSelection<SVGGElement, void> | D3SvgElementSelection<SVGCircleElement, void> | D3SvgElementSelection<SVGRectElement, void> | D3SvgElementSelection<SVGPathElement, void>;
     protected hoverAreaElement?: D3SvgElementSelection<SVGGElement | SVGLineElement, void>;
     protected hoverCircleAreaElement?: D3SvgElementSelection<SVGGElement | SVGCircleElement, void>;
     protected canvasWrapper: D3SvgElementSelection<SVGSVGElement, void>;
@@ -27,7 +27,7 @@ export declare abstract class BaseRenderer implements IBaseRenderer {
     abstract show(theme: any, force?: boolean): void;
     abstract drawSelection(): void;
     abstract moveSelection(): void;
-    protected abstract appendHover(hoverArea: any): D3SvgElementSelection<SVGUseElement, void> | void;
+    protected abstract appendHover(hoverArea: any): D3SvgElementSelection<SVGGElement, void> | D3SvgElementSelection<SVGUseElement, void> | D3SvgElementSelection<SVGCircleElement, void> | D3SvgElementSelection<SVGRectElement, void> | D3SvgElementSelection<SVGPathElement, void> | void;
     protected abstract removeHover(): void;
     protected abstract appendHoverAreaElement(): void;
     remove(): void;

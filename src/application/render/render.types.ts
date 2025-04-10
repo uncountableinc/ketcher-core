@@ -1,16 +1,33 @@
 import { RxnArrowMode, Vec2 } from 'domain/entities';
 import { StereLabelStyleType } from 'application/render/restruct';
 
-type RenderOptionStyles = Record<string, string | number>;
+export type RenderOptionStyles = Record<string, string | number>;
+
+export enum MeasurementUnits {
+  Px = 'px',
+  Cm = 'cm',
+  Pt = 'pt',
+  Inch = 'inch',
+}
+
+export enum UsageInMacromolecule {
+  MonomerConnectionsModal,
+  MonomerPreview,
+  BondPreview,
+}
 
 export type RenderOptions = {
   width?: number;
   height?: number;
 
   rotationStep?: number;
-  doubleBondWidth: number;
+  bondSpacing: number;
+  bondLength: number;
+  bondLengthUnit: MeasurementUnits;
   stereoBondWidth: number;
+  stereoBondWidthUnit: MeasurementUnits;
   bondThickness: number;
+  bondThicknessUnit: MeasurementUnits;
 
   downScale?: boolean;
   rescaleAmount?: number;
@@ -39,7 +56,6 @@ export type RenderOptions = {
   microModeScale: number;
   macroModeScale: number;
   zoom: number;
-  externalZoomScale?: number;
   offset: Vec2;
   lineWidth: number;
 
@@ -48,16 +64,23 @@ export type RenderOptions = {
   subFontSize: number;
   font: string;
   fontsz: number;
+  fontszUnit: MeasurementUnits;
+  fontszsubUnit: MeasurementUnits;
   fontszsub: number;
   fontRLabel: number;
   fontRLogic: number;
 
+  hashSpacing: number;
+  hashSpacingUnit: MeasurementUnits;
+
   /* styles */
   lineattr: RenderOptionStyles;
+  multitailArrow: RenderOptionStyles;
   arrowSnappingStyle: RenderOptionStyles;
   bondSnappingStyle: RenderOptionStyles;
   selectionStyle: RenderOptionStyles;
   hoverStyle: RenderOptionStyles;
+  innerHoverStyle: RenderOptionStyles;
   movingStyle: RenderOptionStyles;
   sgroupBracketStyle: RenderOptionStyles;
   lassoStyle: RenderOptionStyles;
@@ -74,6 +97,16 @@ export type RenderOptions = {
   currentlySelectedMonomerAttachmentPoint?: string;
   labelInMonomerConnectionsModal?: boolean;
   labelInPreview?: boolean;
+
+  // Converted
+  fontszInPx: number;
+  fontszsubInPx: number;
+  bondSpacingInPx: number;
+  bondThicknessInPx: number;
+  stereoBondWidthInPx: number;
+  hashSpacingInPx: number;
+  usageInMacromolecule?: UsageInMacromolecule;
+  viewOnlyMode?: boolean;
 };
 
 export interface RelativeBox {

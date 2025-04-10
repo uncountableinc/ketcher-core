@@ -20,11 +20,11 @@ import { Command } from "../../entities/Command";
 import { EditorSelection } from "../../../application/editor/internal";
 import { DrawingEntitiesManager } from "../../entities/DrawingEntitiesManager";
 import { BaseMonomer } from "../../entities/BaseMonomer";
-import { MonomerItemType } from "../../types";
+import { AmbiguousMonomerType, MonomerItemType } from "../../types";
 import { PolymerBond } from "../../entities/PolymerBond";
 export declare class KetSerializer implements Serializer<Struct> {
     deserializeMicromolecules(content: string): Struct;
-    fillStruct(ket: any): Struct;
+    private static fillStruct;
     serializeMicromolecules(struct: Struct, monomer?: BaseMonomer): string;
     private validateMonomerNodeTemplate;
     private validateConnectionTypeAndEndpoints;
@@ -43,21 +43,23 @@ export declare class KetSerializer implements Serializer<Struct> {
             atoms: never[];
         };
     }[] | undefined;
-    convertMonomerTemplateToStruct(template: IKetMonomerTemplate): Struct;
+    static convertMonomerTemplateToStruct(template: IKetMonomerTemplate): Struct;
     convertMonomerTemplateToLibraryItem(template: IKetMonomerTemplate): MonomerItemType;
-    fillStructRgLabelsByMonomerTemplate(template: IKetMonomerTemplate, monomerItem: MonomerItemType): void;
+    static fillStructRgLabelsByMonomerTemplate(template: IKetMonomerTemplate, monomerItem: MonomerItemType): void;
     deserializeToDrawingEntities(fileContent: string): {
         modelChanges: Command;
         drawingEntitiesManager: DrawingEntitiesManager;
     } | undefined;
     deserialize(fileContent: string): Struct;
-    getConnectionMonomerEndpoint(monomer: BaseMonomer, polymerBond: PolymerBond): IKetConnectionMonomerEndPoint;
+    getConnectionMonomerEndpoint(monomer: BaseMonomer, polymerBond: PolymerBond, monomerIdMap: Map<number, number>): IKetConnectionMonomerEndPoint;
     getConnectionMoleculeEndpoint(monomer: BaseMonomer, polymerBond: PolymerBond, monomerToAtomIdMap: Map<BaseMonomer, Map<number, number>>, struct: Struct): IKetConnectionMoleculeEndPoint;
+    private serializeMonomerTemplate;
+    private serializeVariantMonomerTemplate;
     serializeMacromolecules(struct: Struct, drawingEntitiesManager: DrawingEntitiesManager): {
         serializedMacromolecules: IKetMacromoleculesContentRootProperty;
         micromoleculesStruct: Struct;
     };
     static removeLeavingGroupsFromConnectedAtoms(_struct: Struct): Struct;
     serialize(_struct: Struct, drawingEntitiesManager?: DrawingEntitiesManager, selection?: EditorSelection): string;
-    convertMonomersLibrary(monomersLibrary: IKetMacromoleculesContent): MonomerItemType[];
+    convertMonomersLibrary(monomersLibrary: IKetMacromoleculesContent): MonomerItemType[] & AmbiguousMonomerType[];
 }

@@ -63,7 +63,8 @@ export declare abstract class BaseSequenceItemRenderer extends BaseSequenceRende
     redrawAttachmentPoints(): void;
     redrawAttachmentPointsCoordinates(): void;
     get enumeration(): null;
-    hoverAttachmenPoint(): void;
+    redrawChainBeginning(): void;
+    hoverAttachmentPoint(): void;
     updateAttachmentPoints(): void;
     private drawBackgroundElementHover;
     private removeBackgroundElementHover;

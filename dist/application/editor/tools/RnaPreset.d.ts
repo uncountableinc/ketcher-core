@@ -16,7 +16,6 @@
 import { Tool, IRnaPreset } from "./Tool";
 import { CoreEditor, EditorHistory } from "../internal";
 import { MonomerItemType } from "../../../domain/types";
-export declare const RNA_MONOMER_DISTANCE = 22.5;
 declare class RnaPresetTool implements Tool {
     private editor;
     rnaBase: MonomerItemType | undefined;

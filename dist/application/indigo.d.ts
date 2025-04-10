@@ -42,7 +42,7 @@ export declare class Indigo {
     constructor(structService: any);
     info(): Promise<InfoResult>;
     convert(struct: StructOrString, options?: ConvertOptions): Promise<ConvertResult>;
-    layout(struct: StructOrString): Promise<Struct>;
+    layout(struct: StructOrString, options: any): Promise<Struct>;
     clean(struct: StructOrString): Promise<Struct>;
     aromatize(struct: StructOrString): Promise<Struct>;
     dearomatize(struct: StructOrString): Promise<Struct>;

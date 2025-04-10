@@ -20,7 +20,7 @@ export declare class SequenceMode extends BaseMode {
     set isEditMode(isEditMode: boolean);
     get isEditInRNABuilderMode(): boolean;
     set isEditInRNABuilderMode(isEditInRNABuilderMode: boolean);
-    initialize(needScroll?: boolean, needRemoveSelection?: boolean): Command;
+    initialize(needScroll?: boolean, needRemoveSelection?: boolean, needReArrangeChains?: boolean): Command;
     turnOnEditMode(sequenceItemRenderer?: BaseSequenceItemRenderer, needToRemoveSelection?: boolean): void;
     turnOffEditMode(): void;
     turnOnSequenceEditInRNABuilderMode(): void;
@@ -99,6 +99,7 @@ export declare class SequenceMode extends BaseMode {
     private selectionsCantPreserveConnectionsWithMonomer;
     private presetHasNeededAttachmentPoints;
     private selectionsCantPreserveConnectionsWithPreset;
+    private checkNodeInsertionPossibility;
     insertMonomerFromLibrary(monomerItem: MonomerItemType): void;
     private createRnaPresetNode;
     private replaceSelectionWithPreset;

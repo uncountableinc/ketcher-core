@@ -15,7 +15,7 @@
  ***************************************************************************/
 import { BaseTool } from "./Tool";
 import { CoreEditor, EditorHistory } from "../internal";
-import { MonomerItemType } from "../../../domain/types";
+import { MonomerOrAmbiguousType } from "../../../domain/types";
 declare class MonomerTool implements BaseTool {
     private editor;
     private monomer;
@@ -25,7 +25,7 @@ declare class MonomerTool implements BaseTool {
     readonly MONOMER_PREVIEW_OFFSET_X = 30;
     readonly MONOMER_PREVIEW_OFFSET_Y = 30;
     history: EditorHistory;
-    constructor(editor: CoreEditor, monomer: MonomerItemType);
+    constructor(editor: CoreEditor, monomer: MonomerOrAmbiguousType);
     mousedown(): void;
     mousemove(): void;
     mouseLeaveClientArea(): void;

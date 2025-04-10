@@ -31,8 +31,7 @@ if (typeof window !== 'undefined') {
     typeof raphaelModule === 'function' ? raphaelModule : raphaelModule.default;
 
   // TODO: refactor ugly prototype extensions to plain old functions
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: remove any for raphael
-  (Raphael.el as any).translateAbs = function (x: number, y: number): void {
+  Raphael.el.translateAbs = function (x: number, y: number): void {
     this.delta = this.delta || new Vec2();
     // TODO check that only numbers might be passed to this function
     this.delta.x += x - 0;
@@ -42,8 +41,7 @@ if (typeof window !== 'undefined') {
     );
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TODO: remove any for raphael
-  (Raphael.st as any).translateAbs = function (x: number, y: number): void {
+  Raphael.st.translateAbs = function (x: number, y: number): void {
     this.forEach((el) => {
       el.translateAbs(x, y);
     });

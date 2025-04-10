@@ -18,6 +18,7 @@ import { Struct } from "./struct";
 export declare class MonomerMicromolecule extends SGroup {
     monomer: any;
     constructor(type: string, monomer: any);
+    get isMonomer(): boolean;
     getContractedPosition(struct: Struct): {
         position: import("./vec2").Vec2;
         atomId: number;

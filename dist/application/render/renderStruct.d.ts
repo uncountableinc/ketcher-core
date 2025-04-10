@@ -7,5 +7,5 @@ export declare class RenderStruct {
      */
     static prepareStruct(struct: Struct): Struct;
     static removeSmallAttachmentPointLabelsInModal(render: Render, options?: any): void;
-    static render(el: HTMLElement | null, struct: Struct | null, options?: any): void;
+    static render(wrapperElement: HTMLElement | null, struct: Struct | null, options?: any): void;
 }

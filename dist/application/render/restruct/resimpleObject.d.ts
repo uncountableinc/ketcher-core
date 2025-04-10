@@ -34,7 +34,7 @@ declare class ReSimpleObject extends ReObject {
     calcDistance(p: Vec2, s: any): MinDistanceWithReferencePoint;
     getReferencePointDistance(p: Vec2): MinDistanceWithReferencePoint;
     getReferencePoints(onlyOnObject?: boolean): Array<Vec2>;
-    getHoverPathStyle(path: any, render: Render, isOuterShapeOfHoverPath: boolean): any;
+    getFigureHoverPath(path: any, render: Render, isBorder?: boolean): any;
     hoverPath(render: Render): Array<StyledPath>;
     drawHover(render: Render): Array<any>;
     makeSelectionPlate(restruct: ReStruct, paper: any, styles: any): any;

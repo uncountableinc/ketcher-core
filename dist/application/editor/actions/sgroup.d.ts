@@ -21,6 +21,9 @@ export declare function fromSgroupAttrs(restruct: any, id: any, attrs: any): Act
 export declare function setExpandSGroup(restruct: Restruct, sgid: number, attrs: {
     expanded: boolean;
 }): Action;
+export declare function setExpandMonomerSGroup(restruct: Restruct, sgid: number, attrs: {
+    expanded: boolean;
+}): Action;
 export declare function expandSGroupWithMultipleAttachmentPoint(restruct: any): Action;
 export declare function sGroupAttributeAction(id: any, attrs: any): Action;
 export declare function fromSgroupDeletion(restruct: any, id: any, needPerform?: boolean): Action;

@@ -34,11 +34,15 @@ export class UnresolvedMonomerRenderer extends BaseMonomerRenderer {
     super.show(theme);
   }
 
-  protected get enumerationElementPosition() {
+  public get enumerationElementPosition() {
     return undefined;
   }
 
-  protected get beginningElementPosition() {
+  public get beginningElementPosition() {
+    return undefined;
+  }
+
+  protected get modificationConfig() {
     return undefined;
   }
 }

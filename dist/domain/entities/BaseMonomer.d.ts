@@ -1,6 +1,6 @@
 import { DrawingEntity, DrawingEntityConfig } from './DrawingEntity';
 import { Vec2 } from "./vec2";
-import { AttachmentPointName, MonomerItemType } from "../types";
+import { AttachmentPointName, AttachmentPointsToBonds, MonomerItemType } from "../types";
 import { PolymerBond } from "./PolymerBond";
 import { BaseMonomerRenderer } from "../../application/render/renderers/BaseMonomerRenderer";
 import { IKetAttachmentPoint } from "../../application/formatters/types/ket";
@@ -10,19 +10,21 @@ import { PeptideSubChain } from "./monomer-chains/PeptideSubChain";
 import { SubChainNode } from "./monomer-chains/types";
 import { PhosphateSubChain } from "./monomer-chains/PhosphateSubChain";
 import { BaseSequenceItemRenderer } from "../../application/render/renderers/sequence/BaseSequenceItemRenderer";
+import { MonomerToAtomBond } from "./MonomerToAtomBond";
+import { HydrogenBond } from "./HydrogenBond";
 export declare type BaseMonomerConfig = DrawingEntityConfig;
+export declare const HYDROGEN_BOND_ATTACHMENT_POINT = "hydrogen";
 export declare abstract class BaseMonomer extends DrawingEntity {
     renderer?: BaseMonomerRenderer | BaseSequenceItemRenderer;
-    attachmentPointsToBonds: Partial<Record<AttachmentPointName, PolymerBond | null>>;
+    attachmentPointsToBonds: AttachmentPointsToBonds;
     chosenFirstAttachmentPointForBond: AttachmentPointName | null;
     potentialSecondAttachmentPointForBond: AttachmentPointName | null;
     chosenSecondAttachmentPointForBond: AttachmentPointName | null;
-    potentialAttachmentPointsToBonds: {
-        [key: string]: PolymerBond | null | undefined;
-    };
+    potentialAttachmentPointsToBonds: AttachmentPointsToBonds;
     attachmentPointsVisible: boolean;
     monomerItem: MonomerItemType;
     isMonomerInRnaChainRow: boolean;
+    hydrogenBonds: HydrogenBond[];
     constructor(monomerItem: MonomerItemType, _position?: Vec2, config?: BaseMonomerConfig);
     get label(): string;
     get center(): Vec2;
@@ -32,8 +34,8 @@ export declare abstract class BaseMonomer extends DrawingEntity {
     setChosenFirstAttachmentPoint(attachmentPoint: AttachmentPointName | null): void;
     setChosenSecondAttachmentPoint(attachmentPoint: AttachmentPointName | null): void;
     setPotentialSecondAttachmentPoint(attachmentPoint: AttachmentPointName | null): void;
-    setPotentialBond(attachmentPoint: string | undefined, potentialBond?: PolymerBond | null): void;
-    getAttachmentPointByBond(bond: PolymerBond): AttachmentPointName | undefined;
+    setPotentialBond(attachmentPoint: string | undefined, potentialBond?: PolymerBond | HydrogenBond | null): void;
+    getAttachmentPointByBond(bond: PolymerBond | MonomerToAtomBond | HydrogenBond): AttachmentPointName | undefined;
     abstract getValidSourcePoint(monomer?: BaseMonomer): AttachmentPointName | undefined;
     abstract getValidTargetPoint(monomer: BaseMonomer): string | undefined;
     getPotentialAttachmentPointByBond(bond: PolymerBond): AttachmentPointName | undefined;
@@ -44,25 +46,28 @@ export declare abstract class BaseMonomer extends DrawingEntity {
     get hasFreeAttachmentPoint(): boolean;
     isAttachmentPointExistAndFree(attachmentPoint: AttachmentPointName): boolean;
     setRenderer(renderer: BaseMonomerRenderer): void;
-    forEachBond(callback: (polymerBond: PolymerBond, attachmentPointName: AttachmentPointName) => void): void;
-    setBond(attachmentPointName: AttachmentPointName, bond: PolymerBond): void;
-    unsetBond(attachmentPointName: AttachmentPointName): void;
+    forEachBond(callback: (polymerBond: PolymerBond | MonomerToAtomBond | HydrogenBond, attachmentPointName: AttachmentPointName) => void): void;
+    setBond(attachmentPointName: AttachmentPointName, bond: PolymerBond | MonomerToAtomBond | HydrogenBond): void;
+    unsetBond(attachmentPointName?: AttachmentPointName, bondToDelete?: HydrogenBond | PolymerBond): void;
+    get covalentBonds(): (PolymerBond | MonomerToAtomBond)[];
     get hasBonds(): boolean;
+    hasHydrogenBondWithMonomer(monomer: BaseMonomer): HydrogenBond | undefined;
     hasPotentialBonds(): boolean;
-    getPotentialBond(attachmentPointName: string): PolymerBond | null | undefined;
+    getPotentialBond(attachmentPointName: string): any;
     removeBond(polymerBond: PolymerBond): void;
     removePotentialBonds(clearSelectedPoints?: boolean): void;
     get availableAttachmentPointForBondEnd(): AttachmentPointName | undefined;
     hasAttachmentPoint(attachmentPointName: AttachmentPointName): boolean;
+    get isPhosphate(): boolean;
     get usedAttachmentPointsNamesList(): AttachmentPointName[];
     get unUsedAttachmentPointsNamesList(): AttachmentPointName[];
-    getBondByAttachmentPoint(attachmentPointName: AttachmentPointName): PolymerBond | null | undefined;
-    getPotentialBondByAttachmentPoint(attachmentPointName: AttachmentPointName): PolymerBond | null | undefined;
+    getBondByAttachmentPoint(attachmentPointName: AttachmentPointName): PolymerBond | MonomerToAtomBond | null | undefined;
+    getPotentialBondByAttachmentPoint(attachmentPointName: AttachmentPointName): PolymerBond | MonomerToAtomBond | null | undefined;
     isAttachmentPointUsed(attachmentPointName: AttachmentPointName): boolean;
     isAttachmentPointPotentiallyUsed(attachmentPointName: AttachmentPointName): boolean;
     private getAttachmentPointDict;
     static getAttachmentPointDictFromMonomerDefinition(attachmentPoints: IKetAttachmentPoint[]): {
-        attachmentPointDictionary: Partial<Record<AttachmentPointName, PolymerBond | null>>;
+        attachmentPointDictionary: AttachmentPointsToBonds;
         attachmentPointsList: AttachmentPointName[];
     };
     get attachmentPointNumberToType(): {
@@ -72,10 +77,11 @@ export declare abstract class BaseMonomer extends DrawingEntity {
     };
     private getMonomerDefinitionAttachmentPoints;
     get superatomAttachmentPoints(): readonly import("./sGroupAttachmentPoint").SGroupAttachmentPoint[];
-    getAttachmentPointDictFromAtoms(): Partial<Record<AttachmentPointName, PolymerBond | null>>;
+    getAttachmentPointDictFromAtoms(): AttachmentPointsToBonds;
     get startBondAttachmentPoint(): AttachmentPointName | "R1" | "R2" | undefined;
     abstract get SubChainConstructor(): typeof RnaSubChain | typeof ChemSubChain | typeof PhosphateSubChain | typeof PeptideSubChain;
     isMonomerTypeDifferentForChaining(monomerToChain: SubChainNode | BaseMonomer): boolean;
     get isModification(): boolean;
     get sideConnections(): PolymerBond[];
+    get monomerCaps(): Partial<Record<AttachmentPointName, string>> | undefined;
 }

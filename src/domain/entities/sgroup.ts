@@ -243,14 +243,17 @@ export class SGroup {
     return this.getConnectionPointsCount(struct) >= 1;
   }
 
-  addAttachmentPoint(attachmentPoint: SGroupAttachmentPoint): void {
+  addAttachmentPoint(
+    attachmentPoint: SGroupAttachmentPoint,
+    validateUniqueness = true,
+  ): void {
     const isAttachmentPointAlreadyExist = this.attachmentPoints.some(
       ({ atomId, leaveAtomId }) =>
         attachmentPoint.atomId === atomId &&
         attachmentPoint.leaveAtomId === leaveAtomId,
     );
 
-    if (isAttachmentPointAlreadyExist) {
+    if (isAttachmentPointAlreadyExist && validateUniqueness) {
       throw new Error(
         'The same attachment point cannot be added to an S-group more than once',
       );
@@ -263,9 +266,10 @@ export class SGroup {
     attachmentPoints:
       | ReadonlyArray<SGroupAttachmentPoint>
       | SGroupAttachmentPoint[],
+    validateUniqueness = true,
   ): void {
     for (const attachmentPoint of attachmentPoints) {
-      this.addAttachmentPoint(attachmentPoint);
+      this.addAttachmentPoint(attachmentPoint, validateUniqueness);
     }
   }
 
@@ -362,6 +366,10 @@ export class SGroup {
 
   public get isSuperatomWithoutLabel() {
     return this.type === SGroup.TYPES.SUP && !this.data.name;
+  }
+
+  public get isMonomer() {
+    return false;
   }
 
   static getOffset(sgroup: SGroup): null | Vec2 {
@@ -500,7 +508,8 @@ export class SGroup {
     const crossBonds = crossBondsPerAtom
       ? Object.values(crossBondsPerAtom).flat()
       : null;
-    if (!crossBonds || crossBonds.length !== 2) {
+    // TODO: Overall cross bonds logic seems unclear and not-correct for s groups in general leading to tilted hover plate
+    if (sGroup.isMonomer || !crossBonds || crossBonds.length !== 2) {
       sGroup.bracketDirection = new Vec2(1, 0);
     } else {
       const p1 = mol.bonds.get(crossBonds[0]).getCenter(mol);
@@ -541,8 +550,7 @@ export class SGroup {
       braketBox = !braketBox ? bbb : Box2Abs.union(braketBox, bbb!);
     });
     if (!render) {
-      const vext = new Vec2(0.2, 0.4);
-      if (braketBox) braketBox = (braketBox as Box2Abs).extend(vext, vext);
+      render = window.ketcher!.editor.render;
     } else {
       let attachmentPointsVBox =
         render.ctab.getRGroupAttachmentPointsVBoxByAtomIds(atoms);
@@ -553,13 +561,14 @@ export class SGroup {
         attachmentPointsVBox && braketBox
           ? Box2Abs.union(braketBox, attachmentPointsVBox)
           : braketBox;
-      if (braketBox)
+      if (braketBox) {
         braketBox = (braketBox as Box2Abs).extend(
           PADDING_VECTOR,
           PADDING_VECTOR,
         );
+      }
+      sGroup.bracketBox = braketBox;
     }
-    sGroup.bracketBox = braketBox;
   }
 
   static getBracketParameters(
@@ -631,13 +640,18 @@ export class SGroup {
     return brackets;
   }
 
-  static getObjBBox(atoms, mol): Box2Abs {
+  static getObjBBox(atoms, mol, useCollapsedSgroupsPosition = false): Box2Abs {
     const a0 = mol.atoms.get(atoms[0]).pp;
     let bb = new Box2Abs(a0, a0);
     for (let i = 1; i < atoms.length; ++i) {
       const aid = atoms[i];
       const atom = mol.atoms.get(aid);
-      const p = atom.pp;
+      const sgroupId = atom.sgs.values().next().value;
+      const sgroup = isNumber(sgroupId) ? mol.sgroups.get(sgroupId) : undefined;
+      const p =
+        useCollapsedSgroupsPosition && sgroup && !sgroup.expanded
+          ? sgroup.getContractedPosition(mol).position
+          : atom.pp;
       bb = bb.include(p);
     }
     return bb;

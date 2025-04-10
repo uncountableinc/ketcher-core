@@ -31,11 +31,13 @@ export enum ChemicalMimeType {
   SDF = 'chemical/x-sdf',
   FASTA = 'chemical/x-fasta',
   SEQUENCE = 'chemical/x-sequence',
+  PeptideSequenceThreeLetter = 'chemical/x-peptide-sequence-3-letter',
   RNA = 'chemical/x-rna-sequence',
   DNA = 'chemical/x-dna-sequence',
   PEPTIDE = 'chemical/x-peptide-sequence',
   IDT = 'chemical/x-idt',
   HELM = 'chemical/x-helm',
+  RDF = 'chemical/x-rdf',
 }
 
 export interface WithStruct {
@@ -153,8 +155,7 @@ export type OutputFormatType = 'png' | 'svg';
 export interface GenerateImageOptions extends StructServiceOptions {
   outputFormat: OutputFormatType;
   backgroundColor?: string;
-  bondThickness: number;
-  stereoStyle?: 'ext' | 'old' | 'none';
+  stereoStyle?: 'ext' | 'old' | 'none;';
 }
 
 export interface StructService {

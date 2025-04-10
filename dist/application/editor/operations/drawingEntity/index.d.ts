@@ -20,8 +20,10 @@ export declare class DrawingEntityMoveOperation implements Operation {
     private drawingEntity;
     private wasInverted;
     constructor(moveDrawingEntityChangeModel: () => void, invertMoveDrawingEntityChangeModel: () => void, redoDrawingEntityChangeModel: () => void, drawingEntity: DrawingEntity);
-    execute(renderersManager: RenderersManager): void;
-    invert(renderersManager: RenderersManager): void;
+    execute(): void;
+    invert(): void;
+    executeAfterAllOperations(renderersManager: RenderersManager): void;
+    invertAfterAllOperations(renderersManager: RenderersManager): void;
 }
 export declare class DrawingEntityRedrawOperation implements Operation {
     private drawingEntityRedrawModelChange;

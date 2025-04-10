@@ -14,6 +14,7 @@
  * limitations under the License.
  ***************************************************************************/
 import { ToolConstructorInterface } from './Tool';
-export declare const toolsMap: Record<string, ToolConstructorInterface>;
+import { ToolName } from "./types";
+export declare const toolsMap: Record<ToolName, ToolConstructorInterface>;
 export * from './Tool';
 export * from './Zoom';

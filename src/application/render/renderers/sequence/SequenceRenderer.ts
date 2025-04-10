@@ -2,9 +2,9 @@ import { ChainsCollection } from 'domain/entities/monomer-chains/ChainsCollectio
 import { SequenceNodeRendererFactory } from 'application/render/renderers/sequence/SequenceNodeRendererFactory';
 import {
   BaseMonomer,
+  MonomerToAtomBond,
   Nucleotide,
   Phosphate,
-  RNABase,
   Sugar,
   Vec2,
 } from 'domain/entities';
@@ -14,6 +14,7 @@ import {
   getNextMonomerInChain,
   getRnaBaseFromSugar,
   getSugarFromRnaBase,
+  isRnaBaseOrAmbiguousRnaBase,
 } from 'domain/helpers/monomers';
 import { Nucleoside } from 'domain/entities/Nucleoside';
 import { BackBoneBondSequenceRenderer } from 'application/render/renderers/sequence/BackBoneBondSequenceRenderer';
@@ -32,6 +33,7 @@ import { BaseMonomerRenderer } from 'application/render';
 import { Command } from 'domain/entities/Command';
 import { NewSequenceButton } from 'application/render/renderers/sequence/ui-controls/NewSequenceButton';
 import { isNumber } from 'lodash';
+import { MonomerToAtomBondSequenceRenderer } from 'application/render/renderers/sequence/MonomerToAtomBondSequenceRenderer';
 
 export type SequencePointer = number;
 export type NumberOfSymbolsInRow = number;
@@ -204,72 +206,94 @@ export class SequenceRenderer {
             return;
           }
 
-          if (!handledMonomersToAttachmentPoints.has(node.monomer)) {
-            handledMonomersToAttachmentPoints.set(node.monomer, new Set());
-          }
-          node.monomer.forEachBond((polymerBond, attachmentPointName) => {
-            if (!subChain.bonds.includes(polymerBond)) {
-              subChain.bonds.push(polymerBond);
+          node.monomers.forEach((monomer) => {
+            if (!handledMonomersToAttachmentPoints.has(monomer)) {
+              handledMonomersToAttachmentPoints.set(monomer, new Set());
             }
-            if (!polymerBond.isSideChainConnection) {
-              polymerBond.setRenderer(
-                new BackBoneBondSequenceRenderer(polymerBond),
+
+            monomer.forEachBond((polymerBond, attachmentPointName) => {
+              const handledAttachmentPoints =
+                handledMonomersToAttachmentPoints.get(
+                  monomer,
+                ) as Set<AttachmentPointName>;
+
+              if (polymerBond instanceof MonomerToAtomBond) {
+                const bondRenderer = new MonomerToAtomBondSequenceRenderer(
+                  polymerBond,
+                  node,
+                );
+
+                bondRenderer.show();
+                polymerBond.setRenderer(bondRenderer);
+                handledAttachmentPoints.add(attachmentPointName);
+
+                return;
+              }
+
+              if (!subChain.bonds.includes(polymerBond)) {
+                subChain.bonds.push(polymerBond);
+              }
+              if (!polymerBond.isSideChainConnection) {
+                polymerBond.setRenderer(
+                  new BackBoneBondSequenceRenderer(polymerBond),
+                );
+                return;
+              }
+
+              if (handledAttachmentPoints.has(attachmentPointName)) {
+                return;
+              }
+
+              const anotherMonomer = polymerBond.getAnotherEntity(
+                monomer,
+              ) as BaseMonomer;
+
+              // Skip handling side chains for sugar(R3) + base(R1) connections.
+              if (
+                (monomer instanceof Sugar &&
+                  getRnaBaseFromSugar(monomer) === anotherMonomer) ||
+                (anotherMonomer instanceof Sugar &&
+                  getRnaBaseFromSugar(anotherMonomer) === monomer)
+              ) {
+                return;
+              }
+
+              let bondRenderer;
+
+              // If side connection comes from rna base then take connected sugar and draw side connection from it
+              // because for rna we display only one letter instead of three
+              const connectedSugarToBase = getSugarFromRnaBase(anotherMonomer);
+              if (
+                isRnaBaseOrAmbiguousRnaBase(anotherMonomer) &&
+                connectedSugarToBase
+              ) {
+                bondRenderer = new PolymerBondSequenceRenderer(
+                  new PolymerBond(monomer, connectedSugarToBase),
+                );
+              } else {
+                bondRenderer = new PolymerBondSequenceRenderer(polymerBond);
+              }
+              bondRenderer.show();
+              polymerBond.setRenderer(bondRenderer);
+              handledAttachmentPoints.add(attachmentPointName);
+
+              if (!handledMonomersToAttachmentPoints.get(anotherMonomer)) {
+                handledMonomersToAttachmentPoints.set(
+                  anotherMonomer,
+                  new Set(),
+                );
+              }
+              const anotherMonomerHandledAttachmentPoints =
+                handledMonomersToAttachmentPoints.get(
+                  anotherMonomer,
+                ) as Set<AttachmentPointName>;
+
+              anotherMonomerHandledAttachmentPoints.add(
+                anotherMonomer?.getAttachmentPointByBond(
+                  polymerBond,
+                ) as AttachmentPointName,
               );
-              return;
-            }
-
-            const handledAttachmentPoints =
-              handledMonomersToAttachmentPoints.get(
-                node.monomer,
-              ) as Set<AttachmentPointName>;
-
-            if (handledAttachmentPoints.has(attachmentPointName)) {
-              return;
-            }
-
-            const anotherMonomer = polymerBond.getAnotherMonomer(
-              node.monomer,
-            ) as BaseMonomer;
-
-            // Skip handling side chains for sugar(R3) + base(R1) connections.
-            if (
-              (node.monomer instanceof Sugar &&
-                getRnaBaseFromSugar(node.monomer) === anotherMonomer) ||
-              (anotherMonomer instanceof Sugar &&
-                getRnaBaseFromSugar(anotherMonomer) === node.monomer)
-            ) {
-              return;
-            }
-
-            let bondRenderer;
-
-            // If side connection comes from rna base then take connected sugar and draw side connection from it
-            // because for rna we display only one letter instead of three
-            const connectedSugarToBase = getSugarFromRnaBase(anotherMonomer);
-            if (anotherMonomer instanceof RNABase && connectedSugarToBase) {
-              bondRenderer = new PolymerBondSequenceRenderer(
-                new PolymerBond(node.monomer, connectedSugarToBase),
-              );
-            } else {
-              bondRenderer = new PolymerBondSequenceRenderer(polymerBond);
-            }
-            bondRenderer.show();
-            polymerBond.setRenderer(bondRenderer);
-            handledAttachmentPoints.add(attachmentPointName);
-
-            if (!handledMonomersToAttachmentPoints.get(anotherMonomer)) {
-              handledMonomersToAttachmentPoints.set(anotherMonomer, new Set());
-            }
-            const anotherMonomerHandledAttachmentPoints =
-              handledMonomersToAttachmentPoints.get(
-                anotherMonomer,
-              ) as Set<AttachmentPointName>;
-
-            anotherMonomerHandledAttachmentPoints.add(
-              anotherMonomer?.getAttachmentPointByBond(
-                polymerBond,
-              ) as AttachmentPointName,
-            );
+            });
           });
         });
       });
@@ -339,12 +363,28 @@ export class SequenceRenderer {
     let newCaretPosition = -1;
 
     SequenceRenderer.forEachNode(({ node, nodeIndexOverall }) => {
-      if (node.monomer === monomer) {
+      if (node.monomers.includes(monomer)) {
         newCaretPosition = nodeIndexOverall;
       }
     });
 
     this.setCaretPosition(newCaretPosition);
+  }
+
+  public static setCaretPositionNextToMonomer(monomer: BaseMonomer) {
+    let newCaretPosition = -1;
+
+    SequenceRenderer.forEachNode(({ node, nodeIndexOverall }) => {
+      if (node.monomers.includes(monomer)) {
+        newCaretPosition = nodeIndexOverall;
+      }
+    });
+
+    if (newCaretPosition === -1) {
+      return;
+    }
+
+    this.setCaretPosition(newCaretPosition + 1);
   }
 
   public static setCaretPositionByNode(nodeToCompare: SubChainNode) {
@@ -885,7 +925,7 @@ export class SequenceRenderer {
     let rendererToReturn;
 
     SequenceRenderer.forEachNode(({ node }) => {
-      if (node.monomer === monomer) {
+      if (node.monomers.includes(monomer)) {
         rendererToReturn = node.renderer;
       }
     });
@@ -897,5 +937,16 @@ export class SequenceRenderer {
     const newSequenceButton = new NewSequenceButton(indexOfRowBefore);
     newSequenceButton.show();
     this.newSequenceButtons.push(newSequenceButton);
+  }
+
+  public static isEmptyCanvas() {
+    return (
+      SequenceRenderer.chainsCollection.length === 1 &&
+      SequenceRenderer.chainsCollection.firstNode instanceof EmptySequenceNode
+    );
+  }
+
+  public static get isCaretAtChainEnd() {
+    return SequenceRenderer.currentEdittingNode instanceof EmptySequenceNode;
   }
 }

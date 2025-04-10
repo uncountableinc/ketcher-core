@@ -46,6 +46,8 @@ export declare enum SupportedFormat {
     sequence = "sequence",
     idt = "idt",
     helm = "helm",
-    unknown = "unknown"
+    unknown = "unknown",
+    rdf = "rdf",
+    rdfV3000 = "rdfV3000"
 }
 export declare type FormatterFactoryOptions = Partial<MolSerializerOptions & StructServiceOptions>;

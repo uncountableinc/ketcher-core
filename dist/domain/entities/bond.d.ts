@@ -17,6 +17,7 @@ import { Pile } from './pile';
 import { Struct } from './struct';
 import { Vec2 } from './vec2';
 import { BaseMicromoleculeEntity, initiallySelectedType } from "./BaseMicromoleculeEntity";
+import { SGroup } from "./sgroup";
 declare enum CIP {
     E = "E",
     Z = "Z",
@@ -37,6 +38,8 @@ export interface BondAttributes {
     initiallySelected?: initiallySelectedType;
     beginSuperatomAttachmentPointNumber?: number;
     endSuperatomAttachmentPointNumber?: number;
+    beginSgroup?: SGroup;
+    endSgroup?: SGroup;
 }
 export declare class Bond extends BaseMicromoleculeEntity {
     static PATTERN: {
@@ -86,7 +89,7 @@ export declare class Bond extends BaseMicromoleculeEntity {
     end: number;
     readonly type: number;
     readonly xxx: string;
-    readonly stereo: number;
+    stereo: number;
     readonly topology: number | null;
     readonly reactingCenterStatus: number | null;
     customQuery: string | null;
@@ -101,6 +104,8 @@ export declare class Bond extends BaseMicromoleculeEntity {
     isPreview: boolean;
     beginSuperatomAttachmentPointNumber?: number;
     endSuperatomAttachmentPointNumber?: number;
+    beginSgroup?: SGroup;
+    endSgroup?: SGroup;
     constructor(attributes: BondAttributes);
     static getAttrHash(bond: Bond): {};
     static getBondNeighbourIds(struct: Struct, bondId: number): {
@@ -124,6 +129,8 @@ export declare class Bond extends BaseMicromoleculeEntity {
     getDir(struct: any): Vec2;
     clone(aidMap?: Map<number, number> | null): Bond;
     getAttachedSGroups(struct: Struct): Pile<number>;
+    isExternalBondBetweenMonomers(struct: Struct): boolean;
     static isBondToHiddenLeavingGroup(struct: Struct, bond: Bond): boolean | 0 | null | undefined;
+    static isBondToExpandedMonomer(struct: Struct, bond: Bond): boolean;
 }
 export {};

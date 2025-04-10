@@ -14,5 +14,6 @@
  * limitations under the License.
  ***************************************************************************/
 import { RenderOptions } from './render.types';
-declare function defaultOptions(options: RenderOptions): RenderOptions;
+declare function defaultOptions(renderOptions: RenderOptions): RenderOptions;
+export declare function getOptionsWithConvertedUnits(options: RenderOptions): RenderOptions;
 export default defaultOptions;

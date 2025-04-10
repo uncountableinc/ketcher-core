@@ -10,5 +10,7 @@ export declare class Command {
     setUndoOperationsByPriority(): void;
     invert(renderersManagers: RenderersManager): void;
     execute(renderersManagers: RenderersManager): void;
+    executeAfterAllOperations(renderersManagers: RenderersManager, operations?: Operation[]): void;
+    invertAfterAllOperations(renderersManagers: RenderersManager, operations?: Operation[]): void;
     clear(): void;
 }

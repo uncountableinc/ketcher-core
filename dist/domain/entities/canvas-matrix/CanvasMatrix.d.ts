@@ -15,7 +15,6 @@ export declare class CanvasMatrix {
     polymerBondToCells: Map<PolymerBond, Cell[]>;
     polymerBondToConnections: Map<PolymerBond, Connection[]>;
     constructor(chainsCollection: ChainsCollection, matrixConfig?: MatrixConfig);
-    private get chains();
     private fillConnectionsOffset;
     private fillRightConnectionsOffset;
     private fillCells;

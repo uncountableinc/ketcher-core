@@ -1,8 +1,7 @@
 import { RenderersManager } from 'application/render/renderers/RenderersManager';
 import { Operation } from 'domain/entities/Operation';
 import { DrawingEntity } from 'domain/entities/DrawingEntity';
-import { PolymerBond } from 'domain/entities/PolymerBond';
-
+import { BaseBond } from 'domain/entities/BaseBond';
 export class DrawingEntityHoverOperation implements Operation {
   constructor(private drawingEntity: DrawingEntity) {}
 
@@ -31,33 +30,38 @@ export class DrawingEntityMoveOperation implements Operation {
     private drawingEntity: DrawingEntity,
   ) {}
 
-  public execute(renderersManager: RenderersManager) {
+  public execute() {
     this.wasInverted
       ? this.redoDrawingEntityChangeModel()
       : this.moveDrawingEntityChangeModel();
-    if (this.drawingEntity instanceof PolymerBond) {
-      renderersManager.redrawDrawingEntity(this.drawingEntity);
-    } else {
-      renderersManager.moveDrawingEntity(this.drawingEntity);
-    }
   }
 
-  public invert(renderersManager: RenderersManager) {
+  public invert() {
     this.invertMoveDrawingEntityChangeModel();
+    this.wasInverted = true;
+  }
 
+  public executeAfterAllOperations(renderersManager: RenderersManager) {
     // Redraw Polymer bonds instead of moving needed here because
     // they have two drawing modes: straight and curved.
     // During switching snake/flex layout modes and undo/redo
     // we need to redraw them to apply the correct drawing mode.
-    if (this.drawingEntity instanceof PolymerBond) {
+    if (this.drawingEntity instanceof BaseBond) {
       renderersManager.redrawDrawingEntity(this.drawingEntity);
     } else {
       renderersManager.moveDrawingEntity(this.drawingEntity);
     }
+  }
 
-    this.wasInverted = true;
+  public invertAfterAllOperations(renderersManager: RenderersManager) {
+    if (this.drawingEntity instanceof BaseBond) {
+      renderersManager.redrawDrawingEntity(this.drawingEntity);
+    } else {
+      renderersManager.moveDrawingEntity(this.drawingEntity);
+    }
   }
 }
+
 export class DrawingEntityRedrawOperation implements Operation {
   constructor(
     private drawingEntityRedrawModelChange: () => DrawingEntity,

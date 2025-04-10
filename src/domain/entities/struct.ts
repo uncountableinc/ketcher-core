@@ -39,6 +39,8 @@ import { RGroupAttachmentPoint } from './rgroupAttachmentPoint';
 import { MonomerMicromolecule } from 'domain/entities/monomerMicromolecule';
 import { isNumber } from 'lodash';
 import { Image } from './image';
+import { getStereoAtomsMap } from 'application/editor/actions/helpers';
+import { MultitailArrow } from './multitailArrow';
 
 export type Neighbor = {
   aid: number;
@@ -74,10 +76,11 @@ export class Struct {
   abbreviation?: string;
   sGroupForest: SGroupForest;
   simpleObjects: Pool<SimpleObject>;
-  images: Pool<Image>;
   texts: Pool<Text>;
   functionalGroups: Pool<FunctionalGroup>;
   highlights: Pool<Highlight>;
+  images = new Pool<Image>();
+  multitailArrows = new Pool<MultitailArrow>();
 
   constructor() {
     this.atoms = new Pool<Atom>();
@@ -98,7 +101,6 @@ export class Struct {
     this.texts = new Pool<Text>();
     this.functionalGroups = new Pool<FunctionalGroup>();
     this.highlights = new Pool<Highlight>();
-    this.images = new Pool<Image>();
   }
 
   hasRxnProps(): boolean {
@@ -110,6 +112,10 @@ export class Struct {
 
   hasRxnArrow(): boolean {
     return this.rxnArrows.size >= 1;
+  }
+
+  hasMultitailArrow(): boolean {
+    return this.multitailArrows.size >= 1;
   }
 
   hasRxnPluses(): boolean {
@@ -127,7 +133,8 @@ export class Struct {
       this.rxnPluses.size === 0 &&
       this.simpleObjects.size === 0 &&
       this.texts.size === 0 &&
-      this.images.size === 0
+      this.images.size === 0 &&
+      this.multitailArrows.size === 0
     );
   }
 
@@ -146,6 +153,7 @@ export class Struct {
     textsSet?: Pile<number> | null,
     rgroupAttachmentPointSet?: Pile<number> | null,
     imagesSet?: Pile<number> | null,
+    multitailArrowsSet?: Pile<number> | null,
     bidMap?: Map<number, number> | null,
   ): Struct {
     return this.mergeInto(
@@ -159,6 +167,7 @@ export class Struct {
       textsSet,
       rgroupAttachmentPointSet,
       imagesSet,
+      multitailArrowsSet,
       bidMap,
     );
   }
@@ -204,6 +213,7 @@ export class Struct {
       copyNonFragmentObjects ? undefined : new Pile(),
       copyNonFragmentObjects ? undefined : new Pile(),
       copyNonFragmentObjects ? undefined : new Pile(),
+      copyNonFragmentObjects ? undefined : new Pile(),
     );
   }
 
@@ -218,6 +228,7 @@ export class Struct {
     textsSet?: Pile<number> | null,
     rgroupAttachmentPointSet?: Pile<number> | null,
     imagesSet?: Pile<number> | null,
+    multitailArrowsSet?: Pile<number> | null,
     bidMapEntity?: Map<number, number> | null,
   ): Struct {
     atomSet = atomSet || new Pile<number>(this.atoms.keys());
@@ -226,6 +237,8 @@ export class Struct {
       simpleObjectsSet || new Pile<number>(this.simpleObjects.keys());
     textsSet = textsSet || new Pile<number>(this.texts.keys());
     imagesSet = imagesSet || new Pile<number>(this.images.keys());
+    multitailArrowsSet =
+      multitailArrowsSet || new Pile<number>(this.multitailArrows.keys());
     rgroupAttachmentPointSet =
       rgroupAttachmentPointSet ||
       new Pile<number>(this.rgroupAttachmentPoints.keys());
@@ -342,6 +355,10 @@ export class Struct {
       cp.images.add(this.images.get(id)!.clone());
     });
 
+    multitailArrowsSet.forEach((id) => {
+      cp.multitailArrows.add(this.multitailArrows.get(id)!.clone());
+    });
+
     rgroupAttachmentPointSet.forEach((id) => {
       const rgroupAttachmentPoint = this.rgroupAttachmentPoints.get(id);
       assert(rgroupAttachmentPoint != null);
@@ -450,14 +467,26 @@ export class Struct {
     const halfBond = this.halfBonds.get(halfBondId)!;
     const sgroup1 = this.getGroupFromAtomId(halfBond.begin);
     const sgroup2 = this.getGroupFromAtomId(halfBond.end);
-    const startCoords =
-      sgroup1 instanceof MonomerMicromolecule
+
+    let startCoords: Vec2;
+    let endCoords: Vec2;
+
+    if (sgroup1 instanceof MonomerMicromolecule && sgroup1 !== sgroup2) {
+      startCoords = sgroup1.isContracted()
         ? (sgroup1.pp as Vec2)
         : this.atoms.get(halfBond.begin)!.pp;
-    const endCoords =
-      sgroup2 instanceof MonomerMicromolecule
+    } else {
+      startCoords = this.atoms.get(halfBond.begin)!.pp;
+    }
+
+    if (sgroup2 instanceof MonomerMicromolecule && sgroup1 !== sgroup2) {
+      endCoords = sgroup2.isContracted()
         ? (sgroup2.pp as Vec2)
         : this.atoms.get(halfBond.end)!.pp;
+    } else {
+      endCoords = this.atoms.get(halfBond.end)!.pp;
+    }
+
     const coordsDifference = Vec2.diff(endCoords, startCoords).normalized();
 
     halfBond.dir =
@@ -841,6 +870,9 @@ export class Struct {
     });
 
     this.images.forEach((image) => image.rescaleSize(scale));
+    this.multitailArrows.forEach((multitailArrow) =>
+      multitailArrow.rescaleSize(scale),
+    );
   }
 
   rescale() {
@@ -1073,6 +1105,26 @@ export class Struct {
     }
   }
 
+  public setStereoLabelsToAtoms() {
+    const stereAtomsMap = getStereoAtomsMap(
+      this,
+      Array.from(this.bonds.values()),
+    );
+
+    this.atoms.forEach((atom, id) => {
+      if (this?.atomGetNeighbors(id)?.length === 0) {
+        atom.stereoLabel = null;
+        atom.stereoParity = 0;
+      } else {
+        const stereoProp = stereAtomsMap.get(id);
+        if (stereoProp) {
+          atom.stereoLabel = stereoProp.stereoLabel;
+          atom.stereoParity = stereoProp.stereoParity;
+        }
+      }
+    });
+  }
+
   atomGetNeighbors(aid: number): Array<Neighbor> | undefined {
     return this.atoms.get(aid)?.neighbors.map((nei) => {
       const hb = this.halfBonds.get(nei)!;
@@ -1267,8 +1319,11 @@ export class Struct {
     return sgroup instanceof MonomerMicromolecule;
   }
 
-  isBondFromMacromolecule(bondId: number) {
-    const bond = this.bonds.get(bondId);
+  isBondFromMacromolecule(bondOrBondId: Bond | number) {
+    const bond =
+      bondOrBondId instanceof Bond
+        ? bondOrBondId
+        : this.bonds.get(bondOrBondId);
 
     assert(bond);
 

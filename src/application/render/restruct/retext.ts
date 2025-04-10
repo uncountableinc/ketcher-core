@@ -168,13 +168,11 @@ class ReText extends ReObject {
           )
           .attr({
             font: options.font,
-            'font-size': options.fontsz,
+            'font-size': options.fontszInPx,
             'text-anchor': 'start',
             fill: '#000000',
             ...styles,
           });
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore: raphael typing issues
         path.translateAbs(shiftX, shiftY + (styles.shiftY || 0));
         row.push(path);
         shiftX += path.getBBox().width;
@@ -247,8 +245,8 @@ class ReText extends ReObject {
 
     return ranges.reduce(
       (styles: any, textRange: CustomRawDraftInlineStyleRange) => {
-        const fontsz = customFontSize || options.fontsz;
-        const fontszsub = (customFontSize || options.fontszsub) * 0.5;
+        const fontsz = customFontSize || options.fontszInPx;
+        const fontszsub = (customFontSize || options.fontszsubInPx) * 0.5;
         switch (textRange.style) {
           case TextCommand.Bold:
             styles['font-weight'] = 'bold';

@@ -14,7 +14,18 @@
  * limitations under the License.
  ***************************************************************************/
 import { Action } from './action';
+declare type CreatedItems = {
+    atoms: number[];
+    bonds: number[];
+    rxnArrows: number[];
+    rxnPluses: number[];
+    texts: number[];
+    images: number[];
+    simpleObjects: number[];
+    multitailArrows: number[];
+};
 export declare function fromPaste(restruct: any, pstruct: any, point: any, angle?: number, isPreview?: boolean): [Action, {
     atoms: number[];
     bonds: number[];
-}];
+}, CreatedItems];
+export {};

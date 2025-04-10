@@ -28,6 +28,10 @@ export declare type FloatingToolsParams = {
         y: number;
     };
 };
+export declare enum EditorType {
+    Micromolecules = 0,
+    Macromolecules = 1
+}
 export interface Editor {
     isDitrty: () => boolean;
     setOrigin: () => void;
@@ -36,12 +40,12 @@ export interface Editor {
     subscribe: (eventName: string, handler: (data?: any) => any) => any;
     unsubscribe: (eventName: string, subscriber: any) => void;
     selection: (arg?: EditorSelection | 'all' | null) => EditorSelection | null;
+    clearHistoryStack: () => any;
     undo: () => void;
     redo: () => void;
     clear: () => void;
     options: (value?: any) => any;
     setOptions: (opts: string) => any;
-    clearHistoryStack: () => any;
     zoom: (value?: any) => any;
     structSelected: () => Struct;
     explicitSelected: () => EditorSelection;
@@ -79,4 +83,5 @@ export interface Editor {
     macromoleculeConvertionError: string | null | undefined;
     setMacromoleculeConvertionError: (errorMessage: string) => void;
     clearMacromoleculeConvertionError: () => void;
+    serverSettings: object;
 }

@@ -16,11 +16,13 @@
 export interface HighlightAttributes {
     atoms: Array<number>;
     bonds: Array<number>;
+    rgroupAttachmentPoints: Array<number>;
     color: string;
 }
 export declare class Highlight {
     atoms: Array<number>;
     bonds: Array<number>;
+    rgroupAttachmentPoints: Array<number>;
     color: string;
     constructor(attributes: HighlightAttributes);
 }

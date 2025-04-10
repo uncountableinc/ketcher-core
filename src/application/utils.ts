@@ -36,10 +36,15 @@ export function getStructure(
   drawingEntitiesManager?: DrawingEntitiesManager,
   selection?: EditorSelection,
 ): Promise<string> {
-  const formatter = formatterFactory.create(structureFormat);
+  const serverSettings = ketcherProvider.getKetcher().editor.serverSettings;
+  const formatter = formatterFactory.create(structureFormat, serverSettings);
+  const drawingEntitiesManagerCloningResult = drawingEntitiesManager?.mergeInto(
+    new DrawingEntitiesManager(),
+  );
+
   return formatter.getStructureFromStructAsync(
     struct,
-    drawingEntitiesManager,
+    drawingEntitiesManagerCloningResult?.mergedDrawingEntities,
     selection,
   );
 }
@@ -57,6 +62,7 @@ export async function prepareStructToRender(
   struct.initHalfBonds();
   struct.initNeighbors();
   struct.setImplicitHydrogen();
+  struct.setStereoLabelsToAtoms();
   struct.markFragments();
 
   return struct;
@@ -73,7 +79,7 @@ export function parseStruct(
 
   const service = factory.create(format, {
     'dearomatize-on-load': options['dearomatize-on-load'],
-    'ignore-no-chiral-flag': options.ignoreChiralFlag,
+    ignoreChiralFlag: options.ignoreChiralFlag,
   });
   return service.getStructureFromStringAsync(structStr);
 }

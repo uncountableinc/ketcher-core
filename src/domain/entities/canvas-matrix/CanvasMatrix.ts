@@ -1,10 +1,4 @@
-import {
-  BaseMonomer,
-  Nucleoside,
-  Nucleotide,
-  RNABase,
-  SubChainNode,
-} from 'domain/entities';
+import { BaseMonomer, MonomerToAtomBond, SubChainNode } from 'domain/entities';
 import { ChainsCollection } from 'domain/entities/monomer-chains/ChainsCollection';
 import { Matrix } from 'domain/entities/canvas-matrix/Matrix';
 import { PolymerBond } from 'domain/entities/PolymerBond';
@@ -34,21 +28,17 @@ export class CanvasMatrix {
     this.fillCells();
   }
 
-  private get chains() {
-    return this.chainsCollection.chains;
-  }
-
   private fillConnectionsOffset(
     direction: number,
     increaseOffset = (connection: Connection, increaseValue?: number) => {
       if (isNumber(increaseValue)) {
-        connection.offset = increaseValue;
+        connection.xOffset = increaseValue;
       } else {
-        connection.offset++;
+        connection.xOffset++;
       }
     },
-    getOffset = (connection: Connection) => connection.offset,
-  ) {
+    getOffset = (connection: Connection): number => connection.xOffset,
+  ): void {
     // set offsets for connections with overlappings
     const currentConnections = new Map<PolymerBond, Set<Connection>>();
     const iterationMethod =
@@ -60,14 +50,14 @@ export class CanvasMatrix {
 
     iterationMethod((cell) => {
       const biggestOffsetInCell = cell.connections.reduce(
-        (biggestOffset, connection) => {
+        (biggestOffset: number, connection: Connection): number => {
           return getOffset(connection) > biggestOffset
             ? getOffset(connection)
             : biggestOffset;
         },
         0,
       );
-      cell.connections.forEach((connection) => {
+      cell.connections.forEach((connection: Connection): void => {
         if (connection.direction !== direction || connection.connectedNode) {
           return;
         }
@@ -75,16 +65,18 @@ export class CanvasMatrix {
           const polymerBondConnections = this.polymerBondToConnections.get(
             connection.polymerBond,
           );
-          polymerBondConnections?.forEach((polymerBondConnection) => {
-            increaseOffset(polymerBondConnection, biggestOffsetInCell);
-          });
+          polymerBondConnections?.forEach(
+            (polymerBondConnection: Connection): void => {
+              increaseOffset(polymerBondConnection, biggestOffsetInCell);
+            },
+          );
           currentConnections.set(
             connection.polymerBond,
             new Set(polymerBondConnections),
           );
         }
       });
-      cell.connections.forEach((connection) => {
+      cell.connections.forEach((connection: Connection): void => {
         if (
           !connection.connectedNode ||
           (connection.direction !== direction &&
@@ -94,10 +86,12 @@ export class CanvasMatrix {
         }
         if (currentConnections.has(connection.polymerBond)) {
           currentConnections.delete(connection.polymerBond);
-          currentConnections.forEach((connections) => {
-            Array.from(connections.values()).forEach((currentConnection) => {
-              increaseOffset(currentConnection);
-            });
+          currentConnections.forEach((connections: Set<Connection>): void => {
+            Array.from(connections.values()).forEach(
+              (currentConnection: Connection): void => {
+                increaseOffset(currentConnection);
+              },
+            );
           });
         } else {
           currentConnections.set(
@@ -117,7 +111,8 @@ export class CanvasMatrix {
           this.polymerBondToConnections.get(polymerBond);
         if (
           polymerBondConnections?.every(
-            (connection) => !cell.connections.includes(connection),
+            (connection: Connection): boolean =>
+              !cell.connections.includes(connection),
           )
         ) {
           currentConnections.delete(polymerBond);
@@ -132,25 +127,27 @@ export class CanvasMatrix {
 
     this.matrix.forEach((cell) => {
       const biggestOffsetInCell = cell.connections.reduce(
-        (biggestOffset, connection) => {
-          return connection.offset > biggestOffset
-            ? connection.offset
+        (biggestOffset: number, connection: Connection): number => {
+          return connection.xOffset > biggestOffset
+            ? connection.xOffset
             : biggestOffset;
         },
         0,
       );
 
-      cell.connections.forEach((connection) => {
+      cell.connections.forEach((connection: Connection): void => {
         if (connection.direction !== direction) {
           return;
         }
-        if (connection.offset <= biggestOffsetInCell) {
+        if (connection.xOffset <= biggestOffsetInCell) {
           const polymerBondConnections = this.polymerBondToConnections.get(
             connection.polymerBond,
           );
-          polymerBondConnections?.forEach((polymerBondConnection) => {
-            polymerBondConnection.offset = biggestOffsetInCell;
-          });
+          polymerBondConnections?.forEach(
+            (polymerBondConnection: Connection): void => {
+              polymerBondConnection.xOffset = biggestOffsetInCell;
+            },
+          );
           handledConnections.add(connection.polymerBond);
         }
       });
@@ -164,96 +161,54 @@ export class CanvasMatrix {
           return;
         }
 
-        polymerBondConnection.offset++;
+        polymerBondConnection.xOffset++;
       });
     });
   }
 
   private fillCells() {
-    // iterate over each chain and fill matrix with cells
-    let rowNumber = 0;
-    let columnNumber = 0;
-    let rowsWithRnaBases = 0;
-    let wereBasesInRow = false;
-    this.chains.forEach((chain) => {
-      chain.forEachNode(({ node }) => {
-        node.monomers.forEach((monomer) => {
-          if (
-            (node instanceof Nucleotide || node instanceof Nucleoside) &&
-            monomer instanceof RNABase
-          ) {
-            const cell = new Cell(
-              node,
-              [],
-              columnNumber - 1,
-              rowNumber + rowsWithRnaBases + 1,
-              monomer,
-            );
-            this.matrix.set(
-              rowNumber + rowsWithRnaBases + 1,
-              columnNumber - 1,
-              cell,
-            );
-            this.monomerToCell.set(monomer, cell);
-            wereBasesInRow = true;
+    // create matrix by initial matrix filling empty cells
 
-            return;
-          }
+    for (
+      let rowNumber = 0;
+      rowNumber < this.matrixConfig.initialMatrix.height;
+      rowNumber++
+    ) {
+      for (
+        let columnNumber = 0;
+        columnNumber < this.initialMatrixWidth;
+        columnNumber++
+      ) {
+        const initialMatrixCell = this.matrixConfig.initialMatrix.get(
+          rowNumber,
+          columnNumber,
+        );
 
-          const initialMatrixRowLength =
-            this.matrixConfig.initialMatrix?.getRow(rowNumber)?.length || 0;
-
-          if (columnNumber >= initialMatrixRowLength) {
-            let emptyCellsAmount = this.initialMatrixWidth - columnNumber;
-            while (emptyCellsAmount > 0) {
-              this.matrix.set(
-                rowNumber + rowsWithRnaBases,
-                columnNumber,
-                new Cell(null, [], columnNumber, rowNumber + rowsWithRnaBases),
-              );
-              columnNumber++;
-              emptyCellsAmount--;
-            }
-
-            if (wereBasesInRow) {
-              rowsWithRnaBases++;
-              wereBasesInRow = false;
-              let index = 0;
-              while (index < this.initialMatrixWidth) {
-                const cellWithPotentialRnaBase = this.matrix.get(
-                  rowNumber + rowsWithRnaBases,
-                  index,
-                );
-                if (cellWithPotentialRnaBase) {
-                  index++;
-                  continue;
-                }
-                this.matrix.set(
-                  rowNumber + rowsWithRnaBases,
-                  index,
-                  new Cell(null, [], index, rowNumber + rowsWithRnaBases + 1),
-                );
-                index++;
-              }
-            }
-
-            rowNumber++;
-            columnNumber = 0;
-          }
-
-          const cell = new Cell(
-            node,
-            [],
+        if (!initialMatrixCell) {
+          this.matrix.set(
+            rowNumber,
             columnNumber,
-            rowNumber + rowsWithRnaBases,
-            monomer,
+            new Cell(null, [], columnNumber, rowNumber),
           );
-          this.matrix.set(rowNumber + rowsWithRnaBases, columnNumber, cell);
-          this.monomerToCell.set(monomer, cell);
-          columnNumber++;
-        });
-      });
-    });
+
+          continue;
+        }
+
+        const cell = new Cell(
+          initialMatrixCell.node,
+          [],
+          columnNumber,
+          rowNumber,
+          initialMatrixCell.monomer,
+        );
+
+        this.matrix.set(rowNumber, columnNumber, cell);
+
+        if (initialMatrixCell.monomer) {
+          this.monomerToCell.set(initialMatrixCell.monomer, cell);
+        }
+      }
+    }
 
     const monomerToNode = this.chainsCollection.monomerToNode;
     const handledConnections = new Set<PolymerBond>();
@@ -262,6 +217,10 @@ export class CanvasMatrix {
       const monomer = cell.monomer;
 
       monomer?.forEachBond((polymerBond) => {
+        if (polymerBond instanceof MonomerToAtomBond) {
+          return;
+        }
+
         if (
           polymerBond.isSideChainConnection &&
           !handledConnections.has(polymerBond)
@@ -272,7 +231,12 @@ export class CanvasMatrix {
           const connectedNode = monomerToNode.get(
             anotherMonomer,
           ) as SubChainNode;
-          const connectedCell = this.monomerToCell.get(anotherMonomer) as Cell;
+          const connectedCell = this.monomerToCell.get(anotherMonomer);
+
+          if (!connectedCell) {
+            return;
+          }
+
           const xDistance = connectedCell.x - cell.x;
           const yDistance = connectedCell.y - cell.y;
           const xDirection = xDistance > 0 ? 0 : 180;
@@ -282,14 +246,14 @@ export class CanvasMatrix {
           const isVertical = xDistanceAbsolute === 0;
 
           // fill start cell by connection with direction
-          let connection: Connection = {
-            polymerBond,
+          let connection = new Connection(
             connectedNode,
-            direction: isVertical ? 90 : xDirection,
-            offset: 0,
-            yOffset: 0,
+            isVertical ? 90 : xDirection,
             isVertical,
-          };
+            polymerBond,
+            0,
+            0,
+          );
 
           cell.connections.push(connection);
           this.polymerBondToCells.set(polymerBond, [cell]);
@@ -305,14 +269,14 @@ export class CanvasMatrix {
               nextCellY,
               nextCellX,
             ) as Cell;
-            connection = {
-              polymerBond,
-              connectedNode: null,
-              direction: xDirection,
-              offset: 0,
-              yOffset: 0,
+            connection = new Connection(
+              null,
+              xDirection,
               isVertical,
-            };
+              polymerBond,
+              0,
+              0,
+            );
             nextCellToHandle.connections.push(connection);
             this.polymerBondToCells.get(polymerBond)?.push(nextCellToHandle);
             this.polymerBondToConnections.get(polymerBond)?.push(connection);
@@ -327,14 +291,14 @@ export class CanvasMatrix {
               nextCellY,
               nextCellX,
             ) as Cell;
-            connection = {
-              polymerBond,
-              connectedNode: null,
-              direction: yDirection,
-              offset: 0,
-              yOffset: 0,
+            connection = new Connection(
+              null,
+              yDirection,
               isVertical,
-            };
+              polymerBond,
+              0,
+              0,
+            );
             nextCellToHandle.connections.push(connection);
             this.polymerBondToCells.get(polymerBond)?.push(nextCellToHandle);
             this.polymerBondToConnections.get(polymerBond)?.push(connection);
@@ -350,16 +314,16 @@ export class CanvasMatrix {
             nextCellY,
             nextCellX,
           ) as Cell;
-          connection = {
-            polymerBond,
+          connection = new Connection(
             connectedNode,
-            direction: isVertical
+            isVertical
               ? yDirection
               : { x: xDistance === 0 ? 0 : xDirection, y: yDirection },
-            offset: 0,
-            yOffset: 0,
             isVertical,
-          };
+            polymerBond,
+            0,
+            0,
+          );
           lastCellToHandle.connections.push(connection);
           this.polymerBondToCells.get(polymerBond)?.push(lastCellToHandle);
           this.polymerBondToConnections.get(polymerBond)?.push(connection);
@@ -374,14 +338,14 @@ export class CanvasMatrix {
     this.fillConnectionsOffset(0);
     this.fillConnectionsOffset(
       90,
-      (connection, increaseValue) => {
+      (connection: Connection, increaseValue: number | undefined): void => {
         if (isNumber(increaseValue)) {
           connection.yOffset = increaseValue;
         } else {
           connection.yOffset++;
         }
       },
-      (connection) => connection.yOffset,
+      (connection: Connection): number => connection.yOffset,
     );
   }
 }

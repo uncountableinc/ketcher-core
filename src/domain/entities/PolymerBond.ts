@@ -1,23 +1,27 @@
-import { DrawingEntity } from 'domain/entities/DrawingEntity';
-import { PolymerBondRenderer } from 'application/render/renderers/PolymerBondRenderer';
-import { Vec2 } from 'domain/entities/vec2';
-import { BaseMonomer } from './BaseMonomer';
 import { BaseRenderer } from 'application/render/renderers/BaseRenderer';
-import { AttachmentPointName } from 'domain/types';
+import { FlexModePolymerBondRenderer } from 'application/render/renderers/PolymerBondRenderer/FlexModePolymerBondRenderer';
+import { SnakeModePolymerBondRenderer } from 'application/render/renderers/PolymerBondRenderer/SnakeModePolymerBondRenderer';
 import { BackBoneBondSequenceRenderer } from 'application/render/renderers/sequence/BackBoneBondSequenceRenderer';
 import { PolymerBondSequenceRenderer } from 'application/render/renderers/sequence/PolymerBondSequenceRenderer';
 import { Sugar } from 'domain/entities/Sugar';
-import { RNABase } from 'domain/entities/RNABase';
-import { isMonomerConnectedToR2RnaBase } from 'domain/helpers/monomers';
+import {
+  isMonomerConnectedToR2RnaBase,
+  isRnaBaseOrAmbiguousRnaBase,
+} from 'domain/helpers/monomers';
+import { AttachmentPointName } from 'domain/types';
+import { BaseMonomer } from './BaseMonomer';
+import { BaseBond } from 'domain/entities/BaseBond';
 
-export class PolymerBond extends DrawingEntity {
+export type FlexOrSequenceOrSnakeModePolymerBondRenderer =
+  | BackBoneBondSequenceRenderer
+  | FlexModePolymerBondRenderer
+  | PolymerBondSequenceRenderer
+  | SnakeModePolymerBondRenderer;
+
+export class PolymerBond extends BaseBond {
   public secondMonomer?: BaseMonomer;
-  public renderer?:
-    | PolymerBondRenderer
-    | BackBoneBondSequenceRenderer
-    | PolymerBondSequenceRenderer = undefined;
-
-  public endPosition: Vec2 = new Vec2();
+  public renderer?: FlexOrSequenceOrSnakeModePolymerBondRenderer = undefined;
+  public restOfRowsWithAntisense?: number = undefined;
 
   constructor(public firstMonomer: BaseMonomer, secondMonomer?: BaseMonomer) {
     super();
@@ -34,48 +38,10 @@ export class PolymerBond extends DrawingEntity {
   }
 
   public setRenderer(
-    renderer:
-      | PolymerBondRenderer
-      | BackBoneBondSequenceRenderer
-      | PolymerBondSequenceRenderer,
-  ) {
+    renderer: FlexOrSequenceOrSnakeModePolymerBondRenderer,
+  ): void {
     super.setBaseRenderer(renderer as BaseRenderer);
     this.renderer = renderer;
-  }
-
-  public get finished() {
-    return Boolean(this.firstMonomer && this.secondMonomer);
-  }
-
-  public get center() {
-    return Vec2.centre(this.startPosition, this.endPosition);
-  }
-
-  public moveToLinkedMonomers() {
-    const firstMonomerCenter = this.firstMonomer.position;
-    const secondMonomerCenter = this.secondMonomer?.position;
-    this.moveBondStartAbsolute(firstMonomerCenter.x, firstMonomerCenter.y);
-    if (secondMonomerCenter) {
-      this.moveBondEndAbsolute(secondMonomerCenter.x, secondMonomerCenter.y);
-    }
-  }
-
-  public moveBondStartAbsolute(x, y) {
-    this.moveAbsolute(new Vec2(x, y));
-  }
-
-  public moveBondEndAbsolute(x, y) {
-    this.endPosition = new Vec2(x, y);
-  }
-
-  public get startPosition() {
-    return this.position;
-  }
-
-  public getAnotherMonomer(monomer: BaseMonomer): BaseMonomer | undefined {
-    return this.firstMonomer === monomer
-      ? this.secondMonomer
-      : this.firstMonomer;
   }
 
   public static get backBoneChainAttachmentPoints() {
@@ -112,20 +78,32 @@ export class PolymerBond extends DrawingEntity {
         )
       ) ||
         (isMonomerConnectedToR2RnaBase(this.firstMonomer) &&
-          this.secondMonomer instanceof RNABase) ||
+          isRnaBaseOrAmbiguousRnaBase(this.secondMonomer)) ||
         (isMonomerConnectedToR2RnaBase(this.secondMonomer) &&
-          this.firstMonomer instanceof RNABase) ||
+          isRnaBaseOrAmbiguousRnaBase(this.firstMonomer)) ||
         firstMonomerAttachmentPoint === secondMonomerAttachmentPoint) &&
       !(
         (firstMonomerAttachmentPoint === AttachmentPointName.R1 &&
-          this.firstMonomer instanceof RNABase &&
+          isRnaBaseOrAmbiguousRnaBase(this.firstMonomer) &&
           secondMonomerAttachmentPoint === AttachmentPointName.R3 &&
           this.secondMonomer instanceof Sugar) ||
         (firstMonomerAttachmentPoint === AttachmentPointName.R3 &&
           this.firstMonomer instanceof Sugar &&
           secondMonomerAttachmentPoint === AttachmentPointName.R1 &&
-          this.secondMonomer instanceof RNABase)
+          isRnaBaseOrAmbiguousRnaBase(this.secondMonomer))
       )
     );
+  }
+
+  get firstEndEntity(): BaseMonomer {
+    return this.firstMonomer;
+  }
+
+  get secondEndEntity(): BaseMonomer | undefined {
+    return this.secondMonomer;
+  }
+
+  public getAnotherMonomer(monomer: BaseMonomer): BaseMonomer | undefined {
+    return super.getAnotherEntity(monomer) as BaseMonomer;
   }
 }

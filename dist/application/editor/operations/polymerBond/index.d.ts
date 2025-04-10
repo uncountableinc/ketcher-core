@@ -17,21 +17,22 @@ import { PolymerBond } from "../../../../domain/entities/PolymerBond";
 import { RenderersManager } from "../../../render/renderers/RenderersManager";
 import { Operation } from "../../../../domain/entities/Operation";
 import { BaseMonomer } from "../../../../domain/entities/BaseMonomer";
+import { HydrogenBond } from "../../../../domain/entities";
 export declare class PolymerBondAddOperation implements Operation {
     private addPolymerBondChangeModel;
     private deletePolymerBondChangeModel;
     polymerBond: any;
     priority: number;
-    constructor(addPolymerBondChangeModel: (polymerBond?: PolymerBond) => PolymerBond, deletePolymerBondChangeModel: (polymerBond: any) => void);
+    constructor(addPolymerBondChangeModel: (polymerBond?: PolymerBond | HydrogenBond) => PolymerBond | HydrogenBond, deletePolymerBondChangeModel: (polymerBond: any) => void);
     execute(renderersManager: RenderersManager): void;
     invert(renderersManager: RenderersManager): void;
 }
 export declare class PolymerBondDeleteOperation implements Operation {
-    polymerBond: PolymerBond;
+    polymerBond: PolymerBond | HydrogenBond;
     private deletePolymerBondChangeModel;
     private finishPolymerBondCreationModelChange;
     priority: number;
-    constructor(polymerBond: PolymerBond, deletePolymerBondChangeModel: () => void, finishPolymerBondCreationModelChange: (polymerBond?: PolymerBond) => PolymerBond);
+    constructor(polymerBond: PolymerBond | HydrogenBond, deletePolymerBondChangeModel: () => void, finishPolymerBondCreationModelChange: (polymerBond?: PolymerBond | HydrogenBond) => PolymerBond | HydrogenBond);
     execute(renderersManager: RenderersManager): void;
     invert(renderersManager: RenderersManager): void;
 }

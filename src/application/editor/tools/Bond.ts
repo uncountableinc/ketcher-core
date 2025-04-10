@@ -13,34 +13,63 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-import { BaseMonomerRenderer } from 'application/render/renderers/BaseMonomerRenderer';
 import { CoreEditor, EditorHistory } from 'application/editor/internal';
-import { PolymerBondRenderer } from 'application/render/renderers/PolymerBondRenderer';
-import assert from 'assert';
-import { BaseMonomer } from 'domain/entities/BaseMonomer';
 import { BaseTool } from 'application/editor/tools/Tool';
-import { Chem } from 'domain/entities/Chem';
-import { Peptide } from 'domain/entities/Peptide';
-import { Sugar } from 'domain/entities/Sugar';
-import { RNABase } from 'domain/entities/RNABase';
-import { Phosphate } from 'domain/entities/Phosphate';
-import { Coordinates } from '../shared/coordinates';
-import { AttachmentPointName } from 'domain/types';
+import { BaseMonomerRenderer } from 'application/render/renderers/BaseMonomerRenderer';
+import { FlexModePolymerBondRenderer } from 'application/render/renderers/PolymerBondRenderer/FlexModePolymerBondRenderer';
+import { SnakeModePolymerBondRenderer } from 'application/render/renderers/PolymerBondRenderer/SnakeModePolymerBondRenderer';
+import assert from 'assert';
 import { AttachmentPoint } from 'domain/AttachmentPoint';
-import { Command } from 'domain/entities/Command';
 import { UnresolvedMonomer } from 'domain/entities';
+import { BaseMonomer } from 'domain/entities/BaseMonomer';
+import { Chem } from 'domain/entities/Chem';
+import { Command } from 'domain/entities/Command';
+import { Peptide } from 'domain/entities/Peptide';
+import { Phosphate } from 'domain/entities/Phosphate';
+import { RNABase } from 'domain/entities/RNABase';
+import { Sugar } from 'domain/entities/Sugar';
+import { AttachmentPointName } from 'domain/types';
+// FIXME: If we replace '../shared/coordinates' by 'application/editor' to make it shorter,
+//  we get `Uncaught ReferenceError: Cannot access 'PolymerBond' before initialization`,
+//  which probably due to a circular dependency
+//  because of using uncontrolled `index.ts` files.
+import { Coordinates } from '../shared/coordinates';
+import { AtomRenderer } from 'application/render/renderers/AtomRenderer';
+import { ToolName } from 'application/editor';
+
+type FlexModeOrSnakeModePolymerBondRenderer =
+  | FlexModePolymerBondRenderer
+  | SnakeModePolymerBondRenderer;
+
+export enum MACROMOLECULES_BOND_TYPES {
+  SINGLE = 'single',
+  HYDROGEN = 'hydrogen',
+}
 
 class PolymerBond implements BaseTool {
-  private bondRenderer?: PolymerBondRenderer;
+  private bondRenderer?: FlexModeOrSnakeModePolymerBondRenderer;
   private isBondConnectionModalOpen = false;
-  history: EditorHistory;
+  private history: EditorHistory;
+  private bondType: MACROMOLECULES_BOND_TYPES;
 
-  constructor(private editor: CoreEditor) {
+  constructor(private editor: CoreEditor, options: { toolName: ToolName }) {
     this.editor = editor;
     this.history = new EditorHistory(this.editor);
+    this.bondType =
+      options.toolName === ToolName.bondSingle
+        ? MACROMOLECULES_BOND_TYPES.SINGLE
+        : MACROMOLECULES_BOND_TYPES.HYDROGEN;
+  }
+
+  get isHydrogenBond() {
+    return this.bondType === MACROMOLECULES_BOND_TYPES.HYDROGEN;
   }
 
   public mouseDownAttachmentPoint(event) {
+    if (this.isHydrogenBond) {
+      return;
+    }
+
     const selectedRenderer = event.target.__data__;
     if (
       selectedRenderer instanceof AttachmentPoint &&
@@ -75,7 +104,7 @@ class PolymerBond implements BaseTool {
       const startAttachmentPoint =
         selectedRenderer.monomer.startBondAttachmentPoint;
 
-      if (!startAttachmentPoint) {
+      if (!startAttachmentPoint && !this.isHydrogenBond) {
         this.editor.events.error.dispatch(
           "Selected monomer doesn't have any free attachment points",
         );
@@ -86,6 +115,7 @@ class PolymerBond implements BaseTool {
           selectedRenderer.monomer,
           selectedRenderer.monomer.position,
           Coordinates.canvasToModel(this.editor.lastCursorPositionOfCanvas),
+          this.bondType,
         );
 
       this.editor.renderersContainer.update(modelChanges);
@@ -103,27 +133,29 @@ class PolymerBond implements BaseTool {
     }
   }
 
-  public mouseLeavePolymerBond(event) {
-    const renderer: PolymerBondRenderer = event.target.__data__;
+  // FIXME: Specify the types.
+  public mouseLeavePolymerBond(event): void {
+    const renderer: FlexModeOrSnakeModePolymerBondRenderer =
+      event.target.__data__;
     if (this.bondRenderer || !renderer.polymerBond) return;
 
     const modelChanges =
       this.editor.drawingEntitiesManager.hidePolymerBondInformation(
         renderer.polymerBond,
       );
-    this.editor.renderersContainer.markForRecalculateBegin();
     this.editor.renderersContainer.update(modelChanges);
   }
 
+  // FIXME: Specify the types.
   public mouseOverPolymerBond(event) {
     if (this.bondRenderer) return;
 
-    const renderer: PolymerBondRenderer = event.target.__data__;
+    const renderer: FlexModeOrSnakeModePolymerBondRenderer =
+      event.target.__data__;
     const modelChanges =
       this.editor.drawingEntitiesManager.showPolymerBondInformation(
         renderer.polymerBond,
       );
-    this.editor.renderersContainer.markForRecalculateBegin();
     this.editor.renderersContainer.update(modelChanges);
   }
 
@@ -145,7 +177,7 @@ class PolymerBond implements BaseTool {
         this.editor.drawingEntitiesManager.intendToFinishBondCreation(
           renderer.monomer,
           this.bondRenderer?.polymerBond,
-          shouldCalculateBonds,
+          this.isHydrogenBond ? false : shouldCalculateBonds,
         );
     } else {
       modelChanges =
@@ -154,11 +186,14 @@ class PolymerBond implements BaseTool {
         );
     }
 
-    this.editor.renderersContainer.markForRecalculateBegin();
     this.editor.renderersContainer.update(modelChanges);
   }
 
   public mouseOverAttachmentPoint(event) {
+    if (this.isHydrogenBond) {
+      return;
+    }
+
     const renderer: AttachmentPoint = event.target.__data__;
     let modelChanges;
 
@@ -191,7 +226,6 @@ class PolymerBond implements BaseTool {
         );
     }
 
-    this.editor.renderersContainer.markForRecalculateBegin();
     this.editor.renderersContainer.update(modelChanges);
   }
 
@@ -219,7 +253,6 @@ class PolymerBond implements BaseTool {
           this.bondRenderer?.polymerBond,
         );
 
-      this.editor.renderersContainer.markForRecalculateBegin();
       this.editor.renderersContainer.update(modelChanges);
     }
   }
@@ -238,7 +271,6 @@ class PolymerBond implements BaseTool {
           attachmentPointRenderer.monomer,
           this.bondRenderer?.polymerBond,
         );
-      this.editor.renderersContainer.markForRecalculateBegin();
       this.editor.renderersContainer.update(modelChanges);
     }
   }
@@ -291,8 +323,6 @@ class PolymerBond implements BaseTool {
       this.editor.renderersContainer.update(modelChanges);
       this.editor.renderersContainer.deletePolymerBond(
         this.bondRenderer.polymerBond,
-        false,
-        false,
       );
       this.bondRenderer = undefined;
       event.stopPropagation();
@@ -301,25 +331,48 @@ class PolymerBond implements BaseTool {
 
   private finishBondCreation(secondMonomer: BaseMonomer) {
     assert(this.bondRenderer);
-    if (!secondMonomer.hasFreeAttachmentPoint) {
+
+    if (!this.isHydrogenBond && !secondMonomer.hasFreeAttachmentPoint) {
       this.editor.events.error.dispatch(
         "Monomers don't have any connection point available",
       );
+
       return this.editor.drawingEntitiesManager.cancelPolymerBondCreation(
         this.bondRenderer.polymerBond,
       );
     }
-    const firstMonomerAttachmentPoint =
-      this.bondRenderer.polymerBond.firstMonomer.getPotentialAttachmentPointByBond(
+
+    if (
+      this.isHydrogenBond &&
+      secondMonomer.hasHydrogenBondWithMonomer(
+        this.bondRenderer?.polymerBond.firstMonomer,
+      )
+    ) {
+      this.editor.events.error.dispatch(
+        'Unable to establish multiple hydrogen bonds between two monomers',
+      );
+
+      return this.editor.drawingEntitiesManager.cancelPolymerBondCreation(
         this.bondRenderer.polymerBond,
       );
-    const secondMonomerAttachmentPoint =
-      secondMonomer.getPotentialAttachmentPointByBond(
-        this.bondRenderer.polymerBond,
-      );
+    }
+
+    const firstMonomerAttachmentPoint = this.isHydrogenBond
+      ? AttachmentPointName.HYDROGEN
+      : this.bondRenderer.polymerBond.firstMonomer.getPotentialAttachmentPointByBond(
+          this.bondRenderer.polymerBond,
+        );
+    const secondMonomerAttachmentPoint = this.isHydrogenBond
+      ? AttachmentPointName.HYDROGEN
+      : secondMonomer.getPotentialAttachmentPointByBond(
+          this.bondRenderer.polymerBond,
+        );
     assert(firstMonomerAttachmentPoint);
     assert(secondMonomerAttachmentPoint);
-    if (firstMonomerAttachmentPoint === secondMonomerAttachmentPoint) {
+    if (
+      firstMonomerAttachmentPoint === secondMonomerAttachmentPoint &&
+      !this.isHydrogenBond
+    ) {
       this.editor.events.error.dispatch(
         'You have connected monomers with attachment points of the same group',
       );
@@ -328,7 +381,10 @@ class PolymerBond implements BaseTool {
       this.bondRenderer.polymerBond,
       secondMonomer,
       firstMonomerAttachmentPoint,
-      secondMonomerAttachmentPoint,
+      this.isHydrogenBond
+        ? AttachmentPointName.HYDROGEN
+        : secondMonomerAttachmentPoint,
+      this.bondType,
     );
   }
 
@@ -384,13 +440,44 @@ class PolymerBond implements BaseTool {
       this.editor.renderersContainer.update(modelChanges);
       this.editor.renderersContainer.deletePolymerBond(
         this.bondRenderer.polymerBond,
-        false,
-        false,
       );
       this.bondRenderer = undefined;
       this.history.update(modelChanges);
       event.stopPropagation();
     }
+  }
+
+  public mouseUpAtom(event) {
+    if (!this.bondRenderer || this.isHydrogenBond) {
+      return;
+    }
+
+    const atomRenderer = event.target.__data__ as AtomRenderer;
+    const monomer = this.bondRenderer?.polymerBond.firstMonomer;
+    const attachmentPoint =
+      monomer.getPotentialAttachmentPointByBond(
+        this.bondRenderer?.polymerBond,
+      ) || monomer?.getValidSourcePoint();
+
+    this.editor.drawingEntitiesManager.deletePolymerBond(
+      this.bondRenderer?.polymerBond,
+    );
+    this.bondRenderer?.remove();
+    this.bondRenderer = undefined;
+
+    if (!attachmentPoint) {
+      return;
+    }
+
+    const modelChanges =
+      this.editor.drawingEntitiesManager.addMonomerToAtomBond(
+        monomer,
+        atomRenderer.atom,
+        attachmentPoint,
+      );
+
+    this.editor.renderersContainer.update(modelChanges);
+    this.history.update(modelChanges);
   }
 
   public handleBondCreation = (payload: {
@@ -423,8 +510,6 @@ class PolymerBond implements BaseTool {
     this.isBondConnectionModalOpen = false;
     this.editor.renderersContainer.deletePolymerBond(
       this.bondRenderer.polymerBond,
-      false,
-      false,
     );
     this.bondRenderer = undefined;
   };
@@ -460,6 +545,10 @@ class PolymerBond implements BaseTool {
     secondMonomer: BaseMonomer,
     checkForPotentialBonds = true,
   ) {
+    if (this.isHydrogenBond) {
+      return;
+    }
+
     // No Modal: no free attachment point on second monomer
     if (!secondMonomer.hasFreeAttachmentPoint) {
       return false;

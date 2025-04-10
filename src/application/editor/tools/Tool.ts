@@ -22,6 +22,8 @@ interface ToolEventHandler {
 
   mouseLeavePolymerBond?(event: Event): void;
 
+  mouseOnMovePolymerBond?(event: Event): void;
+
   mouseOverMonomer?(event: Event): void;
 
   mouseOverAttachmentPoint?(event: Event): void;
@@ -47,6 +49,8 @@ interface ToolEventHandler {
   rightClickCanvas?(event: Event): void;
 
   rightClickPolymerBond?(event: Event): void;
+
+  rightClickSelectedMonomers?(event: Event): void;
 
   editSequence?(): void;
 
@@ -77,6 +81,8 @@ interface ToolEventHandler {
   mouseDownOnSequenceItem?(event: Event): void;
 
   doubleClickOnSequenceItem?(event: Event): void;
+
+  mouseUpAtom?(event: Event): void;
 }
 
 export interface IRnaPreset {

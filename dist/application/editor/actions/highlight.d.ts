@@ -18,6 +18,7 @@ import { Action } from './action';
 declare type HighlightType = {
     atoms: number[];
     bonds: number[];
+    rgroupAttachmentPoints: number[];
     color: string;
 };
 export declare function fromHighlightCreate(restruct: ReStruct, highlights: HighlightType[]): Action;

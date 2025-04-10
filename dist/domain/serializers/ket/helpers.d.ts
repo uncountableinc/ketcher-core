@@ -15,9 +15,11 @@
  ***************************************************************************/
 import { Vec2, Struct } from "../../entities";
 import { EditorSelection } from "../../../application/editor";
-export declare const getNodeWithInvertedYCoord: (node: object) => any;
+export declare const getNodeWithInvertedYCoord: <T>(node: T) => T;
 export declare const setMonomerTemplatePrefix: (templateName: string) => string;
 export declare const setMonomerPrefix: (monomerId: number) => string;
+export declare const setAmbiguousMonomerTemplatePrefix: (templateName: string) => string;
+export declare const setAmbiguousMonomerPrefix: (monomerId: number) => string;
 export declare const getKetRef: (entityId: string) => {
     $ref: string;
 };

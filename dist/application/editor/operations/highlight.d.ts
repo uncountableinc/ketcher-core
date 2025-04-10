@@ -18,18 +18,19 @@ import { BaseOperation } from './base';
 declare type Data = {
     atoms: Array<number>;
     bonds: Array<number>;
+    rgroupAttachmentPoints: Array<number>;
     color: string;
     highlightId?: number;
 };
 export declare class HighlightAdd extends BaseOperation {
     data: Data;
-    constructor(atoms: Array<number>, bonds: Array<number>, color: string, highlightId?: number);
+    constructor(atoms: Array<number>, bonds: Array<number>, rgroupAttachmentPoints: Array<number>, color: string, highlightId?: number);
     execute(restruct: ReStruct): void;
     invert(): HighlightDelete;
 }
 export declare class HighlightDelete extends BaseOperation {
     data: Data;
-    constructor(highlightId?: number, atoms?: Array<number>, bonds?: Array<number>, color?: string);
+    constructor(highlightId?: number, atoms?: Array<number>, bonds?: Array<number>, rgroupAttachmentPoints?: Array<number>, color?: string);
     execute(restruct: ReStruct): void;
     invert(): HighlightAdd;
 }
@@ -40,7 +41,7 @@ export declare class HighlightUpdate extends BaseOperation {
     oldData: Data & {
         highlightId: number;
     };
-    constructor(highlightId: number, atoms: Array<number>, bonds: Array<number>, color: string);
+    constructor(highlightId: number, atoms: Array<number>, bonds: Array<number>, rgroupAttachmentPoints: Array<number>, color: string);
     execute(restruct: ReStruct): void;
     invert(): HighlightUpdate;
 }

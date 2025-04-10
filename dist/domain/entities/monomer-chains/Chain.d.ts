@@ -18,9 +18,11 @@ export declare class Chain {
     get firstNode(): SubChainNode;
     get length(): number;
     get isEmpty(): boolean;
+    get isAntisense(): boolean;
     forEachNode(callback: ({ node, subChain, }: {
         node: SubChainNode;
         subChain: BaseSubChain;
+        nodeIndex: number;
     }) => void): void;
     static createChainWithEmptyNode(): {
         emptyChain: Chain;
@@ -28,4 +30,5 @@ export declare class Chain {
         emptySequenceNode: EmptySequenceNode;
     };
     get isNewSequenceChain(): boolean;
+    get monomers(): BaseMonomer[];
 }

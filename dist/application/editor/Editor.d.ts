@@ -1,24 +1,30 @@
-import { SequenceType, Vec2 } from "../../domain/entities";
-import { BaseTool, Tool, ToolEventHandlerName } from "./tools/Tool";
-import { MonomerItemType } from "../../domain/types";
-import { RenderersManager } from "../render/renderers/RenderersManager";
-import { DrawingEntitiesManager } from "../../domain/entities/DrawingEntitiesManager";
-import ZoomTool from './tools/Zoom';
-import { HistoryOperationType } from './EditorHistory';
+import { EditorType } from "./editor.types";
 import { BaseMode } from "./modes/internal";
+import { BaseTool, Tool, ToolEventHandlerName } from "./tools/Tool";
 import { IKetMacromoleculesContent, IKetMonomerGroupTemplate } from "../formatters";
+import { RenderersManager } from "../render/renderers/RenderersManager";
+import { SequenceType, Vec2 } from "../../domain/entities";
+import { DrawingEntitiesManager } from "../../domain/entities/DrawingEntitiesManager";
+import { MonomerItemType } from "../../domain/types";
+import { HistoryOperationType } from './EditorHistory';
+import ZoomTool from './tools/Zoom';
+import { ViewModel } from "../render/view-model/ViewModel";
+import { ToolName } from "./tools/types";
 interface ICoreEditorConstructorParams {
     theme: any;
     canvas: SVGSVGElement;
     mode?: BaseMode;
+    monomersLibraryUpdate?: string | JSON;
 }
 export declare class CoreEditor {
     events: any;
+    _type: EditorType;
     renderersContainer: RenderersManager;
     drawingEntitiesManager: DrawingEntitiesManager;
+    viewModel: ViewModel;
     lastCursorPosition: Vec2;
     lastCursorPositionOfCanvas: Vec2;
-    private _monomersLibraryParsedJson?;
+    private _monomersLibraryParsedJson;
     private _monomersLibrary;
     canvas: SVGSVGElement;
     drawnStructuresWrapperElement: SVGGElement;
@@ -34,10 +40,11 @@ export declare class CoreEditor {
     private copyEventHandler;
     private pasteEventHandler;
     private keydownEventHandler;
-    constructor({ theme, canvas, mode }: ICoreEditorConstructorParams);
+    constructor({ theme, canvas, mode, monomersLibraryUpdate, }: ICoreEditorConstructorParams);
     static provideEditorInstance(): CoreEditor;
     private setMonomersLibrary;
-    get monomersLibraryParsedJson(): IKetMacromoleculesContent | undefined;
+    updateMonomersLibrary(monomersDataRaw: string | JSON): void;
+    get monomersLibraryParsedJson(): IKetMacromoleculesContent | null;
     get monomersLibrary(): MonomerItemType[];
     get defaultRnaPresetsLibraryItems(): IKetMonomerGroupTemplate[];
     private handleHotKeyEvents;
@@ -50,9 +57,10 @@ export declare class CoreEditor {
     private onTurnOnSequenceEditInRNABuilderMode;
     private onTurnOffSequenceEditInRNABuilderMode;
     private onChangeSequenceTypeEnterMode;
+    private onCreateAntisenseChain;
     private onSelectMonomer;
     private onSelectRNAPreset;
-    onSelectTool(tool: string): void;
+    onSelectTool(tool: ToolName, options?: object): void;
     private onCreateBond;
     private onCancelBondCreation;
     private onSelectMode;
@@ -62,7 +70,8 @@ export declare class CoreEditor {
     get isSequenceEditInRNABuilderMode(): boolean | undefined;
     get isSequenceAnyEditMode(): boolean | undefined;
     onSelectHistory(name: HistoryOperationType): void;
-    selectTool(name: string, options?: any): void;
+    selectTool(name: ToolName, options?: any): void;
+    get isHandToolSelected(): boolean;
     unsubscribeEvents(): void;
     get trackedDomEvents(): {
         target: Element | Document;
@@ -76,5 +85,8 @@ export declare class CoreEditor {
     switchToMicromolecules(): void;
     private switchToMacromolecules;
     private rerenderSequenceMode;
+    isCurrentModeWithAutozoom(): boolean;
+    zoomToStructuresIfNeeded(): void;
+    scrollToTopLeftCorner(): void;
 }
 export {};

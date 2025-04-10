@@ -1,7 +1,7 @@
-import { BaseMonomer, Peptide } from 'domain/entities';
-import { ChemSubChain } from 'domain/entities/monomer-chains/ChemSubChain';
+import { BaseMonomer } from 'domain/entities/BaseMonomer';
+import { Peptide } from 'domain/entities/Peptide';
 import { SubChainNode } from 'domain/entities/monomer-chains/types';
-import { PeptideSubChain } from 'domain/entities/monomer-chains/PeptideSubChain';
+import { RnaSubChain } from 'domain/entities/monomer-chains/RnaSubChain';
 
 export class UnsplitNucleotide extends BaseMonomer {
   public getValidSourcePoint(monomer?: BaseMonomer) {
@@ -13,12 +13,10 @@ export class UnsplitNucleotide extends BaseMonomer {
   }
 
   public get SubChainConstructor() {
-    return ChemSubChain;
+    return RnaSubChain;
   }
 
   public isMonomerTypeDifferentForChaining(monomerToChain: SubChainNode) {
-    return ![PeptideSubChain, ChemSubChain].includes(
-      monomerToChain.SubChainConstructor,
-    );
+    return ![RnaSubChain].includes(monomerToChain.SubChainConstructor);
   }
 }

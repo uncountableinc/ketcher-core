@@ -14,19 +14,44 @@
  * limitations under the License.
  ***************************************************************************/
 
-import { RaphaelPaper, VMLElement as Element } from 'raphael';
+import { RaphaelPaper, Element } from 'raphael';
 import { HalfBond, RxnArrowMode, Vec2 } from 'domain/entities';
 
+import { getOptionsWithConvertedUnits } from './options';
 import Raphael from './raphael-ext';
 import svgPath from 'svgpath';
 import util from './util';
 import { ArrowItem, RelativeBox, RenderOptions } from './render.types';
 import { tfx } from 'utilities';
+import { PathBuilder } from './pathBuilder';
+
+const ARROW_HEAD_LENGHT = 0.25; // 10
+const ARROW_HEAD_WIDTH = 0.125; // 5
+const ARROW_HEAD_ATTR = 0.1; // 4
+const ARROW_OFFSET = 0.1; // 4
+const ARROW_DASH_INTERVAL = 0.0875; // 3.5
+const ARROW_FAIL_SIGN_WIDTH = 0.2; // 8
+const ARROW_UNBALANCED_OFFSET = 0.2; // 8 (used to be 15)
+
+export function getArrowHeadDimensions(options: RenderOptions) {
+  const { microModeScale } = getOptionsWithConvertedUnits(options);
+
+  return {
+    arrowHeadLength: ARROW_HEAD_LENGHT * microModeScale,
+    arrowHeadWidth: ARROW_HEAD_WIDTH * microModeScale,
+    arrowHeadAttr: ARROW_HEAD_ATTR * microModeScale,
+    arrowOffset: ARROW_OFFSET * microModeScale,
+  };
+}
+
+function getUnbalancedArrowHeadOffset(options: RenderOptions) {
+  const { microModeScale } = getOptionsWithConvertedUnits(options);
+
+  return ARROW_UNBALANCED_OFFSET * microModeScale;
+}
 
 function rectangle(paper: RaphaelPaper, points: [Vec2, Vec2]) {
   return paper.rect(
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore: raphael typing issues
     tfx(Math.min(points[0].x, points[1].x)),
     tfx(Math.min(points[0].y, points[1].y)),
     tfx(Math.abs(points[1].x - points[0].x)),
@@ -69,21 +94,15 @@ function polyline(paper: RaphaelPaper, points: Vec2[]) {
   const path = ['M', points[0].x, points[0].y];
   for (let i = 1; i < points.length; i++)
     path.push('L', points[i].x, points[i].y);
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore: raphael typing issues
   return paper.path(path);
 }
 
 function line(paper: RaphaelPaper, points: [Vec2, Vec2]) {
   const path = ['M', points[0].x, points[0].y];
   path.push('L', points[1].x, points[1].y);
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore: raphael typing issues
   return paper.path(path);
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore: raphael typing issues
 function arrow(
   paper: RaphaelPaper,
   item: ArrowItem,
@@ -139,6 +158,16 @@ function arrow(
     }
     case RxnArrowMode.Failed: {
       return arrowFailed(
+        paper,
+        item,
+        length,
+        angle,
+        options,
+        shouldApplySnappingStyle,
+      );
+    }
+    case RxnArrowMode.Retrosynthetic: {
+      return arrowRetrosynthetic(
         paper,
         item,
         length,
@@ -279,9 +308,12 @@ function arrowEllipticalArcFilledBow(
   shouldApplySnappingStyle: boolean,
 ) {
   const direction = height >= 0 ? 1 : -1;
-  const arrowHeadLength = direction * 10;
-  const arrowHeadWidth = direction * 5;
-  const arrowHeadAttr = direction * 4;
+  const { arrowHeadLength, arrowHeadWidth, arrowHeadAttr } =
+    getArrowHeadDimensions(options);
+
+  const length = direction * arrowHeadLength;
+  const width = direction * arrowHeadWidth;
+  const attr = direction * arrowHeadAttr;
 
   const endX = start.x + arrowLength;
   const path =
@@ -289,17 +321,15 @@ function arrowEllipticalArcFilledBow(
     `A${arrowLength / 2},${height},${0},${0},${direction > 0 ? 1 : 0},${tfx(
       endX,
     )},${tfx(start.y)}` +
-    `L${tfx(endX - arrowHeadWidth)},${tfx(start.y - arrowHeadLength)}` +
-    `l${tfx(arrowHeadWidth)},${tfx(arrowHeadAttr)}` +
-    `l${tfx(arrowHeadWidth)},${tfx(-arrowHeadAttr)}` +
-    `l${tfx(-arrowHeadWidth)},${arrowHeadLength}`;
+    `L${tfx(endX - width)},${tfx(start.y - length)}` +
+    `l${tfx(width)},${tfx(attr)}` +
+    `l${tfx(width)},${tfx(-attr)}` +
+    `l${tfx(-width)},${length}`;
 
   const transformedPath = svgPath(path)
     .rotate(arrowAngle, start.x, start.y)
     .toString();
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore: raphael typing issues
   return paper.path(transformedPath).attr({
     ...options.lineattr,
     ...(shouldApplySnappingStyle && {
@@ -316,9 +346,12 @@ function arrowEllipticalArcFilledTriangle(
   options: RenderOptions,
   shouldApplySnappingStyle: boolean,
 ) {
+  const { arrowHeadLength, arrowHeadWidth } = getArrowHeadDimensions(options);
+
   const direction = height >= 0 ? 1 : -1;
-  const triangleLength = direction * 10;
-  const triangleWidth = direction * 5;
+
+  const triangleLength = direction * arrowHeadLength;
+  const triangleWidth = direction * arrowHeadWidth;
 
   const endX = start.x + arrowLength;
 
@@ -335,8 +368,6 @@ function arrowEllipticalArcFilledTriangle(
     .rotate(arrowAngle, start.x, start.y)
     .toString();
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore: raphael typing issues
   return paper.path(transformedPath).attr({
     ...options.lineattr,
     ...(shouldApplySnappingStyle && {
@@ -354,8 +385,12 @@ function arrowEllipticalArcOpenAngle(
   shouldApplySnappingStyle: boolean,
 ) {
   const direction = height >= 0 ? 1 : -1;
-  const width = direction * 5;
-  const length = direction * 7;
+
+  const { arrowHeadLength, arrowHeadWidth } = getArrowHeadDimensions(options);
+
+  const width = direction * arrowHeadWidth;
+  const length = direction * arrowHeadLength;
+
   const endX = start.x + arrowLength;
 
   const path =
@@ -371,8 +406,6 @@ function arrowEllipticalArcOpenAngle(
     .rotate(arrowAngle, start.x, start.y)
     .toString();
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore: raphael typing issues
   return paper.path(transformedPath).attr({
     ...options.lineattr,
     ...(shouldApplySnappingStyle && {
@@ -390,8 +423,11 @@ function arrowEllipticalArcOpenHalfAngle(
   shouldApplySnappingStyle: boolean,
 ) {
   const direction = height >= 0 ? 1 : -1;
-  const width = direction * 5;
-  const length = direction * 7;
+
+  const { arrowHeadLength, arrowHeadWidth } = getArrowHeadDimensions(options);
+
+  const width = direction * arrowHeadWidth;
+  const length = direction * arrowHeadLength;
   const endX = start.x + arrowLength;
 
   const path =
@@ -405,8 +441,6 @@ function arrowEllipticalArcOpenHalfAngle(
     .rotate(arrowAngle, start.x, start.y)
     .toString();
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore: raphael typing issues
   return paper.path(transformedPath).attr({
     ...options.lineattr,
     ...(shouldApplySnappingStyle && {
@@ -423,24 +457,17 @@ function arrowOpenAngle(
   options: RenderOptions,
   shouldApplySnappingStyle: boolean,
 ) {
-  const width = 5;
-  const length = 7;
-
-  const endX = start.x + arrowLength;
-
-  const path =
-    `M${tfx(start.x)},${tfx(start.y)}` +
-    `L${tfx(endX)},${tfx(start.y)}` +
-    `L${tfx(endX - length)},${tfx(start.y - width)}` +
-    `M${tfx(endX)},${tfx(start.y)}` +
-    `L${tfx(endX - length)}, ${tfx(start.y + width)}`;
-
-  const transformedPath = svgPath(path)
+  const { arrowHeadAttr, arrowHeadLength } = getArrowHeadDimensions(options);
+  const pathBuilder = new PathBuilder().addOpenArrowPathParts(
+    start,
+    arrowLength,
+    arrowHeadLength,
+    arrowHeadAttr,
+  );
+  const transformedPath = svgPath(pathBuilder.build())
     .rotate(arrowAngle, start.x, start.y)
     .toString();
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore: raphael typing issues
   return paper.path(transformedPath).attr({
     ...options.lineattr,
     ...(shouldApplySnappingStyle && {
@@ -457,16 +484,15 @@ function arrowFilledTriangle(
   options: RenderOptions,
   shouldApplySnappingStyle: boolean,
 ) {
-  const triangleLength = 10;
-  const triangleWidth = 5;
+  const { arrowHeadLength, arrowHeadWidth } = getArrowHeadDimensions(options);
 
   const endX = start.x + arrowLength;
 
   const path =
     `M${tfx(start.x)},${tfx(start.y)}` +
     `L${tfx(endX)},${tfx(start.y)}` +
-    `L${tfx(endX - triangleLength)},${tfx(start.y + triangleWidth)}` +
-    `L${tfx(endX - triangleLength)},${tfx(start.y - triangleWidth)}` +
+    `L${tfx(endX - arrowHeadLength)},${tfx(start.y + arrowHeadWidth)}` +
+    `L${tfx(endX - arrowHeadLength)},${tfx(start.y - arrowHeadWidth)}` +
     `L${tfx(endX)},${tfx(start.y)}Z`;
 
   const transformedPath = svgPath(path)
@@ -488,9 +514,8 @@ function arrowFilledBow(
   options: RenderOptions,
   shouldApplySnappingStyle: boolean,
 ) {
-  const arrowHeadLength = 10;
-  const arrowHeadWidth = 5;
-  const arrowHeadAttr = 4;
+  const { arrowHeadLength, arrowHeadWidth, arrowHeadAttr } =
+    getArrowHeadDimensions(options);
 
   const endX = start.x + arrowLength;
 
@@ -521,9 +546,10 @@ function arrowDashedOpenAngle(
   options: RenderOptions,
   shouldApplySnappingStyle: boolean,
 ) {
-  const triangleLength = 10;
-  const triangleWidth = 5;
-  const dashInterval = 3.5;
+  const { arrowHeadLength, arrowHeadWidth } = getArrowHeadDimensions(options);
+  const { microModeScale } = getOptionsWithConvertedUnits(options);
+
+  const dashInterval = ARROW_DASH_INTERVAL * microModeScale;
 
   const path: string[] = [];
 
@@ -541,9 +567,9 @@ function arrowDashedOpenAngle(
   // Arrowhead
   path.push(
     `M${tfx(endX)},${tfx(start.y)}` +
-      `L${tfx(endX - triangleLength)},${tfx(start.y + triangleWidth)}` +
+      `L${tfx(endX - arrowHeadLength)},${tfx(start.y + arrowHeadWidth)}` +
       `M${tfx(endX)},${tfx(start.y)}` +
-      `L${tfx(endX - triangleLength)},${tfx(start.y - triangleWidth)}`,
+      `L${tfx(endX - arrowHeadLength)},${tfx(start.y - arrowHeadWidth)}`,
   );
 
   const transformedPath = svgPath(path.join(''))
@@ -565,10 +591,11 @@ function arrowFailed(
   options: RenderOptions,
   shouldApplySnappingStyle: boolean,
 ) {
-  const arrowHeadLength = 10;
-  const arrowHeadWidth = 5;
-  const arrowHeadAttr = 4;
-  const failSignWidth = 8;
+  const { arrowHeadLength, arrowHeadWidth, arrowHeadAttr } =
+    getArrowHeadDimensions(options);
+  const { microModeScale } = getOptionsWithConvertedUnits(options);
+
+  const failSignWidth = ARROW_FAIL_SIGN_WIDTH * microModeScale;
 
   const endX = start.x + arrowLength;
 
@@ -609,6 +636,53 @@ function arrowFailed(
   });
 }
 
+function arrowRetrosynthetic(
+  paper: RaphaelPaper,
+  { pos: [start] }: ArrowItem,
+  arrowLength: number,
+  arrowAngle: number,
+  options: RenderOptions,
+  shouldApplySnappingStyle: boolean,
+) {
+  const { arrowHeadLength, arrowHeadWidth, arrowOffset } =
+    getArrowHeadDimensions(options);
+
+  const endX = start.x + arrowLength;
+
+  const path: string[] = [];
+
+  // First arrow and arrowhead
+  path.push(
+    `M${tfx(start.x)},${tfx(start.y - arrowOffset)}` +
+      `L${tfx(endX)},${tfx(start.y - arrowOffset)}` +
+      `L${tfx(endX - arrowHeadLength)},${tfx(
+        start.y - arrowHeadWidth - arrowOffset,
+      )}` +
+      `L${tfx(endX + arrowHeadLength)},${tfx(start.y)}`,
+  );
+
+  // Second arrow and arrowhead
+  path.push(
+    `M${tfx(start.x)},${tfx(start.y + arrowOffset)}` +
+      `L${tfx(endX)},${tfx(start.y + arrowOffset)}` +
+      `L${tfx(endX - arrowHeadLength)},${tfx(
+        start.y + arrowHeadWidth + arrowOffset,
+      )}` +
+      `L${tfx(endX + arrowHeadLength)},${tfx(start.y)}`,
+  );
+
+  const transformedPath = svgPath(path.join(''))
+    .rotate(arrowAngle, start.x, start.y)
+    .toString();
+
+  return paper.path(transformedPath).attr({
+    ...options.lineattr,
+    ...(shouldApplySnappingStyle && {
+      stroke: options.arrowSnappingStyle.stroke,
+    }),
+  });
+}
+
 function arrowBothEndsFilledTriangle(
   paper: RaphaelPaper,
   { pos: [start] }: ArrowItem,
@@ -617,20 +691,19 @@ function arrowBothEndsFilledTriangle(
   options: RenderOptions,
   shouldApplySnappingStyle: boolean,
 ) {
-  const triangleLength = 10;
-  const triangleWidth = 5;
+  const { arrowHeadLength, arrowHeadWidth } = getArrowHeadDimensions(options);
 
   const endX = start.x + arrowLength;
 
   const path =
     `M${tfx(start.x)},${tfx(start.y)}` +
     `L${tfx(endX)},${tfx(start.y)}` +
-    `L${tfx(endX - triangleLength)},${tfx(start.y + triangleWidth)}` +
-    `L${tfx(endX - triangleLength)},${tfx(start.y - triangleWidth)}` +
+    `L${tfx(endX - arrowHeadLength)},${tfx(start.y + arrowHeadWidth)}` +
+    `L${tfx(endX - arrowHeadLength)},${tfx(start.y - arrowHeadWidth)}` +
     `L${tfx(endX)},${tfx(start.y)}` +
     `M${tfx(start.x)},${tfx(start.y)}` +
-    `L${tfx(start.x + triangleLength)},${tfx(start.y - triangleWidth)}` +
-    `L${tfx(start.x + triangleLength)},${tfx(start.y + triangleWidth)}` +
+    `L${tfx(start.x + arrowHeadLength)},${tfx(start.y - arrowHeadWidth)}` +
+    `L${tfx(start.x + arrowHeadLength)},${tfx(start.y + arrowHeadWidth)}` +
     `L${tfx(start.x)},${tfx(start.y)}`;
 
   const transformedPath = svgPath(path)
@@ -652,29 +725,35 @@ function arrowEquilibriumFilledHalfBow(
   options: RenderOptions,
   shouldApplySnappingStyle: boolean,
 ) {
-  const arrowLen = 9;
-  const lineOffset = 3.5;
-  const arrowOffset = 7;
-  const arrowHeadAttr = 2;
+  const { arrowHeadLength, arrowHeadAttr, arrowOffset, arrowHeadWidth } =
+    getArrowHeadDimensions(options);
 
   const endX = start.x + arrowLength;
 
   const path: string[] = [];
 
-  // Arrow
+  // top arrow
   path.push(
-    `M${tfx(start.x)},${tfx(start.y - lineOffset)}` +
-      `L${tfx(endX)},${tfx(start.y - lineOffset)}` +
-      `L${tfx(endX - arrowLen)},${tfx(start.y - arrowOffset)}` +
-      `L${tfx(endX - arrowLen + arrowHeadAttr)},${tfx(start.y - lineOffset)}Z`,
+    `M${tfx(start.x)},${tfx(start.y - arrowOffset)}` +
+      `L${tfx(endX)},${tfx(start.y - arrowOffset)}` +
+      `L${tfx(endX - arrowHeadLength)},${tfx(
+        start.y - arrowHeadWidth - arrowOffset,
+      )}` +
+      `L${tfx(endX - arrowHeadLength + arrowHeadAttr)},${tfx(
+        start.y - arrowOffset,
+      )}Z`,
   );
 
-  // Arrowhead
+  // bottom arrow
   path.push(
-    `M${tfx(endX)},${tfx(start.y + lineOffset)}` +
-      `L${tfx(start.x)},${tfx(start.y + lineOffset)}` +
-      `L${tfx(start.x + arrowLen)},${tfx(start.y + arrowOffset)}` +
-      `L${tfx(start.x + arrowLen - arrowHeadAttr)},${start.y + lineOffset}Z`,
+    `M${tfx(endX)},${tfx(start.y + arrowOffset)}` +
+      `L${tfx(start.x)},${tfx(start.y + arrowOffset)}` +
+      `L${tfx(start.x + arrowHeadLength)},${tfx(
+        start.y + arrowHeadWidth + arrowOffset,
+      )}` +
+      `L${tfx(start.x + arrowHeadLength - arrowHeadAttr)},${
+        start.y + arrowOffset
+      }Z`,
   );
 
   const transformedPath = svgPath(path.join(''))
@@ -696,9 +775,8 @@ function arrowEquilibriumFilledTriangle(
   options: RenderOptions,
   shouldApplySnappingStyle: boolean,
 ) {
-  const arrowLen = 9;
-  const lineOffset = 3.5;
-  const arrowOffset = 7;
+  const { arrowHeadLength, arrowOffset, arrowHeadWidth } =
+    getArrowHeadDimensions(options);
 
   const endX = start.x + arrowLength;
 
@@ -706,23 +784,28 @@ function arrowEquilibriumFilledTriangle(
 
   // First arrow
   path.push(
-    `M${tfx(start.x)},${tfx(start.y - lineOffset)}` +
-      `L${tfx(endX)},${tfx(start.y - lineOffset)}` +
-      `L${tfx(endX - arrowLen)},${tfx(start.y - arrowOffset)}` +
-      `L${tfx(endX - arrowLen)},${tfx(start.y - lineOffset)}` +
-      `L${tfx(endX - arrowLen)},${tfx(start.y)}` +
-      `L${tfx(endX)},${tfx(start.y - lineOffset)}Z`,
+    `M${tfx(start.x)},${tfx(start.y - arrowOffset)}` +
+      `L${tfx(endX)},${tfx(start.y - arrowOffset)}` +
+      `L${tfx(endX - arrowHeadLength)},${tfx(
+        start.y + arrowHeadWidth - arrowOffset,
+      )}` +
+      `L${tfx(endX - arrowHeadLength)},${tfx(
+        start.y - arrowHeadWidth - arrowOffset,
+      )}` +
+      `L${tfx(endX)},${tfx(start.y - arrowOffset)}Z`,
   );
 
   // Second arrow
   path.push(
-    `M${tfx(start.x)},${tfx(start.y + lineOffset)}` +
-      `L${tfx(endX)},${tfx(start.y + lineOffset)}` +
-      `M${tfx(start.x)},${tfx(start.y + lineOffset)}` +
-      `L${tfx(start.x + arrowLen)},${tfx(start.y + arrowOffset)}` +
-      `L${tfx(start.x + arrowLen)},${start.y + lineOffset}Z` +
-      `L${tfx(start.x + arrowLen)},${tfx(start.y)}` +
-      `L${tfx(start.x + arrowLen)},${start.y + lineOffset}Z`,
+    `M${tfx(endX)},${tfx(start.y + arrowOffset)}` +
+      `L${tfx(start.x)},${tfx(start.y + arrowOffset)}` +
+      `L${tfx(start.x + arrowHeadLength)},${tfx(
+        start.y + arrowHeadWidth + arrowOffset,
+      )}` +
+      `L${tfx(start.x + arrowHeadLength)},${tfx(
+        start.y - arrowHeadWidth + arrowOffset,
+      )}` +
+      `L${tfx(start.x)},${tfx(start.y + arrowOffset)}Z`,
   );
 
   const transformedPath = svgPath(path.join(''))
@@ -744,10 +827,8 @@ function arrowEquilibriumOpenAngle(
   options: RenderOptions,
   shouldApplySnappingStyle: boolean,
 ) {
-  const width = 5;
-  const length = 7;
-  const arrowLen = 9;
-  const lineOffset = 3.5;
+  const { arrowHeadLength, arrowHeadWidth, arrowOffset } =
+    getArrowHeadDimensions(options);
 
   const endX = start.x + arrowLength;
 
@@ -755,25 +836,27 @@ function arrowEquilibriumOpenAngle(
 
   // First arrow
   path.push(
-    `M${tfx(start.x)},${tfx(start.y - lineOffset)}` +
-      `L${tfx(endX)},${tfx(start.y - lineOffset)}` +
-      `L${tfx(endX - length)},${tfx(start.y - width - lineOffset)}`,
+    `M${tfx(start.x)},${tfx(start.y - arrowOffset)}` +
+      `L${tfx(endX)},${tfx(start.y - arrowOffset)}` +
+      `L${tfx(endX - arrowHeadLength)},${tfx(
+        start.y - arrowHeadWidth - arrowOffset,
+      )}`,
   );
 
   // Second arrow
   path.push(
-    `M${tfx(start.x)},${tfx(start.y + lineOffset)}` +
-      `L${tfx(endX)},${tfx(start.y + lineOffset)}` +
-      `M${tfx(start.x)},${tfx(start.y + lineOffset)}` +
-      `L${tfx(start.x + arrowLen)},${tfx(start.y + lineOffset + width)}`,
+    `M${tfx(start.x)},${tfx(start.y + arrowOffset)}` +
+      `L${tfx(endX)},${tfx(start.y + arrowOffset)}` +
+      `M${tfx(start.x)},${tfx(start.y + arrowOffset)}` +
+      `L${tfx(start.x + arrowHeadLength)},${tfx(
+        start.y + arrowOffset + arrowHeadWidth,
+      )}`,
   );
 
   const transformedPath = svgPath(path.join(''))
     .rotate(arrowAngle, start.x, start.y)
     .toString();
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore: raphael typing issues
   return paper.path(transformedPath).attr({
     ...options.lineattr,
     ...(shouldApplySnappingStyle && {
@@ -790,11 +873,9 @@ function arrowUnbalancedEquilibriumFilledHalfBow(
   options: RenderOptions,
   shouldApplySnappingStyle: boolean,
 ) {
-  const arrowLen = 9;
-  const lineOffset = 3.5;
-  const arrowOffset = 7;
-  const arrowHeadAttr = 2;
-  const unbalanceVal = 15;
+  const { arrowHeadLength, arrowHeadWidth, arrowOffset, arrowHeadAttr } =
+    getArrowHeadDimensions(options);
+  const unbalanceVal = getUnbalancedArrowHeadOffset(options);
 
   const endX = start.x + arrowLength;
 
@@ -802,22 +883,25 @@ function arrowUnbalancedEquilibriumFilledHalfBow(
 
   // First arrow
   path.push(
-    `M${tfx(start.x)},${tfx(start.y - lineOffset)}` +
-      `L${tfx(endX)},${tfx(start.y - lineOffset)}` +
-      `L${tfx(endX - arrowLen)},${tfx(start.y - arrowOffset)}` +
-      `L${tfx(endX - arrowLen + arrowHeadAttr)},${tfx(start.y - lineOffset)}Z`,
+    `M${tfx(start.x)},${tfx(start.y - arrowOffset)}` +
+      `L${tfx(endX)},${tfx(start.y - arrowOffset)}` +
+      `L${tfx(endX - arrowHeadLength)},${tfx(
+        start.y - arrowHeadWidth - arrowOffset,
+      )}` +
+      `L${tfx(endX - arrowHeadLength + arrowHeadAttr)},${tfx(
+        start.y - arrowOffset,
+      )}Z`,
   );
 
   // Second (Unbalanced) arrow
   path.push(
-    `M${tfx(start.x + unbalanceVal)},${tfx(start.y + lineOffset)}` +
-      `L${tfx(endX - unbalanceVal)},${tfx(start.y + lineOffset)}` +
-      `M${tfx(start.x + unbalanceVal)},${tfx(start.y + lineOffset)}` +
-      `L${tfx(start.x + arrowLen + unbalanceVal)},${tfx(
-        start.y + arrowOffset,
+    `M${tfx(endX - unbalanceVal)},${tfx(start.y + arrowOffset)}` +
+      `L${tfx(start.x + unbalanceVal)},${tfx(start.y + arrowOffset)}` +
+      `L${tfx(start.x + unbalanceVal + arrowHeadLength)},${tfx(
+        start.y + arrowHeadWidth + arrowOffset,
       )}` +
-      `L${tfx(start.x + arrowLen - arrowHeadAttr + unbalanceVal)},${
-        start.y + lineOffset
+      `L${tfx(start.x + unbalanceVal + arrowHeadLength - arrowHeadAttr)},${
+        start.y + arrowOffset
       }Z`,
   );
 
@@ -840,11 +924,9 @@ function arrowUnbalancedEquilibriumOpenHalfAngle(
   options: RenderOptions,
   shouldApplySnappingStyle: boolean,
 ) {
-  const width = 5;
-  const length = 7;
-  const arrowLen = 9;
-  const lineOffset = 3.5;
-  const unbalanceVal = 15;
+  const { arrowHeadLength, arrowHeadWidth, arrowOffset } =
+    getArrowHeadDimensions(options);
+  const unbalanceVal = getUnbalancedArrowHeadOffset(options);
 
   const endX = start.x + arrowLength;
 
@@ -852,18 +934,20 @@ function arrowUnbalancedEquilibriumOpenHalfAngle(
 
   // First arrow
   path.push(
-    `M${tfx(start.x)},${tfx(start.y - lineOffset)}` +
-      `L${tfx(endX)},${tfx(start.y - lineOffset)}` +
-      `L${tfx(endX - length)},${tfx(start.y - width - lineOffset)}`,
+    `M${tfx(start.x)},${tfx(start.y - arrowOffset)}` +
+      `L${tfx(endX)},${tfx(start.y - arrowOffset)}` +
+      `L${tfx(endX - arrowHeadLength)},${tfx(
+        start.y - arrowHeadWidth - arrowOffset,
+      )}`,
   );
 
   // Second (Unbalanced) arrow
   path.push(
-    `M${tfx(start.x + unbalanceVal)},${tfx(start.y + lineOffset)}` +
-      `L${tfx(endX - unbalanceVal)},${tfx(start.y + lineOffset)}` +
-      `M${tfx(start.x + unbalanceVal)},${tfx(start.y + lineOffset)}` +
-      `L${tfx(start.x + arrowLen + unbalanceVal)},${tfx(
-        start.y + lineOffset + width,
+    `M${tfx(start.x + unbalanceVal)},${tfx(start.y + arrowOffset)}` +
+      `L${tfx(endX - unbalanceVal)},${tfx(start.y + arrowOffset)}` +
+      `M${tfx(start.x + unbalanceVal)},${tfx(start.y + arrowOffset)}` +
+      `L${tfx(start.x + arrowHeadLength + unbalanceVal)},${tfx(
+        start.y + arrowOffset + arrowHeadWidth,
       )}`,
   );
 
@@ -871,8 +955,6 @@ function arrowUnbalancedEquilibriumOpenHalfAngle(
     .rotate(arrowAngle, start.x, start.y)
     .toString();
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore: raphael typing issues
   return paper.path(transformedPath).attr({
     ...options.lineattr,
     ...(shouldApplySnappingStyle && {
@@ -889,11 +971,16 @@ function arrowUnbalancedEquilibriumLargeFilledHalfBow(
   options: RenderOptions,
   shouldApplySnappingStyle: boolean,
 ) {
-  const arrowLen = 9;
-  const lineOffset = 3.5;
-  const arrowOffset = 10;
-  const arrowHeadAttr = 2;
-  const unbalanceVal = 15;
+  const {
+    arrowHeadLength,
+    arrowHeadWidth: arrowHeadWidthNormal,
+    arrowOffset,
+    arrowHeadAttr,
+  } = getArrowHeadDimensions(options);
+  const unbalanceVal = getUnbalancedArrowHeadOffset(options);
+
+  // Multiplying by 1.5 because it's large variant
+  const arrowHeadWidth = arrowHeadWidthNormal * 1.5;
 
   const endX = start.x + arrowLength;
 
@@ -901,22 +988,26 @@ function arrowUnbalancedEquilibriumLargeFilledHalfBow(
 
   // First arrow
   path.push(
-    `M${tfx(start.x)},${tfx(start.y - lineOffset)}` +
-      `L${tfx(endX)},${tfx(start.y - lineOffset)}` +
-      `L${tfx(endX - arrowLen)},${tfx(start.y - arrowOffset)}` +
-      `L${tfx(endX - arrowLen + arrowHeadAttr)},${tfx(start.y - lineOffset)}Z`,
+    `M${tfx(start.x)},${tfx(start.y - arrowOffset)}` +
+      `L${tfx(endX)},${tfx(start.y - arrowOffset)}` +
+      `L${tfx(endX - arrowHeadLength)},${tfx(
+        start.y - arrowHeadWidth - arrowOffset,
+      )}` +
+      `L${tfx(endX - arrowHeadLength + arrowHeadAttr)},${tfx(
+        start.y - arrowOffset,
+      )}Z`,
   );
 
   // Second (Unbalanced) arrow
   path.push(
-    `M${tfx(start.x + unbalanceVal)},${tfx(start.y + lineOffset)}` +
-      `L${tfx(endX - unbalanceVal)},${tfx(start.y + lineOffset)}` +
-      `M${tfx(start.x + unbalanceVal)},${tfx(start.y + lineOffset)}` +
-      `L${tfx(start.x + arrowLen + unbalanceVal)},${tfx(
-        start.y + arrowOffset,
+    `M${tfx(start.x + unbalanceVal)},${tfx(start.y + arrowOffset)}` +
+      `L${tfx(endX - unbalanceVal)},${tfx(start.y + arrowOffset)}` +
+      `M${tfx(start.x + unbalanceVal)},${tfx(start.y + arrowOffset)}` +
+      `L${tfx(start.x + arrowHeadLength + unbalanceVal)},${tfx(
+        start.y + arrowHeadWidth + arrowOffset,
       )}` +
-      `L${tfx(start.x + arrowLen - arrowHeadAttr + unbalanceVal)},${
-        start.y + lineOffset
+      `L${tfx(start.x + arrowHeadLength - arrowHeadAttr + unbalanceVal)},${
+        start.y + arrowOffset
       }Z`,
   );
 
@@ -939,10 +1030,9 @@ function arrowUnbalancedEquilibriumFilledHalfTriangle(
   options: RenderOptions,
   shouldApplySnappingStyle: boolean,
 ) {
-  const arrowLen = 9;
-  const lineOffset = 3.5;
-  const arrowOffset = 7;
-  const unbalanceVal = 15;
+  const { arrowHeadLength, arrowHeadWidth, arrowOffset } =
+    getArrowHeadDimensions(options);
+  const unbalanceVal = getUnbalancedArrowHeadOffset(options);
 
   const endX = start.x + arrowLength;
 
@@ -950,21 +1040,25 @@ function arrowUnbalancedEquilibriumFilledHalfTriangle(
 
   // First arrow
   path.push(
-    `M${tfx(start.x)},${tfx(start.y - lineOffset)}` +
-      `L${tfx(endX)},${tfx(start.y - lineOffset)}` +
-      `L${tfx(endX - arrowLen)},${tfx(start.y - arrowOffset)}` +
-      `L${tfx(endX - arrowLen)},${tfx(start.y - lineOffset)}Z`,
+    `M${tfx(start.x)},${tfx(start.y - arrowOffset)}` +
+      `L${tfx(endX)},${tfx(start.y - arrowOffset)}` +
+      `L${tfx(endX - arrowHeadLength)},${tfx(
+        start.y - arrowHeadWidth - arrowOffset,
+      )}` +
+      `L${tfx(endX - arrowHeadLength)},${tfx(start.y - arrowOffset)}Z`,
   );
 
   // Second (Unbalanced) arrow
   path.push(
-    `M${tfx(start.x + unbalanceVal)},${tfx(start.y + lineOffset)}` +
-      `L${tfx(endX - unbalanceVal)},${tfx(start.y + lineOffset)}` +
-      `M${tfx(start.x + unbalanceVal)},${tfx(start.y + lineOffset)}` +
-      `L${tfx(start.x + arrowLen + unbalanceVal)},${tfx(
-        start.y + arrowOffset,
+    `M${tfx(start.x + unbalanceVal)},${tfx(start.y + arrowOffset)}` +
+      `L${tfx(endX - unbalanceVal)},${tfx(start.y + arrowOffset)}` +
+      `M${tfx(start.x + unbalanceVal)},${tfx(start.y + arrowOffset)}` +
+      `L${tfx(start.x + arrowHeadLength + unbalanceVal)},${tfx(
+        start.y + arrowHeadWidth + arrowOffset,
       )}` +
-      `L${tfx(start.x + arrowLen + unbalanceVal)},${start.y + lineOffset}Z`,
+      `L${tfx(start.x + arrowHeadLength + unbalanceVal)},${
+        start.y + arrowOffset
+      }Z`,
   );
 
   const transformedPath = svgPath(path.join(''))
@@ -983,8 +1077,6 @@ function plus(paper: RaphaelPaper, point: Vec2, options: RenderOptions) {
   return paper
     .path(
       'M{0},{4}L{0},{5}M{2},{1}L{3},{1}',
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore: raphael typing issues
       tfx(point.x),
       tfx(point.y),
       tfx(point.x - s),
@@ -1028,8 +1120,6 @@ function bondSingleUp(
   return paper
     .path(
       'M{0},{1}L{2},{3}L{4},{5}Z',
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore: raphael typing issues
       tfx(a.x),
       tfx(a.y),
       tfx(b2.x),
@@ -1059,8 +1149,6 @@ function bondSingleStereoBold(
   const bond = paper
     .path(
       'M{0},{1}L{2},{3}L{4},{5}L{6},{7}Z',
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore: raphael typing issues
       tfx(a1.x),
       tfx(a1.y),
       tfx(a2.x),
@@ -1088,14 +1176,10 @@ function bondDoubleStereoBold(
   isSnapping: boolean,
   color = '#000',
 ) {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore: raphael typing issues
   // eslint-disable-line max-params
   return paper.set([
     sgBondPath,
     paper
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore: raphael typing issues
       .path('M{0},{1}L{2},{3}', tfx(b1.x), tfx(b1.y), tfx(b2.x), tfx(b2.y))
       .attr(options.lineattr)
       .attr({
@@ -1168,7 +1252,6 @@ function bondSingleEither(
     .path(path)
     .attr(options.lineattr)
     .attr({
-      fill: color,
       stroke: color,
     })
     .attr(isSnapping ? options.bondSnappingStyle : {});
@@ -1190,8 +1273,6 @@ function bondDouble(
       cisTrans
         ? 'M{0},{1}L{6},{7}M{4},{5}L{2},{3}'
         : 'M{0},{1}L{2},{3}M{4},{5}L{6},{7}',
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore: raphael typing issues
       tfx(a1.x),
       tfx(a1.y),
       tfx(b1.x),
@@ -1354,16 +1435,12 @@ function bondMark(
   mark: string | null,
   options: RenderOptions,
 ) {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore: raphael typing issues
   const path = paper.text(point.x, point.y, mark).attr({
     font: options.font,
-    'font-size': options.fontszsub,
+    'font-size': options.fontszsubInPx,
     fill: '#000',
   });
   const rbb = util.relBox(path.getBBox());
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore: raphael typing issues
   recenterText(path, rbb);
   return path;
 }
@@ -1375,8 +1452,6 @@ function radicalCap(paper: RaphaelPaper, point1: Vec2, options: RenderOptions) {
   return paper
     .path(
       'M{0},{1}L{2},{3}L{4},{5}',
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore: raphael typing issues
       tfx(point1.x - dw),
       tfx(point1.y + dh),
       tfx(point1.x),
@@ -1397,8 +1472,6 @@ function radicalBullet(
   point1: Vec2,
   options: RenderOptions,
 ) {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore: raphael typing issues
   return paper.circle(tfx(point1.x), tfx(point1.y), options.lineWidth).attr({
     stroke: null,
     fill: '#000',
@@ -1453,8 +1526,6 @@ function bracket(
   return paper
     .path(
       'M{0},{1}L{2},{3}L{4},{5}L{6},{7}',
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore: raphael typing issues
       tfx(bracketArc0.x),
       tfx(bracketArc0.y),
       tfx(bracketPoint0.x),
@@ -1475,8 +1546,6 @@ function selectionRectangle(
 ) {
   return paper
     .rect(
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore: raphael typing issues
       tfx(Math.min(point1.x, point2.x)),
       tfx(Math.min(point1.y, point2.y)),
       tfx(Math.abs(point2.x - point1.x)),
@@ -1565,8 +1634,6 @@ function recenterText(path: Element, relativeBox: RelativeBox) {
   // TODO: find a better way
   if (Raphael.vml) {
     const gap = relativeBox.height * 0.16;
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore: raphael typing issues
     path.translateAbs(0, gap);
     relativeBox.y += gap;
   }
@@ -1581,8 +1648,6 @@ function rgroupAttachmentPoint(
 ) {
   const linePath = paper.path(
     'M{0},{1}L{2},{3}',
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore: raphael typing issues
     tfx(shiftedAtomPositionVector.x),
     tfx(shiftedAtomPositionVector.y),
     tfx(attachmentPointEnd.x),
@@ -1600,7 +1665,7 @@ function rgroupAttachmentPoint(
   const resultShape = paper
     .set([curvePath, linePath])
     .attr(options.lineattr)
-    .attr({ 'stroke-width': options.lineWidth });
+    .attr({ 'stroke-width': options.bondThicknessInPx });
 
   return resultShape;
 }
@@ -1637,7 +1702,7 @@ function rgroupAttachmentPointLabel(
     .text(labelPosition.x, labelPosition.y, labelText)
     .attr({
       font: options.font,
-      'font-size': options.fontsz * 0.9,
+      'font-size': options.fontszInPx * 0.9,
       fill,
     });
   return labelPath;

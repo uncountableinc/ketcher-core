@@ -5,6 +5,7 @@ export declare const macromoleculesFilesInputFormats: {
         rna: string;
         dna: string;
         peptide: string;
+        peptide3Letter: string;
     };
     fasta: {
         rna: string;

@@ -92,6 +92,7 @@ export abstract class BaseSequenceItemRenderer extends BaseSequenceRenderer {
     const rootElement = this.canvas
       .append('g')
       .data([this])
+      .attr('data-testid', 'sequence-item')
       .attr('transition', 'transform 0.2s')
       .attr(
         'transform',
@@ -156,7 +157,7 @@ export abstract class BaseSequenceItemRenderer extends BaseSequenceRenderer {
   ) {
     return rootElement
       .append('text')
-      .attr('x', '-2')
+      .attr('x', '2')
       .attr('y', '-24')
       .text(this.monomerIndexInChain + 1)
       .attr('font-family', 'Courier New')
@@ -331,7 +332,8 @@ export abstract class BaseSequenceItemRenderer extends BaseSequenceRenderer {
     return null;
   }
 
-  public hoverAttachmenPoint() {}
+  public redrawChainBeginning() {}
+  public hoverAttachmentPoint(): void {}
   public updateAttachmentPoints() {}
 
   private drawBackgroundElementHover() {

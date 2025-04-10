@@ -13,9 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-import { RaphaelPaper, VMLElement as Element } from 'raphael';
+import { RaphaelPaper, Element } from 'raphael';
 import { HalfBond, Vec2 } from "../../domain/entities";
 import { ArrowItem, RelativeBox, RenderOptions } from './render.types';
+export declare function getArrowHeadDimensions(options: RenderOptions): {
+    arrowHeadLength: number;
+    arrowHeadWidth: number;
+    arrowHeadAttr: number;
+    arrowOffset: number;
+};
 declare function rectangle(paper: RaphaelPaper, points: [Vec2, Vec2]): any;
 declare function rectangleArrowHighlightAndSelection(_paper: RaphaelPaper, { pos: [start], height }: ArrowItem, length: number, angle: number): string;
 declare function ellipse(paper: RaphaelPaper, points: [Vec2, Vec2]): any;

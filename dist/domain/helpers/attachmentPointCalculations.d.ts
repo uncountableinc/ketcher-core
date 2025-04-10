@@ -15,7 +15,7 @@ export declare function findLabelPoint(pointOnBorder: Coordinates, angle: number
     x: number;
     y: number;
 }[];
-export declare function getSearchFunction(initialAngle: number, canvasOffset: Coordinates, monomer: BaseMonomer): (coordStart: Coordinates, length: number, angle?: number) => any;
+export declare function getSearchFunction(initialAngle: number, canvasOffset: Coordinates, monomer: BaseMonomer): (coordStart: Coordinates, length: number, applyZoomForPositionCalculation: boolean, angle?: number) => any;
 export declare const anglesToSector: {
     '45': {
         min: number;

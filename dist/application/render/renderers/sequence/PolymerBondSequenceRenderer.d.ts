@@ -7,6 +7,7 @@ export declare class PolymerBondSequenceRenderer extends BaseSequenceRenderer {
     private secondNode?;
     private selectionElement;
     constructor(polymerBond: PolymerBond, firstNode?: SubChainNode | undefined, secondNode?: SubChainNode | undefined);
+    private get isHydrogenBond();
     private get firstMonomer();
     private get secondMonomer();
     private get areMonomersOnSameRow();
@@ -21,6 +22,6 @@ export declare class PolymerBondSequenceRenderer extends BaseSequenceRenderer {
     private getBondPath;
     moveStart(): void;
     moveEnd(): void;
-    get isSnake(): boolean;
-    isMonomersOnSameHorizontalLine(): boolean;
+    get isSnake(): false;
+    isMonomersOnSameHorizontalLine(): false;
 }

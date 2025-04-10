@@ -1,16 +1,27 @@
-import { PolymerBondRenderer } from "./PolymerBondRenderer";
+import { BaseMonomerRenderer } from "./BaseMonomerRenderer";
+import { FlexModePolymerBondRenderer } from "./PolymerBondRenderer/FlexModePolymerBondRenderer";
+import { SnakeModePolymerBondRenderer } from "./PolymerBondRenderer/SnakeModePolymerBondRenderer";
+import { HydrogenBond } from "../../../domain/entities";
+import { BaseMonomer } from "../../../domain/entities/BaseMonomer";
 import { Command } from "../../../domain/entities/Command";
 import { DrawingEntity } from "../../../domain/entities/DrawingEntity";
-import { BaseMonomer } from "../../../domain/entities/BaseMonomer";
-import { BaseMonomerRenderer } from "./BaseMonomerRenderer";
 import { PolymerBond } from "../../../domain/entities/PolymerBond";
 import { AttachmentPointName } from "../../../domain/types";
+import { AmbiguousMonomer } from "../../../domain/entities/AmbiguousMonomer";
+import { AmbiguousMonomerRenderer } from "./AmbiguousMonomerRenderer";
+import { Atom } from "../../../domain/entities/CoreAtom";
+import { AtomRenderer } from "./AtomRenderer";
+import { BondRenderer } from "./BondRenderer";
+import { Bond } from "../../../domain/entities/CoreBond";
+import { MonomerToAtomBond } from "../../../domain/entities/MonomerToAtomBond";
+declare type FlexModeOrSnakeModePolymerBondRenderer = FlexModePolymerBondRenderer | SnakeModePolymerBondRenderer;
 export declare class RenderersManager {
     private theme;
-    monomers: Map<number, BaseMonomerRenderer>;
-    polymerBonds: Map<number, PolymerBondRenderer>;
+    monomers: Map<number, BaseMonomerRenderer | AmbiguousMonomerRenderer>;
+    polymerBonds: Map<number, FlexModeOrSnakeModePolymerBondRenderer>;
+    atoms: Map<number, AtomRenderer>;
+    bonds: Map<number, BondRenderer>;
     private needRecalculateMonomersEnumeration;
-    private needRecalculateMonomersBeginning;
     constructor({ theme }: {
         theme: any;
     });
@@ -18,30 +29,32 @@ export declare class RenderersManager {
     selectDrawingEntity(drawingEntity: DrawingEntity): void;
     moveDrawingEntity(drawingEntity: DrawingEntity): void;
     private markForReEnumeration;
-    markForRecalculateBegin(): void;
-    addMonomer(monomer: BaseMonomer, callback?: () => void): void;
+    addMonomer(monomer: BaseMonomer | AmbiguousMonomer, callback?: () => void): void;
     moveMonomer(monomer: BaseMonomer): void;
-    redrawDrawingEntity(drawingEntity: DrawingEntity, force?: boolean): void;
+    redrawDrawingEntity(drawingEntity: DrawingEntity, force?: boolean, recalculateEnumeration?: boolean): void;
     deleteAllDrawingEntities(): void;
     deleteMonomer(monomer: BaseMonomer): void;
-    addPolymerBond(polymerBond: PolymerBond): void;
+    addPolymerBond(polymerBond: PolymerBond | HydrogenBond): void;
     movePolymerBond(polymerBond: PolymerBond): void;
     showPolymerBondInformation(polymerBond: PolymerBond): void;
-    deletePolymerBond(polymerBond: PolymerBond, recalculateEnumeration?: boolean, recalculateBeginning?: boolean): void;
+    deletePolymerBond(polymerBond: PolymerBond | HydrogenBond, recalculateEnumeration?: boolean): void;
     private recalculatePeptideChainEnumeration;
     private recalculateRnaChainEnumeration;
-    private recalculatePeptideEnumeration;
-    private recalculateRnaEnumeration;
     private recalculateMonomersEnumeration;
-    private isOnlyPartOfRnaChain;
-    private recalculateMonomersBeginning;
     finishPolymerBondCreation(polymerBond: PolymerBond): void;
     cancelPolymerBondCreation(polymerBond: PolymerBond, secondMonomer?: BaseMonomer): void;
     hoverMonomer(monomer: BaseMonomer, needRedrawAttachmentPoints: any): void;
     hoverAttachmentPoint(monomer: BaseMonomer, attachmentPointName: AttachmentPointName): void;
+    reinitializeViewModel(): void;
     update(modelChanges?: Command): void;
+    addAtom(atom: Atom): void;
+    deleteAtom(atom: Atom): void;
+    addBond(bond: Bond): void;
+    deleteBond(bond: Bond): void;
+    addMonomerToAtomBond(bond: MonomerToAtomBond): void;
+    deleteMonomerToAtomBond(bond: MonomerToAtomBond): void;
     runPostRenderMethods(): void;
-    static getRenderedStructuresBbox(): {
+    static getRenderedStructuresBbox(monomers?: BaseMonomer[]): {
         left: any;
         right: any;
         top: any;
@@ -51,3 +64,4 @@ export declare class RenderersManager {
     };
     rerenderSideConnectionPolymerBonds(): void;
 }
+export {};

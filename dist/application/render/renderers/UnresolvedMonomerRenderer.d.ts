@@ -7,6 +7,7 @@ export declare class UnresolvedMonomerRenderer extends BaseMonomerRenderer {
     get textColor(): string;
     protected appendBody(rootElement: Selection<SVGGElement, void, HTMLElement, never>): Selection<SVGUseElement, this, HTMLElement, never>;
     show(theme: any): void;
-    protected get enumerationElementPosition(): undefined;
-    protected get beginningElementPosition(): undefined;
+    get enumerationElementPosition(): undefined;
+    get beginningElementPosition(): undefined;
+    protected get modificationConfig(): undefined;
 }

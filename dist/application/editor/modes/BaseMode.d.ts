@@ -8,7 +8,7 @@ export declare abstract class BaseMode {
     private _pasteIsInProgress;
     protected constructor(modeName: LayoutMode, previousMode?: LayoutMode);
     private changeMode;
-    initialize(needRemoveSelection?: boolean, _isUndo?: boolean): Command;
+    initialize(needRemoveSelection?: boolean, _isUndo?: boolean, _needReArrangeChains?: boolean): Command;
     onKeyDown(event: KeyboardEvent): Promise<void>;
     get keyboardEventHandlers(): {};
     abstract getNewNodePosition(): any;
@@ -16,12 +16,12 @@ export declare abstract class BaseMode {
     abstract isPasteAllowedByMode(drawingEntitiesManager: DrawingEntitiesManager): boolean;
     abstract isPasteAvailable(drawingEntitiesManager: DrawingEntitiesManager): boolean;
     abstract scrollForView(): void;
-    onCopy(event: ClipboardEvent): void;
+    onCopy(event?: ClipboardEvent): void;
     onPaste(event: ClipboardEvent): Promise<void>;
     pasteFromClipboard(clipboardData: any): Promise<void>;
     pasteKetFormatFragment(pastedStr: string): Command | undefined;
     pasteWithIndigoConversion(pastedStr: string, inputFormat: ChemicalMimeType, isSequenceOrFasta?: boolean): Promise<Command | undefined>;
-    private updateMonomersPosition;
+    private updateEntitiesPosition;
     unsupportedSymbolsError(errorMessage: string, isSequenceOrFasta?: boolean): void;
     private checkIfTargetIsInput;
     destroy(): void;

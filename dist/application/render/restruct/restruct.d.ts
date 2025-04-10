@@ -31,6 +31,7 @@ import { Render } from '../raphaelRender';
 import Visel from './visel';
 import { ReRGroupAttachmentPoint } from './rergroupAttachmentPoint';
 import { ReImage } from "./reImage";
+import { ReMultitailArrow } from './remultitailArrow';
 declare class ReStruct {
     static readonly maps: {
         readonly atoms: typeof ReAtom;
@@ -47,6 +48,7 @@ declare class ReStruct {
         readonly simpleObjects: typeof ReSimpleObject;
         readonly texts: typeof ReText;
         readonly images: typeof ReImage;
+        readonly multitailArrows: typeof ReMultitailArrow;
     };
     render: Render;
     molecule: Struct;
@@ -62,8 +64,9 @@ declare class ReStruct {
     sgroupData: Map<number, ReDataSGroupData>;
     enhancedFlags: Map<number, ReEnhancedFlag>;
     simpleObjects: Map<number, ReSimpleObject>;
-    images: Map<number, ReImage>;
     texts: Map<number, ReText>;
+    images: Map<number, ReImage>;
+    multitailArrows: Map<number, ReMultitailArrow>;
     private initialized;
     private layers;
     connectedComponents: Pool;
@@ -77,6 +80,7 @@ declare class ReStruct {
     private bondsChanged;
     private textsChanged;
     private imagesChanged;
+    private multitailArrowsChanged;
     private snappingBonds;
     constructor(molecule: any, render: Render | {
         skipRaphaelInitialization: boolean;
@@ -95,6 +99,7 @@ declare class ReStruct {
     markItemRemoved(): void;
     markBond(bid: number, mark: number): void;
     markAtom(aid: number, mark: number): void;
+    markRgroupAttachmentPoint(rgAPid: number, mark: number): void;
     markItem(map: string, id: number, mark: number): void;
     clearVisel(visel: Visel): void;
     eachItem(func: any): void;
@@ -129,6 +134,7 @@ declare class ReStruct {
     showEnhancedFlags(): void;
     showBonds(): void;
     showImages(): void;
+    showMultitailArrows(): void;
     setSelection(selection?: any): void;
     showItemSelection(item: any, selected: any): void;
     addSnappingBonds(bondId: number): void;

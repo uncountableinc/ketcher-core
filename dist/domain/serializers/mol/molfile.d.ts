@@ -32,7 +32,7 @@ export declare class Molfile {
     parseCTFile(props: ParseCTFileProps): any;
     prepareSGroups(skipErrors: boolean, preserveIndigoDesc?: boolean): void;
     getCTab(molecule: Struct, rgroups?: Map<any, any>): string;
-    saveMolecule(molecule: Struct, skipSGroupErrors: boolean, norgroups?: boolean, preserveIndigoDesc?: boolean, ignoreChiralFlag?: boolean): string;
+    saveMolecule(molecule: Struct, skipSGroupErrors: boolean, norgroups?: boolean, preserveIndigoDesc?: boolean): string;
     writeHeader(): void;
     write(str: string): void;
     writeCR(str?: string): void;
@@ -40,8 +40,8 @@ export declare class Molfile {
     writePadded(str: string, width: number): void;
     writePaddedNumber(number: number, width: number): void;
     writePaddedFloat(number: string | number, width: number, precision: number): void;
-    writeCTab2000Header(ignoreChiralFlag: any): void;
-    writeCTab2000(rgroups?: Map<any, any>, ignoreChiralFlag?: boolean): void;
+    writeCTab2000Header(): void;
+    writeCTab2000(rgroups?: Map<any, any>): void;
     private writeAtom;
     private writeBond;
     private writeAtomProps;

@@ -58,17 +58,21 @@ declare class ReAtom extends ReObject {
     static isSelectable(): true;
     getVBoxObj(render: Render): Box2Abs | null;
     drawHover(render: Render): any;
-    getLabeledSelectionContour(render: Render): any;
-    getUnlabeledSelectionContour(render: Render): any;
-    getSelectionContour(render: Render): any;
+    getLabeledSelectionContour(render: Render, isHighlight: boolean): any;
+    getUnlabeledSelectionContour(render: Render, isHighlight: boolean): any;
+    getSelectionContour(render: Render, isHighlight: boolean): any;
+    private isPlateShouldBeHidden;
+    private makeHighlightePlate;
     makeHoverPlate(render: Render): any;
     makeSelectionPlate(restruct: ReStruct): any;
+    private isNeedShiftForCharge;
+    private getRatio;
     /**
      * if atom is rendered as Abbreviation: O, NH, ...
      * In this case we need to shift the bond render start position to free space for Atom,
      * same for the Attachment point
      */
-    getShiftedSegmentPosition(renderOptions: RenderOptions, direction: Vec2, _atomPosition?: Vec2): Vec2;
+    getShiftedSegmentPosition(renderOptions: RenderOptions, direction: Vec2, _atomPosition?: Vec2, bondLen?: number | null): Vec2;
     hasAttachmentPoint(): boolean;
     show(restruct: ReStruct, aid: number, options: any): void;
     getLargestSectorFromNeighbors(struct: Struct): {

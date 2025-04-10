@@ -12,6 +12,7 @@ import {
 } from './helpers/attachmentPointCalculations';
 import { editorEvents } from 'application/editor/editorEvents';
 import { AttachmentPointConstructorParams, AttachmentPointName } from './types';
+import { MonomerToAtomBond } from 'domain/entities/MonomerToAtomBond';
 
 export class AttachmentPoint {
   static attachmentPointVector = 6;
@@ -32,25 +33,32 @@ export class AttachmentPoint {
     strokePotentially: '#167782',
   };
 
-  private rootElement: D3SvgElementSelection<SVGGElement, void>;
-  private attachmentPoint: D3SvgElementSelection<SVGGElement, this> | null;
+  protected rootElement: D3SvgElementSelection<SVGGElement, void>;
+  protected attachmentPoint: D3SvgElementSelection<SVGGElement, this> | null;
   public monomer: BaseMonomer;
-  private bodyWidth: number;
-  private bodyHeight: number;
-  private attachmentPointName: AttachmentPointName;
-  private canvasOffset: Coordinates;
-  private centerOfMonomer: Coordinates;
-  private element: Selection<SVGGElement, this, HTMLElement, never> | undefined;
+  protected bodyWidth: number;
+  protected bodyHeight: number;
+  protected attachmentPointName: AttachmentPointName;
+  protected canvasOffset: Coordinates;
+  protected centerOfMonomer: Coordinates;
+  protected element:
+    | Selection<SVGGElement, this, HTMLElement, never>
+    | undefined;
+
   private hoverableArea:
     | Selection<SVGGElement, this, HTMLElement, never>
     | undefined;
 
-  private initialAngle = 0;
+  protected initialAngle = 0;
   private isUsed: boolean;
   private isSnake;
   private editorEvents: typeof editorEvents;
+  private applyZoomForPositionCalculation: boolean;
 
-  constructor(constructorParams: AttachmentPointConstructorParams) {
+  constructor(
+    constructorParams: AttachmentPointConstructorParams,
+    skipInit?: boolean,
+  ) {
     this.rootElement = constructorParams.rootElement;
     this.monomer = constructorParams.monomer;
     this.bodyWidth = constructorParams.bodyWidth;
@@ -64,10 +72,14 @@ export class AttachmentPoint {
     this.isSnake = constructorParams.isSnake;
     this.isUsed = constructorParams.isUsed;
     this.initialAngle = constructorParams.angle;
+    this.applyZoomForPositionCalculation =
+      constructorParams.applyZoomForPositionCalculation;
     this.editorEvents = editorEvents;
     this.attachmentPoint = null;
 
-    this.appendAttachmentPoint();
+    if (!skipInit) {
+      this.appendAttachmentPoint();
+    }
   }
 
   private get fill() {
@@ -82,7 +94,7 @@ export class AttachmentPoint {
     }
   }
 
-  private get stroke() {
+  protected get stroke() {
     if (
       this.monomer.isAttachmentPointPotentiallyUsed(this.attachmentPointName)
     ) {
@@ -98,7 +110,7 @@ export class AttachmentPoint {
     this.element?.remove();
   }
 
-  private renderAttachmentPointByCoordinates(
+  protected renderAttachmentPointByCoordinates(
     attachmentOnBorder: Coordinates,
     attachmentPointCoordinates: Coordinates,
     labelCoordinatesOnMonomer: Coordinates,
@@ -151,6 +163,7 @@ export class AttachmentPoint {
     monomerCenter: Coordinates,
     attachmentPointCenter: Coordinates,
     angleDegrees: number,
+    hasBond: boolean,
   ) {
     if (!this.element) {
       return;
@@ -191,7 +204,7 @@ export class AttachmentPoint {
       .attr('stroke-width', '1px')
       .attr('fill', '#0097A8')
       .style('opacity', '0')
-      .style('pointer-events', 'auto')
+      .style('pointer-events', hasBond ? 'none' : 'auto')
       .attr(
         'transform',
         `translate(${attachmentPointCenter.x},${attachmentPointCenter.y})rotate(${rotation})`,
@@ -222,15 +235,23 @@ export class AttachmentPoint {
     let angleRadians: number;
     const polymerBond =
       this.monomer.attachmentPointsToBonds[this.attachmentPointName];
-    const flip = this.monomer.id === polymerBond?.firstMonomer?.id;
+
+    const firstMonomer =
+      polymerBond instanceof MonomerToAtomBond
+        ? polymerBond.monomer
+        : polymerBond?.firstMonomer;
+    const flip = this.monomer.id === firstMonomer?.id;
     const isAttachmentpointR1 = this.attachmentPointName === 'R1';
     if (!polymerBond) {
       angleDegrees = this.initialAngle;
     } else if (
+      !(polymerBond instanceof MonomerToAtomBond) &&
       this.isSnake &&
       !polymerBond?.renderer?.isMonomersOnSameHorizontalLine()
     ) {
-      angleRadians = isAttachmentpointR1 ? 0 : Math.PI;
+      angleRadians = isAttachmentpointR1
+        ? this.rotateToAngle(polymerBond, flip)
+        : Math.PI;
       angleDegrees = Vec2.radiansToDegrees(angleRadians);
     } else {
       angleRadians = this.rotateToAngle(polymerBond, flip);
@@ -263,6 +284,7 @@ export class AttachmentPoint {
       attachmentToCenterCoordinates,
       attachmentPointCoordinates,
       angleDegrees,
+      Boolean(polymerBond),
     );
 
     this.hoverableArea = hoverableArea;
@@ -278,7 +300,10 @@ export class AttachmentPoint {
       .attr('stroke', this.fill === 'white' ? '#0097A8' : 'white');
   }
 
-  public rotateToAngle(polymerBond: PolymerBond, flip = false) {
+  public rotateToAngle(
+    polymerBond: PolymerBond | MonomerToAtomBond,
+    flip = false,
+  ) {
     let angleRadians = 0;
     if (flip) {
       angleRadians = Vec2.oxAngleForVector(
@@ -295,7 +320,7 @@ export class AttachmentPoint {
     return angleRadians;
   }
 
-  private getCoordinates(angleDegrees) {
+  protected getCoordinates(angleDegrees) {
     const [pointOnBorder, pointOfAttachment, labelPoint] =
       this.catchThePoint(angleDegrees);
 
@@ -331,7 +356,9 @@ export class AttachmentPoint {
     const polymerBond =
       this.monomer.attachmentPointsToBonds[this.attachmentPointName];
 
-    assert(polymerBond);
+    if (!polymerBond || polymerBond instanceof MonomerToAtomBond) {
+      return;
+    }
 
     const flip = this.monomer.id === polymerBond?.firstMonomer?.id;
 
@@ -380,9 +407,13 @@ export class AttachmentPoint {
       this.monomer,
     );
 
+    const applyZoomForPositionCalculation =
+      this.applyZoomForPositionCalculation;
+
     const pointOnBorder = findPointOnMonomerBorder(
       currentMonomerCenter,
       (this.bodyWidth + this.bodyHeight) / 2,
+      applyZoomForPositionCalculation,
     );
 
     const [labelPoint, pointOfAttachment] = findLabelPoint(
@@ -393,6 +424,7 @@ export class AttachmentPoint {
       AttachmentPoint.labelSize,
       this.isUsed,
     );
+
     return [pointOnBorder, pointOfAttachment, labelPoint];
   }
 

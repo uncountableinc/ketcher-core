@@ -19,9 +19,10 @@ declare class ReRGroupAttachmentPoint extends ReObject {
     get endPoint(): Vec2;
     get outlineEndPoint(): Vec2;
     static isSelectable(): boolean;
-    getOutlinePoints(): readonly [Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2];
+    getOutlinePoints(isHighlight?: boolean): readonly [Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2];
     getDistanceTo(destination: Vec2): number;
-    show(restruct: ReStruct): void;
+    private makeHighlightePlate;
+    show(restruct: ReStruct, rgroupAttachmentPointId: number): void;
     private getHoverPlatePath;
     makeHoverPlate(render: Render): any;
     makeSelectionPlate(_restruct: ReStruct, paper: RaphaelPaper, options: RenderOptions): any;

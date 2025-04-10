@@ -37,6 +37,7 @@ import { Scale } from 'domain/helpers';
 import draw from '../draw';
 import util from '../util';
 import { MonomerMicromolecule } from 'domain/entities/monomerMicromolecule';
+import { RenderOptions, RenderOptionStyles } from '../render.types';
 
 class ReBond extends ReObject {
   b: Bond;
@@ -68,9 +69,7 @@ class ReBond extends ReObject {
     atomId: number,
     sgroup?: SGroup,
   ) {
-    return sgroup instanceof MonomerMicromolecule
-      ? (sgroup.getAttachmentAtomId() as number)
-      : sgroup?.isContracted()
+    return sgroup?.isContracted()
       ? sgroup?.getContractedPosition(struct).atomId
       : atomId;
   }
@@ -94,27 +93,41 @@ class ReBond extends ReObject {
     ) {
       return;
     }
-    const p1 =
-      sgroup1 instanceof MonomerMicromolecule
-        ? (sgroup1.pp as Vec2)
-        : beginAtom.a.pp;
 
-    const p2 =
-      sgroup2 instanceof MonomerMicromolecule
-        ? (sgroup2.pp as Vec2)
-        : endAtom.a.pp;
+    let p1: Vec2;
+    let p2: Vec2;
+
+    if (sgroup1 instanceof MonomerMicromolecule && sgroup1 !== sgroup2) {
+      p1 = sgroup1.isContracted() ? (sgroup1.pp as Vec2) : beginAtom.a.pp;
+    } else {
+      p1 = beginAtom.a.pp;
+    }
+
+    if (sgroup2 instanceof MonomerMicromolecule && sgroup1 !== sgroup2) {
+      p2 = sgroup2.isContracted() ? (sgroup2.pp as Vec2) : endAtom.a.pp;
+    } else {
+      p2 = endAtom.a.pp;
+    }
+
     const hb1 = restruct.molecule.halfBonds.get(bond.b.hb1);
     const hb2 = restruct.molecule.halfBonds.get(bond.b.hb2);
 
     if (!hb1?.dir || !hb2?.dir) return;
 
-    hb1.p = beginAtom.getShiftedSegmentPosition(options, hb1.dir, p1);
-    hb2.p = endAtom.getShiftedSegmentPosition(options, hb2.dir, p2);
     bond.b.center = Vec2.lc2(p1, 0.5, p2, 0.5);
     bond.b.len = Vec2.dist(
       Scale.modelToCanvas(p1, render.options),
       Scale.modelToCanvas(p2, render.options),
     );
+
+    hb1.p = beginAtom.getShiftedSegmentPosition(
+      options,
+      hb1.dir,
+      p1,
+      bond.b.len,
+    );
+    hb2.p = endAtom.getShiftedSegmentPosition(options, hb2.dir, p2, bond.b.len);
+
     bond.b.sb = options.lineWidth * 5;
     /* eslint-disable no-mixed-operators */
     bond.b.sa = Math.max(bond.b.sb, bond.b.len / 2 - options.lineWidth * 2);
@@ -128,12 +141,12 @@ class ReBond extends ReObject {
     return ret;
   }
 
-  getSelectionPoints(render: Render) {
+  getSelectionPoints(render: Render, isHighlight = false) {
     // please refer to: ketcher-core/docs/data/hover_selection_1.png
     const bond: Bond = this.b;
     const { ctab: restruct, options } = render;
-    const { bondThickness, doubleBondWidth, stereoBondWidth } = options;
-    const regularSelectionThikness = doubleBondWidth + bondThickness;
+    const { bondThickness, bondSpacingInPx, stereoBondWidth } = options;
+    const regularSelectionThikness = bondSpacingInPx + bondThickness;
 
     // get half-bond positions, this is where the actual bond
     // image on the screen is drawn, it may be different e.g. if the
@@ -147,7 +160,9 @@ class ReBond extends ReObject {
       bond.stereo !== Bond.PATTERN.STEREO.NONE &&
       bond.stereo !== Bond.PATTERN.STEREO.CIS_TRANS;
 
-    const addPadding = isStereoBond ? 0 : -2;
+    const highlightPadding = isHighlight ? -1 : 0;
+    const stereoPadding = isStereoBond ? 0 : -2;
+    const addPadding = highlightPadding + stereoPadding;
 
     // find the points on the line where we will be drawing the curves
     const contourStart = Vec2.getLinePoint(
@@ -163,14 +178,17 @@ class ReBond extends ReObject {
 
     const stereoBondStartHeightCoef = 0.5;
     const bondPadding = 0.5;
-    const addStart = isStereoBond
-      ? stereoBondWidth * stereoBondStartHeightCoef
-      : regularSelectionThikness + bondPadding;
+    const highlightBondPadding = isHighlight ? 0 : 2;
+    const addStart =
+      (isStereoBond
+        ? stereoBondWidth * stereoBondStartHeightCoef
+        : regularSelectionThikness + bondPadding) + highlightBondPadding;
     const stereoBondEndHeightCoef = 1;
-    const addEnd = isStereoBond
-      ? stereoBondWidth +
-        (regularSelectionThikness * stereoBondEndHeightCoef) / stereoBondWidth
-      : regularSelectionThikness + bondPadding;
+    const addEnd =
+      (isStereoBond
+        ? stereoBondWidth +
+          (regularSelectionThikness * stereoBondEndHeightCoef) / stereoBondWidth
+        : regularSelectionThikness + bondPadding) + highlightBondPadding;
 
     const contourPaddedStart = Vec2.getLinePoint(
       contourStart,
@@ -237,7 +255,7 @@ class ReBond extends ReObject {
     ];
   }
 
-  getSelectionContour(render: Render) {
+  getSelectionContour(render: Render, isHighlight: boolean) {
     const { paper } = render;
     const [
       startPadTop,
@@ -248,7 +266,7 @@ class ReBond extends ReObject {
       endBottom,
       startPadBottom,
       startBottom,
-    ] = this.getSelectionPoints(render);
+    ] = this.getSelectionPoints(render, isHighlight);
 
     // for a visual representation of the points
     // please refer to: ketcher-core/docs/data/hover_selection_exp.png
@@ -266,45 +284,53 @@ class ReBond extends ReObject {
   makeHoverPlate(render: Render) {
     const restruct = render.ctab;
     const options = render.options;
-    ReBond.bondRecalc(this, restruct, options);
-    const bond = this.b;
-    const sgroups = restruct.sgroups;
-    const functionalGroups = restruct.molecule.functionalGroups;
-    if (
-      FunctionalGroup.isBondInContractedFunctionalGroup(
-        bond,
-        sgroups,
-        functionalGroups,
-      ) ||
-      Bond.isBondToHiddenLeavingGroup(restruct.molecule, bond)
-    ) {
+    if (this.isPlateShouldBeHidden(restruct, options)) {
       return null;
     }
 
-    const rect = this.getSelectionContour(render);
+    const rect = this.getSelectionContour(render, false);
 
     return rect.attr({ ...options.hoverStyle });
   }
 
   makeSelectionPlate(restruct: ReStruct, _: any, options: any) {
+    if (this.isPlateShouldBeHidden(restruct, options)) {
+      return null;
+    }
+
+    const rect = this.getSelectionContour(restruct.render, false);
+
+    return rect.attr(options.selectionStyle);
+  }
+
+  private isPlateShouldBeHidden = (
+    restruct: ReStruct,
+    options: RenderOptions,
+  ) => {
     ReBond.bondRecalc(this, restruct, options);
     const bond = this.b;
     const sgroups = restruct.render.ctab.sgroups;
     const functionalGroups = restruct.render.ctab.molecule.functionalGroups;
-    if (
+    return (
       FunctionalGroup.isBondInContractedFunctionalGroup(
         bond,
         sgroups,
         functionalGroups,
-      ) ||
-      Bond.isBondToHiddenLeavingGroup(restruct.molecule, bond)
-    ) {
+      ) || Bond.isBondToHiddenLeavingGroup(restruct.molecule, bond)
+    );
+  };
+
+  private makeHighlitePlate(
+    restruct: ReStruct,
+    highlightStyle: RenderOptionStyles,
+  ) {
+    const options = restruct.render.options;
+    if (this.isPlateShouldBeHidden(restruct, options)) {
       return null;
     }
 
-    const rect = this.getSelectionContour(restruct.render);
-
-    return rect.attr(options.selectionStyle);
+    const rect = this.getSelectionContour(restruct.render, true);
+    return rect.attr(highlightStyle);
   }
 
   show(restruct: ReStruct, bid: number, options: any): void {
@@ -326,6 +352,13 @@ class ReBond extends ReObject {
         sgroups,
         functionalGroups,
       )
+    ) {
+      return;
+    }
+
+    if (
+      bond.type === Bond.PATTERN.TYPE.HYDROGEN &&
+      Bond.isBondToExpandedMonomer(struct, bond)
     ) {
       return;
     }
@@ -448,25 +481,11 @@ class ReBond extends ReObject {
     if (isHighlighted) {
       const style = {
         fill: highlightColor,
-        stroke: highlightColor,
-        'stroke-width': options.lineattr['stroke-width'] * 7,
-        'stroke-linecap': 'round',
+        stroke: 'none',
       };
 
-      const c = Scale.modelToCanvas(this.b.center, restruct.render.options);
-
-      const highlightPath = getHighlightPath(restruct, hb1, hb2);
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore: raphael typing issues
-      highlightPath.attr(style);
-
-      restruct.addReObjectPath(
-        LayerMap.hovering,
-        this.visel,
-        highlightPath,
-        c,
-        true,
-      );
+      const ret = this.makeHighlitePlate(restruct, style);
+      render.ctab.addReObjectPath(LayerMap.hovering, this.visel, ret);
     }
 
     if (bond.cip && options.stereoLabelStyle !== StereLabelStyleType.Off) {
@@ -478,19 +497,6 @@ class ReBond extends ReObject {
       });
     }
   }
-}
-
-function getHighlightPath(restruct: ReStruct, hb1: HalfBond, hb2: HalfBond) {
-  const beginning = { x: hb1.p.x, y: hb1.p.y };
-  const end = { x: hb2.p.x, y: hb2.p.y };
-
-  const paper = restruct.render.paper;
-
-  const pathString = `M${beginning.x},${beginning.y} L${end.x},${end.y}`;
-
-  const path = paper.path(pathString);
-
-  return path;
 }
 
 function findIncomingStereoUpBond(
@@ -914,8 +920,6 @@ function getBondDoubleStereoBoldPath(
   );
   return draw.bondDoubleStereoBold(
     render.paper,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore: raphael typing issues
     sgBondPath,
     b1,
     b2,
@@ -925,7 +929,7 @@ function getBondDoubleStereoBoldPath(
   );
 }
 
-function getBondLineShift(cos: number, sin: number): number {
+export function getBondLineShift(cos: number, sin: number): number {
   if (sin < 0 || Math.abs(cos) > 0.9) return 0;
   return sin / (1 - cos);
 }
@@ -955,6 +959,15 @@ function stereoUpBondGetCoordinates(
   return sin > 0 ? [a1, a2] : [a2, a1];
 }
 
+function calculateLines(length: number, lineWidth: number, interval: number) {
+  const usableLength = length - lineWidth;
+  const linesCount = Math.max(
+    Math.floor(usableLength / (lineWidth + interval)),
+    0,
+  );
+  return linesCount + 2;
+}
+
 function getBondSingleDownPath(
   render: Render,
   hb1: HalfBond,
@@ -963,24 +976,36 @@ function getBondSingleDownPath(
   struct: Struct,
   isSnapping: boolean,
 ) {
+  const MIN_LINES = 4;
+  const DEFAULT_HASH_SPACING_IN_PX = 1.2;
   const a = hb1.p;
   const b = hb2.p;
   const options = render.options;
   let d = b.sub(a);
   const len = d.length() + 0.2;
   d = d.normalized();
-  const interval = 1.2 * options.lineWidth;
-  const nlines =
-    Math.max(
-      Math.floor((len - options.lineWidth) / (options.lineWidth + interval)),
-      0,
-    ) + 2;
-  const step = len / (nlines - 1);
+  let hashSpacingInPx = options.hashSpacingInPx ?? DEFAULT_HASH_SPACING_IN_PX;
+  const interval = hashSpacingInPx * options.lineWidth;
+  const gaps = MIN_LINES - 1;
+  const isHashSpacingTooLarge = interval >= len / gaps;
+
+  const nlines = calculateLines(len, options.lineWidth, interval);
+
+  if (isHashSpacingTooLarge && nlines < MIN_LINES) {
+    const averageSpacing = (len - options.lineWidth) / gaps;
+    hashSpacingInPx = averageSpacing / options.lineWidth;
+  }
+
+  const intervalAdjusted = hashSpacingInPx * options.lineWidth;
+
+  const finalLines = calculateLines(len, options.lineWidth, intervalAdjusted);
+
+  const step = len / (finalLines - 1);
   return draw.bondSingleDown(
     render.paper,
     hb1,
     d,
-    nlines,
+    finalLines,
     step,
     options,
     isSnapping,
@@ -1323,8 +1348,6 @@ function getBondMark(
   const p = c.add(new Vec2(n.x * (s.x + fixed), n.y * (s.y + fixed)));
   const path = draw.bondMark(render.paper, p, mark, options);
   tooltip &&
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore: raphael typing issues
     path.node.childNodes[0].setAttribute(
       'data-tooltip',
       util.escapeHtml(tooltip),

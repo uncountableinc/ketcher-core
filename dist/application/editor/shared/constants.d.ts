@@ -20,12 +20,14 @@ export declare const SgContexts: {
     Atom: string;
     Group: string;
 };
-export declare const selectionKeys: readonly ["atoms", "bonds", "frags", "sgroups", "rgroups", "rgroupAttachmentPoints", "rxnArrows", "rxnPluses", "simpleObjects", "texts", "images"];
+export declare const selectionKeys: readonly ["atoms", "bonds", "frags", "sgroups", "rgroups", "rgroupAttachmentPoints", "rxnArrows", "rxnPluses", "simpleObjects", "texts", "images", "multitailArrows"];
 export declare const defaultBondThickness = 2;
 export declare enum MonomerGroups {
     SUGARS = "Sugars",
     BASES = "Bases",
-    PHOSPHATES = "Phosphates"
+    PHOSPHATES = "Phosphates",
+    PEPTIDES = "Amino acids",
+    NUCLEOTIDES = "Nucleotides"
 }
 export declare enum MonomerGroupCodes {
     R = "R",

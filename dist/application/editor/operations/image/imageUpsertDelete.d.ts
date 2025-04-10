@@ -16,17 +16,24 @@
 import { BaseOperation } from "../base";
 import { Image } from "../../../../domain/entities/image";
 import { ReStruct } from "../../../render";
+interface ImageUpsertData {
+    id?: number;
+}
+interface ImageDeleteData {
+    id: number;
+}
 export declare class ImageUpsert extends BaseOperation {
     private readonly image;
-    private id?;
-    constructor(image: Image, id?: number | undefined);
+    data: ImageUpsertData;
+    constructor(image: Image, id?: number);
     execute(reStruct: ReStruct): void;
     invert(): BaseOperation;
 }
 export declare class ImageDelete extends BaseOperation {
-    private id;
     private image?;
+    data: ImageDeleteData;
     constructor(id: number);
     execute(reStruct: ReStruct): void;
     invert(): BaseOperation;
 }
+export {};

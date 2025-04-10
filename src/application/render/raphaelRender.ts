@@ -52,11 +52,7 @@ export class Render {
     this.clientArea = clientArea;
     this.paper = new Raphael(
       clientArea,
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore: raphael typing issues
       options.width || '100%',
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore: raphael typing issues
       options.height || '100%',
     );
     this.sz = this.getCanvasSizeVector();
@@ -80,10 +76,7 @@ export class Render {
 
   observeCanvasResize = () => {
     this.resizeObserver = new ResizeObserver(() => {
-      this.sz = new Vec2(
-        this.clientArea.clientWidth,
-        this.clientArea.clientHeight,
-      );
+      this.sz = this.getCanvasSizeVector();
       this.resizeViewBox();
     });
 
@@ -142,7 +135,9 @@ export class Render {
   }
 
   private getCanvasSizeVector() {
-    return new Vec2(this.clientArea.clientWidth, this.clientArea.clientHeight);
+    return this.userOpts.width
+      ? new Vec2(this.userOpts.width, this.userOpts.height)
+      : new Vec2(this.clientArea.clientWidth, this.clientArea.clientHeight);
   }
 
   resizeViewBox() {
@@ -215,8 +210,8 @@ export class Render {
     viewSz =
       viewSz ||
       new Vec2(
-        this.clientArea.clientWidth || 100,
-        this.clientArea.clientHeight || 100,
+        this.userOpts.width || this.clientArea.clientWidth || 100,
+        this.userOpts.height || this.clientArea.clientHeight || 100,
       );
 
     const changes = this.ctab.update(force);

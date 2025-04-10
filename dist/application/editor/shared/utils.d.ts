@@ -13,7 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-import { Struct, Vec2 } from "../../../domain/entities";
+import { Struct } from "../../../domain/entities/struct";
+import { Vec2 } from "../../../domain/entities/vec2";
 import { BondAtoms } from "./utils.types";
 declare function setFracAngle(angle: number): void;
 declare function calcAngle(pos0: Vec2, pos1: Vec2): number;

@@ -25,6 +25,7 @@ import {
   initiallySelectedType,
 } from 'domain/entities/BaseMicromoleculeEntity';
 import { isNumber } from 'lodash';
+import { MonomerMicromolecule } from 'domain/entities/monomerMicromolecule';
 
 /**
  * Return unions of Pick.
@@ -787,7 +788,11 @@ export class Atom extends BaseMicromoleculeEntity {
       attachmentPointAtomBonds.filter((_, bond) => {
         const beginAtom = struct.atoms.get(bond.begin);
         const endAtom = struct.atoms.get(bond.end);
+        const isExternalBondBetweenMonomers =
+          bond.isExternalBondBetweenMonomers(struct);
+
         return (
+          isExternalBondBetweenMonomers ||
           beginAtom?.fragment !== atom?.fragment ||
           endAtom?.fragment !== atom?.fragment
         );
@@ -803,9 +808,10 @@ export class Atom extends BaseMicromoleculeEntity {
       struct,
       atomId,
     );
-    const sgroup = struct.getGroupFromAtomId(atomId);
+    const sGroup = struct.getGroupFromAtomId(atomId);
+    const isMonomer = sGroup instanceof MonomerMicromolecule;
 
-    if (!sgroup || !sgroup?.isSuperatomWithoutLabel) {
+    if (!sGroup || (!isMonomer && !sGroup?.isSuperatomWithoutLabel)) {
       return false;
     }
 

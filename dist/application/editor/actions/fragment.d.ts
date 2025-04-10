@@ -15,7 +15,7 @@
  ***************************************************************************/
 import { Vec2 } from "../../../domain/entities";
 import { Action } from './action';
-export declare function fromMultipleMove(restruct: any, lists: any, d: Vec2): Action;
+export declare function fromMultipleMove(restruct: any, lists: any, d: Vec2, shouldPerform?: boolean): Action;
 export declare function fromStereoFlagUpdate(restruct: any, frid: any, flag?: null): Action;
 /**
  * @param restruct { ReStruct }

@@ -14,12 +14,23 @@
  * limitations under the License.
  ***************************************************************************/
 import { AromatizeData, AromatizeResult, AutomapData, AutomapResult, CalculateCipData, CalculateCipResult, CalculateData, CalculateResult, CheckData, CheckResult, CleanData, CleanResult, ConvertData, ConvertResult, DearomatizeData, DearomatizeResult, ExplicitHydrogensData, ExplicitHydrogensResult, GenerateImageOptions, InfoResult, LayoutData, LayoutResult, RecognizeResult, StructService, StructServiceOptions } from "../../../domain/services";
+export declare function pickStandardServerOptions(options?: StructServiceOptions): {
+    'dearomatize-on-load': string | number | boolean | undefined;
+    'smart-layout': string | number | boolean | undefined;
+    'ignore-stereochemistry-errors': string | number | boolean | undefined;
+    'mass-skip-error-on-pseudoatoms': string | number | boolean | undefined;
+    'gross-formula-add-rsites': string | number | boolean | undefined;
+    'gross-formula-add-isotopes': string | number | boolean | undefined;
+    'ignore-no-chiral-flag': any;
+    'aromatize-skip-superatoms': boolean;
+};
 export declare class RemoteStructService implements StructService {
     private readonly apiPath;
     private readonly defaultOptions;
     private readonly customHeaders?;
     constructor(apiPath: string, defaultOptions: StructServiceOptions, customHeaders?: Record<string, string>);
     getInChIKey(struct: string): Promise<string>;
+    private getStandardServerOptions;
     info(): Promise<InfoResult>;
     convert(data: ConvertData, options?: StructServiceOptions): Promise<ConvertResult>;
     layout(data: LayoutData, options?: StructServiceOptions): Promise<LayoutResult>;

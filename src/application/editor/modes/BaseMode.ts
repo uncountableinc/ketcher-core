@@ -25,6 +25,10 @@ import { ChemicalMimeType } from 'domain/services';
 import { PolymerBond } from 'domain/entities/PolymerBond';
 import { ketcherProvider } from 'application/utils';
 import { DrawingEntitiesManager } from 'domain/entities/DrawingEntitiesManager';
+import { HydrogenBond } from 'domain/entities/HydrogenBond';
+import { AttachmentPointName } from 'domain/types';
+import { MACROMOLECULES_BOND_TYPES } from 'application/editor/tools/Bond';
+import { Atom } from 'domain/entities/CoreAtom';
 
 export abstract class BaseMode {
   private _pasteIsInProgress = false;
@@ -39,10 +43,14 @@ export abstract class BaseMode {
     const ModeConstructor = modesMap[modeName];
     editor.mode.destroy();
     editor.setMode(new ModeConstructor());
-    editor.mode.initialize(true, isUndo);
+    editor.mode.initialize(true, isUndo, false);
   }
 
-  public initialize(needRemoveSelection = true, _isUndo = false) {
+  public initialize(
+    needRemoveSelection = true,
+    _isUndo = false,
+    _needReArrangeChains = false,
+  ) {
     const command = new Command();
     const editor = CoreEditor.provideEditorInstance();
 
@@ -97,8 +105,8 @@ export abstract class BaseMode {
 
   abstract scrollForView(): void;
 
-  onCopy(event: ClipboardEvent) {
-    if (this.checkIfTargetIsInput(event)) {
+  onCopy(event?: ClipboardEvent) {
+    if (event && this.checkIfTargetIsInput(event)) {
       return;
     }
     const editor = CoreEditor.provideEditorInstance();
@@ -109,6 +117,12 @@ export abstract class BaseMode {
           entity.monomerItem,
           entity.position,
           entity,
+        );
+      } else if (entity instanceof Atom) {
+        drawingEntitiesManager.addMonomerChangeModel(
+          entity.monomer.monomerItem,
+          entity.monomer.position,
+          entity.monomer,
         );
       } else if (entity instanceof PolymerBond && entity.secondMonomer) {
         const firstAttachmentPoint =
@@ -126,9 +140,19 @@ export abstract class BaseMode {
             entity.secondMonomer,
             firstAttachmentPoint,
             secondAttachmentPoint,
+            undefined,
             entity,
           );
         }
+      } else if (entity instanceof HydrogenBond && entity.secondMonomer) {
+        drawingEntitiesManager.finishPolymerBondCreationModelChange(
+          entity.firstMonomer,
+          entity.secondMonomer,
+          AttachmentPointName.HYDROGEN,
+          AttachmentPointName.HYDROGEN,
+          MACROMOLECULES_BOND_TYPES.HYDROGEN,
+          entity,
+        );
       }
     });
     const ketSerializer = new KetSerializer();
@@ -138,7 +162,7 @@ export abstract class BaseMode {
     );
     if (isClipboardAPIAvailable()) {
       navigator.clipboard.writeText(serializedKet);
-    } else {
+    } else if (event) {
       legacyCopy(event.clipboardData, {
         'text/plain': serializedKet,
       });
@@ -147,23 +171,40 @@ export abstract class BaseMode {
   }
 
   async onPaste(event: ClipboardEvent) {
-    if (!this.checkIfTargetIsInput(event)) {
-      if (isClipboardAPIAvailable()) {
-        const isSequenceEditInRNABuilderMode =
-          CoreEditor.provideEditorInstance().isSequenceEditInRNABuilderMode;
+    if (this.checkIfTargetIsInput(event)) {
+      return;
+    }
+    const editor = CoreEditor.provideEditorInstance();
+    const isCanvasEmptyBeforePaste =
+      !editor.drawingEntitiesManager.hasDrawingEntities;
 
-        if (isSequenceEditInRNABuilderMode || this._pasteIsInProgress) return;
-        this._pasteIsInProgress = true;
+    if (isClipboardAPIAvailable()) {
+      const isSequenceEditInRNABuilderMode =
+        CoreEditor.provideEditorInstance().isSequenceEditInRNABuilderMode;
 
-        const clipboardData = await navigator.clipboard.read();
-        this.pasteFromClipboard(clipboardData).finally(() => {
-          this._pasteIsInProgress = false;
-        });
-      } else {
-        const clipboardData = legacyPaste(event.clipboardData, ['text/plain']);
-        this.pasteFromClipboard(clipboardData);
-        event.preventDefault();
+      if (isSequenceEditInRNABuilderMode || this._pasteIsInProgress) return;
+      this._pasteIsInProgress = true;
+
+      const clipboardData = await navigator.clipboard.read();
+      this.pasteFromClipboard(clipboardData).finally(() => {
+        this._pasteIsInProgress = false;
+
+        if (!isCanvasEmptyBeforePaste) {
+          return;
+        }
+
+        editor.zoomToStructuresIfNeeded();
+      });
+    } else {
+      const clipboardData = legacyPaste(event.clipboardData, ['text/plain']);
+      this.pasteFromClipboard(clipboardData);
+      event.preventDefault();
+
+      if (!isCanvasEmptyBeforePaste) {
+        return;
       }
+
+      editor.zoomToStructuresIfNeeded();
     }
   }
 
@@ -239,7 +280,7 @@ export abstract class BaseMode {
       return;
     }
 
-    this.updateMonomersPosition(drawingEntitiesManager);
+    this.updateEntitiesPosition(drawingEntitiesManager);
     const { command: modelChanges, mergedDrawingEntities } =
       drawingEntitiesManager.mergeInto(editor.drawingEntitiesManager);
 
@@ -277,24 +318,19 @@ export abstract class BaseMode {
     }
   }
 
-  private updateMonomersPosition(
+  private updateEntitiesPosition(
     drawingEntitiesManager: DrawingEntitiesManager,
   ) {
-    let offset: Vec2;
-    let index = 0;
     const newNodePosition = this.getNewNodePosition();
-    drawingEntitiesManager.monomers.forEach((monomer) => {
-      let position;
-      if (index === 0) {
-        offset = Vec2.diff(newNodePosition, new Vec2(monomer.position));
-        position = newNodePosition;
-      } else {
-        position = offset
-          ? new Vec2(monomer.position).add(offset)
-          : new Vec2(monomer.position);
-      }
-      drawingEntitiesManager.moveMonomer(monomer, position);
-      index++;
+    const firstEntityPosition =
+      drawingEntitiesManager.allEntities[0]?.[1].position;
+    const offset = Vec2.diff(newNodePosition, new Vec2(firstEntityPosition));
+
+    drawingEntitiesManager.allEntities.forEach(([, drawindEntity]) => {
+      drawingEntitiesManager.moveDrawingEntityModelChange(
+        drawindEntity,
+        offset,
+      );
     });
   }
 

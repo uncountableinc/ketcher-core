@@ -42,7 +42,8 @@ import Visel from './visel';
 import util from '../util';
 import { ReRGroupAttachmentPoint } from './rergroupAttachmentPoint';
 import { ReImage } from 'application/render/restruct/reImage';
-import { IMAGE_KEY } from 'domain/constants';
+import { IMAGE_KEY, MULTITAIL_ARROW_KEY } from 'domain/constants';
+import { ReMultitailArrow } from './remultitailArrow';
 
 class ReStruct {
   public static readonly maps = {
@@ -60,6 +61,7 @@ class ReStruct {
     simpleObjects: ReSimpleObject,
     texts: ReText,
     [IMAGE_KEY]: ReImage,
+    [MULTITAIL_ARROW_KEY]: ReMultitailArrow,
   } as const;
 
   public render: Render;
@@ -77,10 +79,12 @@ class ReStruct {
   public sgroupData: Map<number, ReDataSGroupData> = new Map();
   public enhancedFlags: Map<number, ReEnhancedFlag> = new Map();
   public simpleObjects: Map<number, ReSimpleObject> = new Map();
-  public images: Map<number, ReImage> = new Map();
   public texts: Map<number, ReText> = new Map();
+  public images = new Map<number, ReImage>();
+  public multitailArrows = new Map<number, ReMultitailArrow>();
+
   private initialized = false;
-  private layers: Array<any> = [];
+  private layers: Record<LayerMap, any> = {} as Record<LayerMap, unknown>;
   public connectedComponents: Pool = new Pool();
   private ccFragmentType: Pool = new Pool();
   private structChanged = false;
@@ -93,7 +97,8 @@ class ReStruct {
   private enhancedFlagsChanged: Map<number, ReEnhancedFlag> = new Map();
   private bondsChanged: Map<number, ReEnhancedFlag> = new Map();
   private textsChanged: Map<number, ReText> = new Map();
-  private imagesChanged: Map<number, ReImage> = new Map();
+  private imagesChanged = new Map<number, ReImage>();
+  private multitailArrowsChanged = new Map<number, ReMultitailArrow>();
   private snappingBonds: number[] = [];
 
   constructor(
@@ -163,6 +168,9 @@ class ReStruct {
     });
     molecule.images.forEach((item, id) => {
       this.images.set(id, new ReImage(item));
+    });
+    molecule.multitailArrows.forEach((item, id) => {
+      this.multitailArrows.set(id, new ReMultitailArrow(item));
     });
   }
 
@@ -272,8 +280,6 @@ class ReStruct {
 
   initLayers(): void {
     for (const group in LayerMap) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore: raphael typing issues
       this.layers[LayerMap[group]] = this.render.paper
         .rect(0, 0, 10, 10)
         .attr({
@@ -327,6 +333,10 @@ class ReStruct {
 
   markAtom(aid: number, mark: number): void {
     this.markItem('atoms', aid, mark);
+  }
+
+  markRgroupAttachmentPoint(rgAPid: number, mark: number): void {
+    this.markItem('rgroupAttachmentPoints', rgAPid, mark);
   }
 
   markItem(map: string, id: number, mark: number): void {
@@ -526,6 +536,7 @@ class ReStruct {
     this.showSimpleObjects();
     this.showTexts();
     this.showImages();
+    this.showMultitailArrows();
     this.clearMarks();
 
     return true;
@@ -690,7 +701,7 @@ class ReStruct {
         return;
       }
 
-      rgroupAttachmentPoint?.show(this);
+      rgroupAttachmentPoint?.show(this, id);
     });
   }
 
@@ -734,6 +745,15 @@ class ReStruct {
     });
   }
 
+  showMultitailArrows() {
+    this.multitailArrowsChanged.forEach((_, id) => {
+      const multitailArrow = this.multitailArrows.get(id);
+      if (multitailArrow) {
+        multitailArrow.show(this, this.render.options);
+      }
+    });
+  }
+
   setSelection(selection?) {
     const atoms: { selected: boolean; sgroup: number }[] = [];
 
@@ -761,7 +781,9 @@ class ReStruct {
             const sGroupAtoms = atoms.filter(
               (atom) => atom.sgroup === item?.item?.id,
             );
-            item.selected = sGroupAtoms.length > 0 && sGroupAtoms[0].selected;
+            item.selected =
+              sGroupAtoms.length > 0 &&
+              sGroupAtoms.some((atom) => atom.selected);
           }
 
           let selected = selection?.[map]
@@ -773,7 +795,6 @@ class ReStruct {
           }
 
           this.showItemSelection(item, selected);
-          item.selectionPlate?.toBack();
         });
       }
     });

@@ -2,6 +2,8 @@ import { Subscription } from 'subscription';
 import { ToolEventHandlerName } from 'application/editor/tools/Tool';
 import { CoreEditor } from 'application/editor/Editor';
 import ZoomTool from 'application/editor/tools/Zoom';
+import { SequenceType } from 'domain/entities/monomer-chains/types';
+import { ToolName } from 'application/editor/tools/types';
 
 export let editorEvents;
 
@@ -20,6 +22,7 @@ export function resetEditorEvents() {
     openMonomerConnectionModal: new Subscription(),
     mouseOverPolymerBond: new Subscription(),
     mouseLeavePolymerBond: new Subscription(),
+    mouseOnMovePolymerBond: new Subscription(),
     mouseOverMonomer: new Subscription(),
     mouseOnMoveMonomer: new Subscription(),
     mouseLeaveMonomer: new Subscription(),
@@ -33,6 +36,7 @@ export function resetEditorEvents() {
     rightClickSequence: new Subscription(),
     rightClickCanvas: new Subscription(),
     rightClickPolymerBond: new Subscription(),
+    rightClickSelectedMonomers: new Subscription(),
     editSequence: new Subscription(),
     startNewSequence: new Subscription(),
     turnOnSequenceEditInRNABuilderMode: new Subscription(),
@@ -49,12 +53,18 @@ export function resetEditorEvents() {
     mouseDownOnSequenceItem: new Subscription(),
     doubleClickOnSequenceItem: new Subscription(),
     openConfirmationDialog: new Subscription(),
+    mouseUpAtom: new Subscription(),
+    updateMonomersLibrary: new Subscription(),
+    createAntisenseChain: new Subscription(),
+    copySelectedStructure: new Subscription(),
+    deleteSelectedStructure: new Subscription(),
   };
 }
 resetEditorEvents();
 export const renderersEvents: ToolEventHandlerName[] = [
   'mouseOverPolymerBond',
   'mouseLeavePolymerBond',
+  'mouseOnMovePolymerBond',
   'mouseOverMonomer',
   'mouseOnMoveMonomer',
   'mouseOverAttachmentPoint',
@@ -68,6 +78,7 @@ export const renderersEvents: ToolEventHandlerName[] = [
   'rightClickSequence',
   'rightClickCanvas',
   'rightClickPolymerBond',
+  'rightClickSelectedMonomers',
   'editSequence',
   'startNewSequence',
   'turnOnSequenceEditInRNABuilderMode',
@@ -83,13 +94,32 @@ export const renderersEvents: ToolEventHandlerName[] = [
   'mousedownBetweenSequenceItems',
   'mouseDownOnSequenceItem',
   'doubleClickOnSequenceItem',
+  'mouseUpAtom',
 ];
 
 export const hotkeysConfiguration = {
+  RNASequenceType: {
+    shortcut: ['Control+Alt+r'],
+    handler: (editor: CoreEditor) => {
+      editor.events.changeSequenceTypeEnterMode.dispatch(SequenceType.RNA);
+    },
+  },
+  DNASequenceType: {
+    shortcut: ['Control+Alt+d'],
+    handler: (editor: CoreEditor) => {
+      editor.events.changeSequenceTypeEnterMode.dispatch(SequenceType.DNA);
+    },
+  },
+  PEPTIDESequenceTYpe: {
+    shortcut: ['Control+Alt+p'],
+    handler: (editor: CoreEditor) => {
+      editor.events.changeSequenceTypeEnterMode.dispatch(SequenceType.PEPTIDE);
+    },
+  },
   exit: {
     shortcut: ['Shift+Tab', 'Escape'],
     handler: (editor: CoreEditor) => {
-      editor.events.selectTool.dispatch('select-rectangle');
+      editor.events.selectTool.dispatch(ToolName.selectRectangle);
     },
   },
   undo: {
@@ -109,15 +139,15 @@ export const hotkeysConfiguration = {
     handler: (editor: CoreEditor) => {
       // TODO create an ability to stop event propagation from mode event handlers to keyboard shortcuts handlers
       if (editor.isSequenceEditMode) return;
-      editor.events.selectTool.dispatch('erase');
-      editor.events.selectTool.dispatch('select-rectangle');
+      editor.events.selectTool.dispatch(ToolName.erase);
+      editor.events.selectTool.dispatch(ToolName.selectRectangle);
     },
   },
   clear: {
     shortcut: ['Mod+Delete', 'Mod+Backspace'],
     handler: (editor: CoreEditor) => {
-      editor.events.selectTool.dispatch('clear');
-      editor.events.selectTool.dispatch('select-rectangle');
+      editor.events.selectTool.dispatch(ToolName.clear);
+      editor.events.selectTool.dispatch(ToolName.selectRectangle);
     },
   },
   'zoom-plus': {
@@ -144,6 +174,12 @@ export const hotkeysConfiguration = {
       const modelChanges =
         editor.drawingEntitiesManager.selectAllDrawingEntities();
       editor.renderersContainer.update(modelChanges);
+    },
+  },
+  hand: {
+    shortcut: 'Mod+Alt+h',
+    handler: (editor: CoreEditor) => {
+      editor.events.selectTool.dispatch(ToolName.hand);
     },
   },
 };

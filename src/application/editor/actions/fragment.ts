@@ -29,6 +29,7 @@ import {
   SimpleObjectMove,
   TextMove,
   ImageMove,
+  MultitailArrowMove,
 } from '../operations';
 import { Pile, RGroup, Vec2 } from 'domain/entities';
 import { fromRGroupFragment, fromUpdateIfThen } from './rgroup';
@@ -36,9 +37,14 @@ import { fromRGroupFragment, fromUpdateIfThen } from './rgroup';
 import { Action } from './action';
 import { fromAtomsFragmentAttr } from './atom';
 import { getRelSGroupsBySelection } from './utils';
-import { IMAGE_KEY } from 'domain/constants';
+import { IMAGE_KEY, MULTITAIL_ARROW_KEY } from 'domain/constants';
 
-export function fromMultipleMove(restruct, lists, d: Vec2) {
+export function fromMultipleMove(
+  restruct,
+  lists,
+  d: Vec2,
+  shouldPerform = true,
+) {
   d = new Vec2(d);
 
   const action = new Action();
@@ -135,7 +141,13 @@ export function fromMultipleMove(restruct, lists, d: Vec2) {
     });
   }
 
-  return action.perform(restruct);
+  if (lists[MULTITAIL_ARROW_KEY]) {
+    lists[MULTITAIL_ARROW_KEY].forEach((multitailArrow) => {
+      action.addOp(new MultitailArrowMove(multitailArrow, d));
+    });
+  }
+
+  return shouldPerform ? action.perform(restruct) : action;
 }
 
 export function fromStereoFlagUpdate(restruct, frid, flag = null) {
@@ -144,11 +156,13 @@ export function fromStereoFlagUpdate(restruct, frid, flag = null) {
   if (!flag) {
     const struct = restruct.molecule;
     const frag = restruct.molecule.frags.get(frid);
-    frag?.stereoAtoms.forEach((aid) => {
-      if (struct.atoms.get(aid).stereoLabel === null) {
-        action.addOp(new FragmentDeleteStereoAtom(frid, aid));
-      }
-    });
+    if (frag) {
+      frag.stereoAtoms.forEach((aid) => {
+        if (struct.atoms.get(aid).stereoLabel === null) {
+          action.addOp(new FragmentDeleteStereoAtom(frid, aid));
+        }
+      });
+    }
   }
 
   action.addOp(new FragmentStereoFlag(frid));

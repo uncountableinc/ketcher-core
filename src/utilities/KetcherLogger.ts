@@ -17,7 +17,7 @@ export class KetcherLogger {
       return {};
     }
 
-    return window?.ketcher?.logging ?? {};
+    return window.ketcher?.logging ?? {};
   }
 
   static set settings(newSettings: LogSettings) {

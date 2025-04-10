@@ -39,10 +39,14 @@ import { Scale } from 'domain/helpers';
 import draw from '../draw';
 import util from '../util';
 import { tfx } from 'utilities';
-import { RenderOptions } from 'application/render/render.types';
+import {
+  RenderOptions,
+  RenderOptionStyles,
+} from 'application/render/render.types';
 import { MonomerMicromolecule } from 'domain/entities/monomerMicromolecule';
 import { attachmentPointNames } from 'domain/types';
 import { getAttachmentPointLabel } from 'domain/helpers/attachmentPointCalculations';
+import { VALENCE_MAP } from 'application/render/restruct/constants';
 
 interface ElemAttr {
   text: string;
@@ -111,16 +115,17 @@ class ReAtom extends ReObject {
     return ret;
   }
 
-  getLabeledSelectionContour(render: Render) {
+  getLabeledSelectionContour(render: Render, isHighlight: boolean) {
     const { paper, ctab: restruct, options } = render;
-    const { fontsz, radiusScaleFactor } = options;
-    const padding = fontsz * radiusScaleFactor;
-    const radius = fontsz * radiusScaleFactor * 2;
+    const { fontszInPx, radiusScaleFactor } = options;
+    const highlightPadding = isHighlight ? -2 : 0;
+    const padding = fontszInPx * radiusScaleFactor + highlightPadding;
+    const radius = fontszInPx * radiusScaleFactor * 2 + highlightPadding;
     const box = this.getVBoxObj(restruct.render)!;
     const ps1 = Scale.modelToCanvas(box.p0, restruct.render.options);
     const ps2 = Scale.modelToCanvas(box.p1, restruct.render.options);
     const width = ps2.x - ps1.x;
-    const height = fontsz * 1.23;
+    const height = fontszInPx * 1.23;
     return paper.rect(
       ps1.x - padding,
       ps1.y - padding,
@@ -130,67 +135,104 @@ class ReAtom extends ReObject {
     );
   }
 
-  getUnlabeledSelectionContour(render: Render) {
+  getUnlabeledSelectionContour(render: Render, isHighlight: boolean) {
     const { paper, options } = render;
     const { atomSelectionPlateRadius } = options;
+    const highlightPadding = isHighlight ? -2 : 0;
     const ps = Scale.modelToCanvas(this.a.pp, options);
-    return paper.circle(ps.x, ps.y, atomSelectionPlateRadius);
+    return paper.circle(
+      ps.x,
+      ps.y,
+      atomSelectionPlateRadius + highlightPadding,
+    );
   }
 
-  getSelectionContour(render: Render) {
+  getSelectionContour(render: Render, isHighlight: boolean) {
     const hasLabel =
       (this.a.pseudo && this.a.pseudo.length > 1 && !getQueryAttrsText(this)) ||
       (this.showLabel && this.a.implicitH !== 0);
     return hasLabel
-      ? this.getLabeledSelectionContour(render)
-      : this.getUnlabeledSelectionContour(render);
+      ? this.getLabeledSelectionContour(render, isHighlight)
+      : this.getUnlabeledSelectionContour(render, isHighlight);
   }
 
-  makeHoverPlate(render: Render) {
-    const atom = this.a;
-    const { options } = render;
+  private isPlateShouldBeHidden = (atom: Atom, render: Render) => {
     const sgroups = render.ctab.sgroups;
     const functionalGroups = render.ctab.molecule.functionalGroups;
     const struct = render.ctab.molecule;
     const atomId = struct.atoms.keyOf(atom) as number;
 
-    if (
+    return (
       FunctionalGroup.isAtomInContractedFunctionalGroup(
         atom,
         sgroups,
         functionalGroups,
         true,
-      ) ||
-      Atom.isHiddenLeavingGroupAtom(struct, atomId)
-    ) {
+      ) || Atom.isHiddenLeavingGroupAtom(struct, atomId)
+    );
+  };
+
+  private makeHighlightePlate = (
+    restruct: ReStruct,
+    style: RenderOptionStyles,
+  ) => {
+    const atom = this.a;
+    const { render } = restruct;
+    if (this.isPlateShouldBeHidden(atom, render)) {
       return null;
     }
 
-    return this.getSelectionContour(render).attr(options.hoverStyle);
+    return this.getSelectionContour(render, true).attr(style);
+  };
+
+  makeHoverPlate(render: Render) {
+    const atom = this.a;
+    const { options } = render;
+    if (this.isPlateShouldBeHidden(atom, render)) {
+      return null;
+    }
+
+    return this.getSelectionContour(render, false).attr(options.hoverStyle);
   }
 
   makeSelectionPlate(restruct: ReStruct) {
     const atom = this.a;
     const { render } = restruct;
     const { options } = render;
-    const sgroups = render.ctab.sgroups;
-    const functionalGroups = render.ctab.molecule.functionalGroups;
-    const struct = render.ctab.molecule;
-    const atomId = struct.atoms.keyOf(atom) as number;
 
-    if (
-      FunctionalGroup.isAtomInContractedFunctionalGroup(
-        atom,
-        sgroups,
-        functionalGroups,
-        true,
-      ) ||
-      Atom.isHiddenLeavingGroupAtom(struct, atomId)
-    ) {
+    if (this.isPlateShouldBeHidden(atom, render)) {
       return null;
     }
+    return this.getSelectionContour(render, false).attr(options.selectionStyle);
+  }
 
-    return this.getSelectionContour(render).attr(options.selectionStyle);
+  private isNeedShiftForCharge(showCharge: boolean, bondLength: number) {
+    const MIN_BOND_LENGTH = 24;
+    const isBondLengthTooShort = bondLength <= MIN_BOND_LENGTH;
+    const hasCharge = this.a.charge !== null && this.a.charge !== 0;
+    return showCharge && isBondLengthTooShort && hasCharge;
+  }
+
+  private getRatio(
+    renderOptions: RenderOptions,
+    bondLen: number | null,
+  ): number {
+    const DEFAULT_BOND_LENGTH = 40;
+    const DEFAULT_SUB_FONT_SIZE = 13;
+    const subFontSize = renderOptions.fontszsubInPx || DEFAULT_SUB_FONT_SIZE;
+    if (!bondLen) return 1;
+    const showCharge = renderOptions.showCharge;
+
+    const isNeedShift = this.isNeedShiftForCharge(showCharge, bondLen);
+
+    if (!isNeedShift) {
+      return 1;
+    }
+
+    const DEFAULT_PROPORTION = DEFAULT_BOND_LENGTH / DEFAULT_SUB_FONT_SIZE;
+    const currentProportion = bondLen / subFontSize;
+    const ratio = currentProportion / DEFAULT_PROPORTION;
+    return ratio;
   }
 
   /**
@@ -202,6 +244,7 @@ class ReAtom extends ReObject {
     renderOptions: RenderOptions,
     direction: Vec2,
     _atomPosition?: Vec2,
+    bondLen: number | null = null,
   ): Vec2 {
     const atomPosition = Scale.modelToCanvas(
       _atomPosition || this.a.pp,
@@ -209,14 +252,14 @@ class ReAtom extends ReObject {
     );
     let atomSymbolShift = 0;
     const exts = this.visel.exts;
+    const ratio = this.getRatio(renderOptions, bondLen);
     for (let k = 0; k < exts.length; ++k) {
       const box = exts[k].translate(atomPosition);
-
-      atomSymbolShift = Math.max(
-        atomSymbolShift,
-        util.shiftRayBox(atomPosition, direction, box),
-      );
+      const shiftRayBox = util.shiftRayBox(atomPosition, direction, box);
+      const shift = shiftRayBox * ratio;
+      atomSymbolShift = Math.max(atomSymbolShift, shift);
     }
+
     if (atomSymbolShift > 0) {
       return atomPosition.addScaled(
         direction,
@@ -262,12 +305,18 @@ class ReAtom extends ReObject {
             : this.a.pp,
           render.options,
         );
+        const fontFamily = options.font.substr(
+          options.font.indexOf(' ') + 1,
+          options.font.length,
+        );
         const path = render.paper
           .text(position.x, position.y, sgroup.data.name)
           .attr({
             'font-weight': '700',
-            'font-size': 14,
+            'font-size': options.fontszInPx,
+            'font-family': fontFamily,
           });
+
         restruct.addReObjectPath(
           LayerMap.data,
           this.visel,
@@ -322,7 +371,7 @@ class ReAtom extends ReObject {
       }
       index.path = render.paper.text(idPos.x, idPos.y, index.text).attr({
         font: options.font,
-        'font-size': options.fontszsub,
+        'font-size': options.fontszsubInPx,
         fill: '#070',
       });
       index.rbb = util.relBox(index.path.getBBox());
@@ -496,7 +545,7 @@ class ReAtom extends ReObject {
       const elem = Elements.get(this.a.label);
       const aamPath = render.paper.text(ps.x, ps.y, text).attr({
         font: options.font,
-        'font-size': options.fontszsub,
+        'font-size': options.fontszsubInPx,
         fill:
           options.atomColoring && elem ? ElementColor[this.a.label] : '#000',
       });
@@ -504,18 +553,13 @@ class ReAtom extends ReObject {
         // use dom element to change color of stereo label which is the first element
         // of just created text
         // text -> tspan
+        const node = aamPath.node.childNodes[0] as unknown as HTMLElement;
         const color = getStereoAtomColor(render.options, stereoLabel);
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore: raphael typing issues
-        aamPath.node.childNodes[0].setAttribute('fill', color);
+        node.setAttribute('fill', color);
         const opacity = getStereoAtomOpacity(render.options, stereoLabel);
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore: raphael typing issues
-        aamPath.node.childNodes[0].setAttribute('fill-opacity', opacity);
+        node.setAttribute('fill-opacity', opacity.toString());
       }
       const aamBox = util.relBox(aamPath.getBBox());
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore: raphael typing issues
       draw.recenterText(aamPath, aamBox);
       const visel = this.visel;
       let t = 3;
@@ -551,11 +595,7 @@ class ReAtom extends ReObject {
     if (isHighlighted) {
       const style = { fill: highlightColor, stroke: 'none' };
 
-      const ps = Scale.modelToCanvas(this.a.pp, restruct.render.options);
-      const path = render.paper
-        .circle(ps.x, ps.y, options.atomSelectionPlateRadius * 0.8)
-        .attr(style);
-
+      const path = this.makeHighlightePlate(restruct, style);
       restruct.addReObjectPath(LayerMap.hovering, this.visel, path);
     }
 
@@ -799,11 +839,10 @@ function buildLabel(
   const {
     atomColoring,
     font,
-    fontsz,
+    fontszInPx,
     currentlySelectedMonomerAttachmentPoint,
     connectedMonomerAttachmentPoints,
-    labelInMonomerConnectionsModal,
-    labelInPreview,
+    usageInMacromolecule,
   } = options;
   // eslint-disable-line max-statements
   const label: any = {
@@ -821,19 +860,21 @@ function buildLabel(
     }
   }
 
-  const shouldStyleLabel = labelInMonomerConnectionsModal || labelInPreview;
+  const shouldStyleLabel = usageInMacromolecule !== undefined;
   const isMonomerAttachmentPoint = attachmentPointNames.includes(label.text);
   const isMonomerAttachmentPointSelected =
     currentlySelectedMonomerAttachmentPoint === label.text;
   const isMonomerAttachmentPointUsed =
     connectedMonomerAttachmentPoints?.includes(label.text);
 
+  const { color, fill, stroke } = util.useLabelStyles(
+    isMonomerAttachmentPointSelected,
+    isMonomerAttachmentPointUsed,
+    usageInMacromolecule,
+  );
+
   if (isMonomerAttachmentPoint && shouldStyleLabel) {
-    atom.color = isMonomerAttachmentPointSelected
-      ? '#FFF'
-      : isMonomerAttachmentPointUsed
-      ? '#B4B9D6'
-      : '#585858';
+    atom.color = color;
   }
 
   if (label.text?.length > MAX_LABEL_LENGTH) {
@@ -845,19 +886,14 @@ function buildLabel(
 
   label.path = paper.text(ps.x, ps.y, label.text).attr({
     font,
-    'font-size': fontsz,
+    'font-size': fontszInPx,
     fill: atom.color,
     'font-style': atom.a.pseudo ? 'italic' : '',
     'fill-opacity': atom.a.isPreview ? previewOpacity : 1,
   });
 
   if (isMonomerAttachmentPoint && shouldStyleLabel) {
-    const fill = isMonomerAttachmentPointSelected
-      ? '#167782'
-      : isMonomerAttachmentPointUsed
-      ? '#E1E5EA'
-      : '#FFF';
-    const backgroundSize = fontsz * 2;
+    const backgroundSize = fontszInPx * 2;
 
     label.background = paper
       .rect(
@@ -868,13 +904,7 @@ function buildLabel(
         10,
       )
       .attr({ fill })
-      .attr({
-        stroke: labelInPreview
-          ? 'none'
-          : isMonomerAttachmentPointUsed
-          ? '#B4B9D6'
-          : '#7C7C7F',
-      });
+      .attr({ stroke });
   }
   if (tooltip) {
     addTooltip(label.path.node, tooltip);
@@ -950,7 +980,7 @@ function showHydroIndex(atom, render, implh, rightMargin): ElemAttr {
   hydroIndex.text = (implh + 1).toString();
   hydroIndex.path = render.paper.text(ps.x, ps.y, hydroIndex.text).attr({
     font: options.font,
-    'font-size': options.fontszsub,
+    'font-size': options.fontszsubInPx,
     fill: atom.color,
   });
   hydroIndex.rbb = util.relBox(hydroIndex.path.getBBox());
@@ -1018,7 +1048,7 @@ function showIsotope(
   isotope.text = atom.a.isotope === null ? '' : atom.a.isotope.toString();
   isotope.path = render.paper.text(ps.x, ps.y, isotope.text).attr({
     font: options.font,
-    'font-size': options.fontszsub,
+    'font-size': options.fontszsubInPx,
     fill: atom.color,
   });
   isotope.rbb = util.relBox(isotope.path.getBBox());
@@ -1055,7 +1085,7 @@ function showCharge(
 
   charge.path = render.paper.text(ps.x, ps.y, charge.text).attr({
     font: options.font,
-    'font-size': options.fontszsub,
+    'font-size': options.fontszsubInPx,
     fill: atom.color,
   });
   charge.rbb = util.relBox(charge.path.getBBox());
@@ -1076,35 +1106,18 @@ function showExplicitValence(
   render: Render,
   rightMargin: number,
 ): ElemAttr {
-  const mapValence = {
-    0: '0',
-    1: 'I',
-    2: 'II',
-    3: 'III',
-    4: 'IV',
-    5: 'V',
-    6: 'VI',
-    7: 'VII',
-    8: 'VIII',
-    9: 'IX',
-    10: 'X',
-    11: 'XI',
-    12: 'XII',
-    13: 'XIII',
-    14: 'XIV',
-  };
   const ps = Scale.modelToCanvas(atom.a.pp, render.options);
   const options = render.options;
   const delta = 0.5 * options.lineWidth;
   const valence: any = {};
-  valence.text = mapValence[atom.a.explicitValence];
+  valence.text = VALENCE_MAP[atom.a.explicitValence];
   if (!valence.text) {
     throw new Error('invalid valence ' + atom.a.explicitValence.toString());
   }
   valence.text = '(' + valence.text + ')';
   valence.path = render.paper.text(ps.x, ps.y, valence.text).attr({
     font: options.font,
-    'font-size': options.fontszsub,
+    'font-size': options.fontszsubInPx,
     fill: atom.color,
   });
   valence.rbb = util.relBox(valence.path.getBBox());
@@ -1146,7 +1159,7 @@ function showHydrogen(
   hydrogen.text = 'H';
   hydrogen.path = render.paper.text(ps.x, ps.y, hydrogen.text).attr({
     font: options.font,
-    'font-size': options.fontsz,
+    'font-size': options.fontszInPx,
     fill: atom.color,
   });
   hydrogen.rbb = util.relBox(hydrogen.path.getBBox());
@@ -1155,7 +1168,7 @@ function showHydrogen(
     pathAndRBoxTranslate(
       hydrogen.path,
       hydrogen.rbb,
-      data.rightMargin + 0.5 * hydrogen.rbb.width + delta,
+      data.rightMargin + 0.35 * hydrogen.rbb.width + delta,
       0,
     );
     data.rightMargin += hydrogen.rbb.width + delta;
@@ -1165,7 +1178,7 @@ function showHydrogen(
     hydroIndex.text = implh.toString();
     hydroIndex.path = render.paper.text(ps.x, ps.y, hydroIndex.text).attr({
       font: options.font,
-      'font-size': options.fontszsub,
+      'font-size': options.fontszsubInPx,
       fill: atom.color,
     });
     hydroIndex.rbb = util.relBox(hydroIndex.path.getBBox());
@@ -1175,7 +1188,7 @@ function showHydrogen(
         hydroIndex.path,
         hydroIndex.rbb,
         data.rightMargin +
-          0.5 * hydroIndex.rbb.width * (options.zoom > 1 ? 1 : options.zoom) +
+          0.15 * hydroIndex.rbb.width * (options.zoom > 1 ? 1 : options.zoom) +
           delta,
         0.2 * atom.label!.rbb.height,
       );
@@ -1187,7 +1200,7 @@ function showHydrogen(
       pathAndRBoxTranslate(
         hydroIndex.path,
         hydroIndex.rbb,
-        data.leftMargin - 0.5 * hydroIndex.rbb.width - delta,
+        data.leftMargin - 0.4 * hydroIndex.rbb.width - delta,
         0.2 * atom.label!.rbb.height,
       );
       data.leftMargin -= hydroIndex.rbb.width + delta;
@@ -1196,7 +1209,7 @@ function showHydrogen(
       hydrogen.path,
       hydrogen.rbb,
       data.leftMargin -
-        0.5 *
+        0.4 *
           hydrogen.rbb.width *
           (implh > 1 && options.zoom < 1 ? options.zoom : 1) -
         delta,

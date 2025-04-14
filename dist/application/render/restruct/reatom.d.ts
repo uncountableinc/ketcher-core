@@ -57,14 +57,14 @@ declare class ReAtom extends ReObject {
     constructor(atom: Atom);
     static isSelectable(): true;
     getVBoxObj(render: Render): Box2Abs | null;
-    drawHover(render: Render): any;
-    getLabeledSelectionContour(render: Render, isHighlight: boolean): any;
-    getUnlabeledSelectionContour(render: Render, isHighlight: boolean): any;
-    getSelectionContour(render: Render, isHighlight: boolean): any;
+    drawHover(render: Render): import("raphael").RaphaelElement<"SVG" | "VML", SVGRectElement | Element> | import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGCircleElement> | null;
+    getLabeledSelectionContour(render: Render, isHighlight: boolean): import("raphael").RaphaelElement<"SVG" | "VML", SVGRectElement | Element>;
+    getUnlabeledSelectionContour(render: Render, isHighlight: boolean): import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGCircleElement>;
+    getSelectionContour(render: Render, isHighlight: boolean): import("raphael").RaphaelElement<"SVG" | "VML", SVGRectElement | Element> | import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGCircleElement>;
     private isPlateShouldBeHidden;
     private makeHighlightePlate;
-    makeHoverPlate(render: Render): any;
-    makeSelectionPlate(restruct: ReStruct): any;
+    makeHoverPlate(render: Render): import("raphael").RaphaelElement<"SVG" | "VML", SVGRectElement | Element> | import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGCircleElement> | null;
+    makeSelectionPlate(restruct: ReStruct): import("raphael").RaphaelElement<"SVG" | "VML", SVGRectElement | Element> | import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGCircleElement> | null;
     private isNeedShiftForCharge;
     private getRatio;
     /**

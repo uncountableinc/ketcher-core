@@ -39,10 +39,10 @@ declare class ReBond extends ReObject {
     static isSelectable(): boolean;
     private static getAtomPositionForBond;
     static bondRecalc(bond: ReBond, restruct: ReStruct, options: any): void;
-    drawHover(render: Render): any;
+    drawHover(render: Render): import("raphael").RaphaelPath<"SVG" | "VML"> | null;
     getSelectionPoints(render: Render, isHighlight?: boolean): Vec2[];
-    getSelectionContour(render: Render, isHighlight: boolean): any;
-    makeHoverPlate(render: Render): any;
+    getSelectionContour(render: Render, isHighlight: boolean): import("raphael").RaphaelPath<"SVG" | "VML">;
+    makeHoverPlate(render: Render): import("raphael").RaphaelPath<"SVG" | "VML"> | null;
     makeSelectionPlate(restruct: ReStruct, _: any, options: any): any;
     private isPlateShouldBeHidden;
     private makeHighlitePlate;

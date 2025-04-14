@@ -40,9 +40,9 @@ declare function drawCIPLabel({ atomOrBond, position, restruct, visel, }: {
     restruct: ReStruct;
     visel: Visel;
 }): {
-    path: any;
-    text: any;
-    rectangle: any;
+    path: import("raphael").RaphaelSet<"SVG" | "VML">;
+    text: import("raphael").RaphaelElement<"SVG" | "VML", SVGTextElement | Element>;
+    rectangle: import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGRectElement>;
 };
 declare function updateHalfBondCoordinates(hb1: HalfBond, hb2: HalfBond, xShift: number): [HalfBond, HalfBond];
 declare function escapeHtml(str: any): any;

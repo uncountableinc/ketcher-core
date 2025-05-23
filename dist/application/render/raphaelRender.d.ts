@@ -33,9 +33,9 @@ export declare class Render {
     observeCanvasResize: () => void;
     unobserveCanvasResize: () => void;
     updateOptions(opts: string): false | RenderOptions;
-    selectionPolygon(polygon: Vec2[]): any;
-    selectionLine(point0: Vec2, point1: Vec2): any;
-    selectionRectangle(point0: Vec2, point1: Vec2): any;
+    selectionPolygon(polygon: Vec2[]): import("raphael").RaphaelPath<"SVG" | "VML">;
+    selectionLine(point0: Vec2, point1: Vec2): import("raphael").RaphaelPath<"SVG" | "VML">;
+    selectionRectangle(point0: Vec2, point1: Vec2): import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGRectElement>;
     /** @deprecated recommend using `CoordinateTransformation.pageToModel` instead */
     page2obj(event: MouseEvent | {
         clientX: number;

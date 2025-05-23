@@ -35,12 +35,12 @@ export declare class ReMultitailArrow extends ReObject {
     getReferenceLines(renderOptions: RenderOptions, referencePositions?: import("../../../domain/entities").MultitailArrowsReferencePositions): import("../../../domain/entities").MultitailArrowsReferenceLines;
     drawSingleLineHover(builder: PathBuilder, renderOptions: RenderOptions, lineStart: Vec2, lineEnd: Vec2, verticalDirection: -1 | 1, horizontalDirection: -1 | 1): void;
     buildFrame(renderOptions: RenderOptions): string;
-    drawHover(render: Render): any;
+    drawHover(render: Render): import("raphael").RaphaelPath<"SVG" | "VML">;
     getSelectionPointsFromReferencePoint(point: Vec2, topSpine: Vec2, name: string, spineOffset: number): {
         [x: string]: Vec2;
     };
     addTestSelectionPoints(reStruct: ReStruct, paper: RaphaelPaper, renderOptions: RenderOptions): void;
-    makeSelectionPlate(reStruct: ReStruct, paper: RaphaelPaper, options: RenderOptions): any;
+    makeSelectionPlate(reStruct: ReStruct, paper: RaphaelPaper, options: RenderOptions): import("raphael").RaphaelSet<"SVG" | "VML">;
     show(reStruct: ReStruct, renderOptions: RenderOptions): void;
     private getClosestArrowPartPosition;
     private getTailArrayFromPool;

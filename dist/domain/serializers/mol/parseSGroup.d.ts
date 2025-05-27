@@ -31,7 +31,7 @@ declare function readKeyValuePairs(str: string, valueString: boolean): Pool;
 declare function readKeyMultiValuePairs(str: string, valueString: boolean): any[];
 declare function loadSGroup(mol: any, sg: any, atomMap: any): any;
 declare function initSGroup(sGroups: any, propData: any): void;
-declare function applySGroupProp(sGroups: any, propName: any, propData: any, numeric: any, core: any): void;
+declare function applySGroupProp(sGroups: any, propName: any, propData: any, numeric: any, core: any, lowercase: any): void;
 declare function applySGroupArrayProp(sGroups: any, propName: any, propData: any, shift: any): void;
 declare function applyDataSGroupName(sg: any, name: any): void;
 declare function applyDataSGroupQuery(sg: any, query: any): void;

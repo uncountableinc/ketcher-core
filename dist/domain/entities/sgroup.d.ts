@@ -147,4 +147,5 @@ export declare class SGroup {
     static isQuerySGroup(sGroup: SGroup): boolean;
     static isSRUSGroup(sGroup: SGroup): boolean;
     static isMulSGroup(sGroup: SGroup): boolean;
+    static isCOPGroup(sGroup: SGroup): boolean;
 }

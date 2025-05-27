@@ -15,11 +15,13 @@ declare namespace prepareForSaving {
     export { prepareSupForSaving as SUP };
     export { prepareDatForSaving as DAT };
     export { prepareGenForSaving as GEN };
+    export { prepareCopForSaving as COP };
     export { prepareQueryComponentForSaving as queryComponent };
 }
 declare namespace saveToMolfile {
     export { saveMulToMolfile as MUL };
     export { saveSruToMolfile as SRU };
+    export { saveCopToMolfile as COP };
     export { saveSupToMolfile as SUP };
     export { saveDatToMolfile as DAT };
     export { saveGenToMolfile as GEN };
@@ -29,9 +31,11 @@ declare function prepareSruForSaving(sgroup: any, mol: any): void;
 declare function prepareSupForSaving(sgroup: any, mol: any): void;
 declare function prepareDatForSaving(sgroup: any, mol: any): void;
 declare function prepareGenForSaving(_sgroup: any, _mol: any): void;
+declare function prepareCopForSaving(sgroup: any, mol: any): void;
 declare function prepareQueryComponentForSaving(_sgroup: any, _mol: any): void;
 declare function saveMulToMolfile(sgroup: any, mol: any, sgMap: any, atomMap: any, bondMap: any): string;
 declare function saveSruToMolfile(sgroup: any, mol: any, sgMap: any, atomMap: any, bondMap: any): string;
+declare function saveCopToMolfile(sgroup: any, mol: any, sgMap: any, atomMap: any, bondMap: any): string;
 declare function saveSupToMolfile(sgroup: any, mol: any, sgMap: any, atomMap: any, bondMap: any): string;
 declare function saveDatToMolfile(sgroup: any, mol: any, sgMap: any, atomMap: any): string;
 declare function saveGenToMolfile(sgroup: any, mol: any, sgMap: any, atomMap: any, bondMap: any): string;

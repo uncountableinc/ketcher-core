@@ -24,9 +24,9 @@ declare class ReRGroupAttachmentPoint extends ReObject {
     private makeHighlightePlate;
     show(restruct: ReStruct, rgroupAttachmentPointId: number): void;
     private getHoverPlatePath;
-    makeHoverPlate(render: Render): any;
-    makeSelectionPlate(_restruct: ReStruct, paper: RaphaelPaper, options: RenderOptions): any;
-    drawHover(render: Render): any;
+    makeHoverPlate(render: Render): import("raphael").RaphaelPath<"SVG" | "VML">;
+    makeSelectionPlate(_restruct: ReStruct, paper: RaphaelPaper, options: RenderOptions): import("raphael").RaphaelPath<"SVG" | "VML">;
+    drawHover(render: Render): import("raphael").RaphaelPath<"SVG" | "VML">;
     private getAttachmentPointDirectionVector;
     private isTrisectionAttachmentPoint;
 }

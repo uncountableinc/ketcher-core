@@ -148,4 +148,7 @@ export declare class SGroup {
     static isSRUSGroup(sGroup: SGroup): boolean;
     static isMulSGroup(sGroup: SGroup): boolean;
     static isCOPGroup(sGroup: SGroup): boolean;
+    static isMONGroup(sGroup: SGroup): boolean;
+    static isMIXGroup(sGroup: SGroup): boolean;
+    static isCOMGroup(sGroup: SGroup): boolean;
 }

@@ -134,7 +134,9 @@ export declare class Struct {
     getBondFragment(bid: number): number | undefined;
     bindSGroupsToFunctionalGroups(): void;
     getGroupIdFromAtomId(atomId: number): number | null;
+    getGroupIdsFromAtomId(atomId: number | undefined): number[];
     getGroupFromAtomId(atomId: number | undefined): SGroup | undefined;
+    getGroupsFromAtomId(atomId: number | undefined): SGroup[];
     getGroupIdFromBondId(bondId: number): number | null;
     getGroupFromBondId(atomId: number): SGroup | undefined;
     getGroupsIdsFromBondId(bondId: number): number[];

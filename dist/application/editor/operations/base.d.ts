@@ -26,6 +26,7 @@ declare class BaseOperation {
     execute(_restruct: ReStruct): void;
     perform(restruct: ReStruct): BaseOperation;
     invert(): BaseOperation;
+    isInvertible(): boolean;
     isDummy(_restruct: ReStruct): boolean;
     protected static invalidateAtom(restruct: ReStruct, atomId: number, level?: any): void;
     protected static invalidateLoop(restruct: ReStruct, bondId: number): void;

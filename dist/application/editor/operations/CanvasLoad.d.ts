@@ -22,5 +22,6 @@ export declare class CanvasLoad extends BaseOperation {
     };
     constructor(struct?: Struct);
     execute(restruct: ReStruct): void;
+    isInvertible(): boolean;
     invert(): CanvasLoad;
 }

@@ -1,6 +1,6 @@
 import { Vec2 } from "../../../../domain/entities";
 import { HalfEdge } from "../../view-model/HalfEdge";
-export declare type BondSVGPath = {
+export declare type SVGPathAttributes = {
     d: string;
     attrs: Record<string, string | number>;
 };

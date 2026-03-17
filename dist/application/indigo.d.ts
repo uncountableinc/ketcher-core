@@ -13,12 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-import { AutomapMode, CalculateProps, CalculateResult, CheckResult, CheckTypes, ChemicalMimeType, ConvertResult, InfoResult, OutputFormatType } from "../domain/services";
+import { AutomapMode, CalculateMacromoleculePropertiesResult, CalculateProps, CalculateResult, CheckResult, CheckTypes, ChemicalMimeType, ConvertResult, InfoResult, OutputFormatType } from "../domain/services";
 import { StructOrString } from "./indigo.types";
-import { Struct } from "../domain/entities";
+import { SequenceType, Struct } from "../domain/entities";
 declare type ConvertOptions = {
     outputFormat?: ChemicalMimeType;
     inputFormat?: ChemicalMimeType;
+    sequenceType?: SequenceType;
+    outputContentType?: ChemicalMimeType;
+    monomerLibrarySavingMode?: string;
+    molfileSavingSkipDate?: string;
 };
 declare type AutomapOptions = {
     mode?: AutomapMode;
@@ -53,5 +57,6 @@ export declare class Indigo {
     recognize(image: Blob, options?: RecognizeOptions): Promise<Struct>;
     generateImageAsBase64(struct: StructOrString, options?: GenerateImageOptions): Promise<string>;
     toggleExplicitHydrogens(struct: StructOrString): Promise<Struct>;
+    calculateMacromoleculeProperties(struct: string): Promise<CalculateMacromoleculePropertiesResult>;
 }
 export {};

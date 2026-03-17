@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-import { AtomAttributes, AtomQueryProperties, Bond, Struct, Vec2 } from "../../../domain/entities";
+import { AtomAttributes, AtomQueryProperties, Bond, SGroup, Struct, Vec2 } from "../../../domain/entities";
 import { ReStruct } from "../../render";
 import { EditorSelection } from '../editor.types';
 export declare type AtomType = 'single' | 'list' | 'pseudo';
@@ -27,10 +27,11 @@ export declare function atomGetSGroups(restruct: any, atomId: number): number[];
 export declare function atomGetPos(restruct: any, id: any): any;
 export declare function findStereoAtoms(struct: Struct, atomIds: number[] | undefined): number[];
 export declare function structSelection(struct: any): EditorSelection;
+export declare function getSelectionFromStruct(struct: Struct): EditorSelection;
 export declare function formatSelection(selection: any): any;
 export declare function atomForNewBond(restruct: any, id: any, bond?: any): {
     atom: any;
     pos: Vec2;
 };
-export declare function getRelSGroupsBySelection(struct: Struct, selectedAtoms: number[]): import("../../../domain/entities").Pool<import("domain/entities").SGroup>;
+export declare function getRelSGroupsBySelection(struct: Struct, selectedAtoms: number[]): Set<SGroup>;
 export declare function isAttachmentBond({ begin, end }: Bond, selection: EditorSelection): boolean;

@@ -13,10 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-export declare function isControlKey(event: any): any;
-declare function keyNorm(obj: any): any;
-declare namespace keyNorm {
-    var lookup: (map: any, event: any) => any;
-}
-export declare function initHotKeys(actions: any): any;
+export declare const KeyboardModifiers: {
+    readonly Alt: "Alt";
+    readonly Control: "Control";
+    readonly Ctrl: "Ctrl";
+    readonly Meta: "Meta";
+    readonly Shift: "Shift";
+};
+export declare const KeyCodePrefixes: {
+    Key: string;
+    Digit: string;
+};
+export declare const CanonicalModifiersOrder: ("Alt" | "Ctrl" | "Meta" | "Shift")[];
+export declare const ModifiersRegex: {
+    Mod: RegExp;
+    Meta: RegExp;
+    Ctrl: RegExp;
+    Alt: RegExp;
+    Shift: RegExp;
+};
+export declare const isControlKey: (event: KeyboardEvent | PointerEvent) => boolean;
+declare const keyNorm: {
+    (obj: any): any;
+    lookup: (map: Record<string, string>, event: KeyboardEvent) => string;
+};
+export declare const initHotKeys: (actions: any) => any;
 export { keyNorm };

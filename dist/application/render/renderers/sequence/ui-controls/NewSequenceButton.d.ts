@@ -1,8 +1,8 @@
 import { D3SvgElementSelection } from "../../../types";
 export declare class NewSequenceButton {
-    private indexOfRowBefore;
+    private readonly indexOfRowBefore;
     private buttonElement?;
-    private canvas;
+    private readonly canvas;
     private rootElement?;
     private bodyElement?;
     constructor(indexOfRowBefore: number);
@@ -14,4 +14,5 @@ export declare class NewSequenceButton {
     moveSelection(): void;
     protected removeHover(): void;
     remove(): void;
+    setWidth(width: number): void;
 }

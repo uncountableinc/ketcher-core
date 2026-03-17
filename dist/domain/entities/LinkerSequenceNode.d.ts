@@ -8,4 +8,6 @@ export declare class LinkerSequenceNode {
     get monomers(): BaseMonomer[];
     get renderer(): import("../..").BaseMonomerRenderer | import("../..").BaseSequenceItemRenderer | undefined;
     get modified(): boolean;
+    static isValidPartForLinker(monomer?: BaseMonomer): monomer is BaseMonomer;
+    static isPartOfLinker(monomer?: BaseMonomer): boolean;
 }

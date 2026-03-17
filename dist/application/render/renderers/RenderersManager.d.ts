@@ -14,9 +14,12 @@ import { AtomRenderer } from "./AtomRenderer";
 import { BondRenderer } from "./BondRenderer";
 import { Bond } from "../../../domain/entities/CoreBond";
 import { MonomerToAtomBond } from "../../../domain/entities/MonomerToAtomBond";
+import { RxnArrow } from "../../../domain/entities/CoreRxnArrow";
+import { MultitailArrow } from "../../../domain/entities/CoreMultitailArrow";
+import { RxnPlus } from "../../../domain/entities/CoreRxnPlus";
 declare type FlexModeOrSnakeModePolymerBondRenderer = FlexModePolymerBondRenderer | SnakeModePolymerBondRenderer;
 export declare class RenderersManager {
-    private theme;
+    private readonly theme;
     monomers: Map<number, BaseMonomerRenderer | AmbiguousMonomerRenderer>;
     polymerBonds: Map<number, FlexModeOrSnakeModePolymerBondRenderer>;
     atoms: Map<number, AtomRenderer>;
@@ -34,10 +37,10 @@ export declare class RenderersManager {
     redrawDrawingEntity(drawingEntity: DrawingEntity, force?: boolean, recalculateEnumeration?: boolean): void;
     deleteAllDrawingEntities(): void;
     deleteMonomer(monomer: BaseMonomer): void;
-    addPolymerBond(polymerBond: PolymerBond | HydrogenBond): void;
+    addPolymerBond(polymerBond: PolymerBond | HydrogenBond, redrawAttachmentPoints?: boolean): void;
     movePolymerBond(polymerBond: PolymerBond): void;
     showPolymerBondInformation(polymerBond: PolymerBond): void;
-    deletePolymerBond(polymerBond: PolymerBond | HydrogenBond, recalculateEnumeration?: boolean): void;
+    deletePolymerBond(polymerBond: PolymerBond | HydrogenBond, recalculateEnumeration?: boolean, redrawAttachmentPoints?: boolean): void;
     private recalculatePeptideChainEnumeration;
     private recalculateRnaChainEnumeration;
     private recalculateMonomersEnumeration;
@@ -53,8 +56,17 @@ export declare class RenderersManager {
     deleteBond(bond: Bond): void;
     addMonomerToAtomBond(bond: MonomerToAtomBond): void;
     deleteMonomerToAtomBond(bond: MonomerToAtomBond): void;
+    addRxnArrow(arrow: RxnArrow): void;
+    deleteRxnArrow(arrow: RxnArrow): void;
+    addMultitailArrow(arrow: MultitailArrow): void;
+    deleteMultitailArrow(arrow: MultitailArrow): void;
+    addRxnPlus(rxnPlus: RxnPlus): void;
+    deleteRxnPlus(rxnPlus: RxnPlus): void;
+    private renderAromaticCircles;
+    private calculateDashedPolygonPath;
+    private calculateLoopCenterAndRadius;
     runPostRenderMethods(): void;
-    static getRenderedStructuresBbox(monomers?: BaseMonomer[]): {
+    static getRenderedStructuresBbox(drawingEntities?: DrawingEntity[]): {
         left: any;
         right: any;
         top: any;

@@ -15,7 +15,7 @@
  ***************************************************************************/
 import { Struct } from "../../../domain/entities/struct";
 import { Vec2 } from "../../../domain/entities/vec2";
-import { BondAtoms } from "./utils.types";
+import type { BondAtoms, FlipDirection } from './utils.types';
 declare function setFracAngle(angle: number): void;
 declare function calcAngle(pos0: Vec2, pos1: Vec2): number;
 declare function fracAngle(angle: any, angle2: any): number;
@@ -27,6 +27,8 @@ declare function mergeBondsParams(struct1: Struct, bond1: BondAtoms, struct2: St
     scale: number;
     cross: boolean;
 };
+export declare const rotateDelta: (v: Vec2, center: Vec2, angle: number) => Vec2;
+export declare const flipPointByCenter: (pointToFlip: Vec2, center: Vec2, flipDirection: FlipDirection) => Vec2;
 declare const _default: {
     calcAngle: typeof calcAngle;
     fracAngle: typeof fracAngle;

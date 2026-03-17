@@ -18,12 +18,7 @@ import { Struct } from './struct';
 import { Vec2 } from './vec2';
 import { BaseMicromoleculeEntity, initiallySelectedType } from "./BaseMicromoleculeEntity";
 import { SGroup } from "./sgroup";
-declare enum CIP {
-    E = "E",
-    Z = "Z",
-    M = "M",
-    P = "P"
-}
+import { BondCIP } from "./types";
 export interface BondAttributes {
     reactingCenterStatus?: number | null;
     topology?: number | null;
@@ -33,7 +28,7 @@ export interface BondAttributes {
     type: number;
     end: number;
     begin: number;
-    cip?: CIP | null;
+    cip?: BondCIP | null;
     isPreview?: boolean;
     initiallySelected?: initiallySelectedType;
     beginSuperatomAttachmentPointNumber?: number;
@@ -42,7 +37,7 @@ export interface BondAttributes {
     endSgroup?: SGroup;
 }
 export declare class Bond extends BaseMicromoleculeEntity {
-    static PATTERN: {
+    static readonly PATTERN: {
         TYPE: {
             SINGLE: number;
             DOUBLE: number;
@@ -77,7 +72,7 @@ export declare class Bond extends BaseMicromoleculeEntity {
             MADE_OR_BROKEN_AND_CHANGED: number;
         };
     };
-    static attrlist: {
+    static readonly attrlist: {
         type: number;
         stereo: number;
         topology: number;
@@ -96,7 +91,7 @@ export declare class Bond extends BaseMicromoleculeEntity {
     len: number;
     sb: number;
     sa: number;
-    cip?: CIP | null;
+    cip?: BondCIP | null;
     hb1?: number;
     hb2?: number;
     angle: number;
@@ -130,7 +125,6 @@ export declare class Bond extends BaseMicromoleculeEntity {
     clone(aidMap?: Map<number, number> | null): Bond;
     getAttachedSGroups(struct: Struct): Pile<number>;
     isExternalBondBetweenMonomers(struct: Struct): boolean;
-    static isBondToHiddenLeavingGroup(struct: Struct, bond: Bond): boolean | 0 | null | undefined;
+    static isBondToHiddenLeavingGroup(struct: Struct, bond: Bond, includeAtomsInCollapsedSgroups?: boolean): boolean | 0 | null | undefined;
     static isBondToExpandedMonomer(struct: Struct, bond: Bond): boolean;
 }
-export {};

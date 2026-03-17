@@ -30,5 +30,6 @@ export declare class MonomerToAtomBondDeleteOperation implements Operation {
     addMonomerToAtomBondChangeModel: (monomerToAtomBond?: MonomerToAtomBond) => MonomerToAtomBond;
     constructor(monomerToAtomBond: MonomerToAtomBond, deleteMonomerToAtomBondChangeModel: (monomerToAtomBond?: MonomerToAtomBond) => void, addMonomerToAtomBondChangeModel: (monomerToAtomBond?: MonomerToAtomBond) => MonomerToAtomBond);
     execute(renderersManager: RenderersManager): void;
-    invert(renderersManager: RenderersManager): void;
+    invert(): void;
+    invertAfterAllOperations(renderersManager: RenderersManager): void;
 }

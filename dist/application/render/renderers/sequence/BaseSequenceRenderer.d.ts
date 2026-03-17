@@ -9,4 +9,5 @@ export declare class BaseSequenceRenderer extends BaseRenderer {
     protected removeHover(): void;
     show(_theme?: any): void;
     get center(): Vec2;
+    get selectionPoints(): Vec2[];
 }

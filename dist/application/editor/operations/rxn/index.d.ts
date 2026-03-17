@@ -15,14 +15,16 @@
  ***************************************************************************/
 import { RxnArrowMode, Vec2 } from "../../../../domain/entities";
 import Base from '../base';
+import Restruct from "../../../render/restruct/restruct";
 declare type RxnArrowAddData = {
     id?: number;
     pos: Array<Vec2>;
     mode: RxnArrowMode;
+    height?: number;
 };
 declare class RxnArrowAdd extends Base {
     data: RxnArrowAddData;
-    constructor(pos?: Array<Vec2>, mode?: RxnArrowMode, id?: number);
+    constructor(pos?: Array<Vec2>, mode?: RxnArrowMode, id?: number, height?: number);
     execute(restruct: any): void;
     invert(): Base;
 }
@@ -30,12 +32,13 @@ interface RxnArrowDeleteData {
     id: number;
     pos?: Array<Vec2>;
     mode?: RxnArrowMode;
+    height?: number;
 }
 declare class RxnArrowDelete extends Base {
     data: RxnArrowDeleteData;
     performed: boolean;
     constructor(id: number);
-    execute(restruct: any): void;
+    execute(restruct: Restruct): void;
     invert(): Base;
 }
 export { RxnArrowAdd, RxnArrowDelete };

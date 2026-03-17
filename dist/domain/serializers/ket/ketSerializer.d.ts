@@ -55,11 +55,16 @@ export declare class KetSerializer implements Serializer<Struct> {
     getConnectionMoleculeEndpoint(monomer: BaseMonomer, polymerBond: PolymerBond, monomerToAtomIdMap: Map<BaseMonomer, Map<number, number>>, struct: Struct): IKetConnectionMoleculeEndPoint;
     private serializeMonomerTemplate;
     private serializeVariantMonomerTemplate;
-    serializeMacromolecules(struct: Struct, drawingEntitiesManager: DrawingEntitiesManager): {
+    serializeMacromolecules(struct: Struct, drawingEntitiesManager: DrawingEntitiesManager, needSetSelection?: boolean): {
         serializedMacromolecules: IKetMacromoleculesContentRootProperty;
         micromoleculesStruct: Struct;
+        moleculesSelection: {
+            atoms: number[];
+            bonds: number[];
+        };
     };
     static removeLeavingGroupsFromConnectedAtoms(_struct: Struct): Struct;
-    serialize(_struct: Struct, drawingEntitiesManager?: DrawingEntitiesManager, selection?: EditorSelection): string;
+    serialize(_struct: Struct, drawingEntitiesManager?: DrawingEntitiesManager, selection?: EditorSelection, isBeautified?: boolean, // TODO make false by default
+    needSetSelectionToMacromolecules?: boolean): string;
     convertMonomersLibrary(monomersLibrary: IKetMacromoleculesContent): MonomerItemType[] & AmbiguousMonomerType[];
 }

@@ -45,26 +45,34 @@ export declare enum ShowHydrogenLabelNames {
 declare class ReAtom extends ReObject {
     a: Atom;
     showLabel: boolean;
+    showInfoLabel: boolean;
     hydrogenOnTheLeft: boolean;
     color: string;
     component: number;
     label?: ElemAttr;
+    infoLabel?: string;
     cip?: {
         path: any;
         text: any;
         rectangle: any;
     };
+    private expandedMonomerAttachmentPoints?;
     constructor(atom: Atom);
     static isSelectable(): true;
     getVBoxObj(render: Render): Box2Abs | null;
-    drawHover(render: Render): import("raphael").RaphaelElement<"SVG" | "VML", SVGRectElement | Element> | import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGCircleElement> | null;
-    getLabeledSelectionContour(render: Render, isHighlight: boolean): import("raphael").RaphaelElement<"SVG" | "VML", SVGRectElement | Element>;
-    getUnlabeledSelectionContour(render: Render, isHighlight: boolean): import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGCircleElement>;
-    getSelectionContour(render: Render, isHighlight: boolean): import("raphael").RaphaelElement<"SVG" | "VML", SVGRectElement | Element> | import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGCircleElement>;
-    private isPlateShouldBeHidden;
-    private makeHighlightePlate;
-    makeHoverPlate(render: Render): import("raphael").RaphaelElement<"SVG" | "VML", SVGRectElement | Element> | import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGCircleElement> | null;
-    makeSelectionPlate(restruct: ReStruct): import("raphael").RaphaelElement<"SVG" | "VML", SVGRectElement | Element> | import("raphael").RaphaelElement<"SVG" | "VML", Element | SVGCircleElement> | null;
+    drawHover(render: Render, drawOutline?: boolean): any;
+    private attachHighlightTriggerForAttachmentPointAtom;
+    private drawHoverForPotentialAttachmentPointAtomsInMonomerCreationWizard;
+    setHover(hover: boolean, render: Render, drawOutline?: boolean): boolean | undefined;
+    makeMonomerAttachmentPointHighlightPlate(render: Render): any;
+    getLabeledSelectionContour(render: Render, highlightPadding?: number): any;
+    getUnlabeledSelectionContour(render: Render, highlightPadding?: number): any;
+    getSelectionContour(render: Render, highlightPadding?: number): any;
+    private readonly isPlateShouldBeHidden;
+    private readonly makeHighlightePlate;
+    makeHoverPlate(render: Render, drawOutline?: boolean): any;
+    makeSelectionPlate(restruct: ReStruct): any;
+    private createInvisibleAtomTarget;
     private isNeedShiftForCharge;
     private getRatio;
     /**

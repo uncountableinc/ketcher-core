@@ -1,6 +1,6 @@
 import { Command } from "../../../domain/entities/Command";
 import { LayoutMode } from "./";
-import { ChemicalMimeType } from "../../../domain/services";
+import { SequenceType } from "../../../domain/entities";
 import { DrawingEntitiesManager } from "../../../domain/entities/DrawingEntitiesManager";
 export declare abstract class BaseMode {
     modeName: LayoutMode;
@@ -17,12 +17,12 @@ export declare abstract class BaseMode {
     abstract isPasteAvailable(drawingEntitiesManager: DrawingEntitiesManager): boolean;
     abstract scrollForView(): void;
     onCopy(event?: ClipboardEvent): void;
-    onPaste(event: ClipboardEvent): Promise<void>;
+    onPaste(event?: ClipboardEvent): Promise<void>;
     pasteFromClipboard(clipboardData: any): Promise<void>;
     pasteKetFormatFragment(pastedStr: string): Command | undefined;
-    pasteWithIndigoConversion(pastedStr: string, inputFormat: ChemicalMimeType, isSequenceOrFasta?: boolean): Promise<Command | undefined>;
+    pasteWithIndigoConversion(pastedStr: string, sequenceType: SequenceType): Promise<Command | undefined>;
     private updateEntitiesPosition;
-    unsupportedSymbolsError(errorMessage: string, isSequenceOrFasta?: boolean): void;
+    unsupportedSymbolsError(errorMessage: string): void;
     private checkIfTargetIsInput;
     destroy(): void;
 }

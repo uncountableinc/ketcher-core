@@ -1,5 +1,6 @@
 import { Chain } from "./Chain";
 import { AmbiguousMonomer, BaseMonomer, Chem, Peptide, Phosphate, RNABase, SubChainNode, Sugar, UnresolvedMonomer, UnsplitNucleotide } from "./..";
+import { SequenceNode } from "./types";
 import { BaseSubChain } from "./BaseSubChain";
 export interface ComplimentaryChainsWithData {
     complimentaryChain: Chain;
@@ -12,9 +13,17 @@ export declare type GrouppedChain = {
     group: number;
     chain: Chain;
 };
+export interface ITwoStrandedChainItem {
+    senseNode?: SequenceNode;
+    senseNodeIndex: number;
+    chain: Chain;
+    antisenseNode?: SequenceNode;
+    antisenseNodeIndex?: number;
+    antisenseChain?: Chain;
+}
 export declare class ChainsCollection {
     chains: Chain[];
-    private get monomerToChain();
+    get monomerToChain(): Map<BaseMonomer, Chain>;
     get monomerToNode(): Map<BaseMonomer, SubChainNode>;
     rearrange(): void;
     add(chain: Chain): this;
@@ -36,10 +45,13 @@ export declare class ChainsCollection {
         subChain: BaseSubChain;
         chain: Chain;
     }) => void): void;
-    private getFirstAntisenseMonomerInNode;
-    private getComplimentaryChainIfNucleotide;
+    private getFirstComplimentaryMonomer;
+    private findCycledComplimentaryChains;
+    getComplimentaryChainIfNucleotide(node: SubChainNode, monomerToChain: Map<BaseMonomer, Chain>, monomerToNode: Map<BaseMonomer, SubChainNode>): {
+        complimentaryChain: Chain | undefined;
+        complimentaryNode: SubChainNode | undefined;
+    };
     private reorderChainsPutSenseChainOrderInAccordanceAntisenseConnection;
     getAllChainsWithConnectionInBlock(c: Chain): GrouppedChain[];
-    getChainByMonomer(monomer: BaseMonomer): Chain | undefined;
     getComplimentaryChainsWithData(chain: Chain): ComplimentaryChainsWithData[];
 }

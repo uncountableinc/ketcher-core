@@ -7,10 +7,12 @@ import { RNA_DNA_NON_MODIFIED_PART } from "../constants/monomers";
 import { BaseMonomer } from "./BaseMonomer";
 import { AmbiguousMonomer } from "./AmbiguousMonomer";
 export declare class Nucleotide {
-    sugar: Sugar;
-    rnaBase: RNABase | AmbiguousMonomer;
-    phosphate: Phosphate;
+    readonly sugar: Sugar;
+    readonly rnaBase: RNABase | AmbiguousMonomer;
+    readonly phosphate: Phosphate;
+    private readonly monomersCache;
     constructor(sugar: Sugar, rnaBase: RNABase | AmbiguousMonomer, phosphate: Phosphate);
+    toString(): string;
     static fromSugar(sugar: Sugar, needValidation?: boolean): Nucleotide;
     static createOnCanvas(rnaBaseName: string, position: Vec2, sugarName?: RNA_DNA_NON_MODIFIED_PART): {
         modelChanges: import("./Command").Command;

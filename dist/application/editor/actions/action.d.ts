@@ -17,9 +17,10 @@ import { BaseOperation } from '../operations/base';
 import { ReStruct } from '../../render';
 export declare class Action {
     operations: BaseOperation[];
-    constructor(operations?: never[]);
+    constructor(operations?: BaseOperation[]);
     addOp(operation: BaseOperation, restruct?: ReStruct): BaseOperation;
     mergeWith(action: any): this;
+    /** Perform action and return inverted one */
     perform(restruct: ReStruct): Action;
     isDummy(restruct?: ReStruct): boolean;
 }

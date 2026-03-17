@@ -1,8 +1,18 @@
 import { AttachmentPointName } from "../../../domain/types";
+import type { FlipDirection } from "../../editor/shared/utils.types";
 export declare enum KetNodeType {
     MONOMER = "monomer",
     AMBIGUOUS_MONOMER = "ambiguousMonomer"
 }
+export declare type MonomerTransformation = Partial<{
+    rotate: number;
+    shift: Partial<{
+        x: number;
+        y: number;
+    }>;
+    flip: FlipDirection;
+}>;
+export declare type AmbiguousMonomerTransformation = Pick<MonomerTransformation, 'flip'>;
 export interface IKetMonomerNode {
     type: KetNodeType.MONOMER;
     id: string;
@@ -13,6 +23,9 @@ export interface IKetMonomerNode {
     };
     alias: string;
     templateId: string;
+    expanded?: boolean;
+    transformation?: MonomerTransformation;
+    selected?: boolean;
 }
 export interface IKetAmbiguousMonomerNode {
     type: KetNodeType.AMBIGUOUS_MONOMER;
@@ -23,6 +36,8 @@ export interface IKetAmbiguousMonomerNode {
     };
     alias: string;
     templateId: string;
+    transformation?: AmbiguousMonomerTransformation;
+    selected?: boolean;
 }
 export declare type KetNode = IKetMonomerNode | IKetAmbiguousMonomerNode;
 export interface IKetConnectionMonomerEndPoint {
@@ -53,6 +68,7 @@ export interface IKetConnection {
     label?: string;
     endpoint1: IKetConnectionEndPoint;
     endpoint2: IKetConnectionEndPoint;
+    selected?: boolean;
 }
 export declare type monomerClass = 'RNA' | 'PEPTIDE' | 'CHEM' | 'UNKNOWN' | 'DNA' | 'MODDNA';
 export declare enum KetMonomerClass {
@@ -98,6 +114,10 @@ export interface KetAmbiguousMonomerTemplateOption {
     ratio?: number;
     probability?: number;
 }
+export declare type KetMonomerTemplateAtom = {
+    label: string;
+    location: [number, number, number];
+};
 export interface IKetMonomerTemplate {
     type: KetTemplateType.MONOMER_TEMPLATE;
     class?: KetMonomerClass;
@@ -106,6 +126,7 @@ export interface IKetMonomerTemplate {
     id: string;
     fullName?: string;
     alias: string;
+    aliasHELM?: string;
     naturalAnalog?: string;
     attachmentPoints?: IKetAttachmentPoint[];
     root: {
@@ -115,8 +136,11 @@ export interface IKetMonomerTemplate {
     name?: string;
     idtAliases?: IKetIdtAliases;
     unresolved?: boolean;
-    atoms: [];
+    aliasAxoLabs?: string;
+    atoms: KetMonomerTemplateAtom[];
     bonds: [];
+    modificationTypes?: string[];
+    hidden?: boolean;
 }
 export interface IKetAmbiguousMonomerTemplate {
     type: KetTemplateType.AMBIGUOUS_MONOMER_TEMPLATE;

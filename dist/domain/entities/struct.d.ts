@@ -14,7 +14,7 @@
  * limitations under the License.
  ***************************************************************************/
 import { Atom } from './atom';
-import { EditorSelection } from "../../application/editor";
+import type { EditorSelection } from "../../application/editor";
 import { Bond } from './bond';
 import { Fragment } from './fragment';
 import { FunctionalGroup } from './functionalGroup';
@@ -71,15 +71,15 @@ export declare class Struct {
     isRxn(): boolean;
     isBlank(): boolean;
     isSingleGroup(): boolean;
-    clone(atomSet?: Pile<number> | null, bondSet?: Pile<number> | null, dropRxnSymbols?: boolean, aidMap?: Map<number, number> | null, simpleObjectsSet?: Pile<number> | null, textsSet?: Pile<number> | null, rgroupAttachmentPointSet?: Pile<number> | null, imagesSet?: Pile<number> | null, multitailArrowsSet?: Pile<number> | null, bidMap?: Map<number, number> | null): Struct;
+    clone(atomSet?: Pile<number> | null, bondSet?: Pile<number> | null, dropRxnSymbols?: boolean, aidMap?: Map<number, number> | null, simpleObjectsSet?: Pile<number> | null, textsSet?: Pile<number> | null, rgroupAttachmentPointSet?: Pile<number> | null, imagesSet?: Pile<number> | null, multitailArrowsSet?: Pile<number> | null, bidMap?: Map<number, number> | null, needCloneAttachmentPoints?: boolean): Struct;
     getScaffold(): Struct;
     getFragmentIds(_fid: number | number[]): Pile<number>;
     getFragment(fid: number | number[], copyNonFragmentObjects?: boolean, aidMap?: Map<number, number>): Struct;
-    mergeInto(cp: Struct, atomSet?: Pile<number> | null, bondSet?: Pile<number> | null, dropRxnSymbols?: boolean, keepAllRGroups?: boolean, aidMap?: Map<number, number> | null, simpleObjectsSet?: Pile<number> | null, textsSet?: Pile<number> | null, rgroupAttachmentPointSet?: Pile<number> | null, imagesSet?: Pile<number> | null, multitailArrowsSet?: Pile<number> | null, bidMapEntity?: Map<number, number> | null): Struct;
+    mergeInto(cp: Struct, atomSet?: Pile<number> | null, bondSet?: Pile<number> | null, dropRxnSymbols?: boolean, keepAllRGroups?: boolean, aidMap?: Map<number, number> | null, simpleObjectsSet?: Pile<number> | null, textsSet?: Pile<number> | null, rgroupAttachmentPointSet?: Pile<number> | null, imagesSet?: Pile<number> | null, multitailArrowsSet?: Pile<number> | null, bidMapEntity?: Map<number, number> | null, needCloneAttachmentPoints?: boolean): Struct;
     prepareLoopStructure(): void;
     atomAddToSGroup(sgid: any, aid: any): void;
-    calcConn(atom: any): any[];
-    findBondId(begin: any, end: any): number | null;
+    calcConn(atom: any, includeAtomsInCollapsedSgroups?: boolean): any[];
+    findBondId(begin: number, end: number): number | null;
     initNeighbors(): void;
     bondInitHalfBonds(bid: any, bond?: Bond): void;
     halfBondUpdate(halfBondId: number): void;
@@ -109,7 +109,8 @@ export declare class Struct {
     checkBondExists(begin: number, end: number): boolean;
     findConnectedComponent(firstaid: number): Pile<number>;
     findConnectedComponents(discardExistingFragments?: boolean): any[];
-    markFragment(idSet: Pile<number>, properties: [StructProperty]): void;
+    markFragment(idSet: Pile<number>, properties?: [StructProperty]): void;
+    clearFragments(): void;
     markFragments(properties?: any): void;
     scale(scale: number): void;
     rescale(): void;
@@ -122,8 +123,8 @@ export declare class Struct {
         newLoops: any[];
         bondsToMark: number[];
     };
-    calcImplicitHydrogen(aid: number): void;
-    setImplicitHydrogen(list?: Array<number>): void;
+    calcImplicitHydrogen(aid: number, includeAtomsInCollapsedSgroups?: boolean): void;
+    setImplicitHydrogen(list?: Array<number>, includeAtomsInCollapsedSgroups?: boolean): void;
     setStereoLabelsToAtoms(): void;
     atomGetNeighbors(aid: number): Array<Neighbor> | undefined;
     getComponents(): {
@@ -133,9 +134,9 @@ export declare class Struct {
     defineRxnFragmentTypeForAtomset(atomset: Pile<number>, arrowpos: number): 1 | 2;
     getBondFragment(bid: number): number | undefined;
     bindSGroupsToFunctionalGroups(): void;
-    getGroupIdFromAtomId(atomId: number): number | null;
+    getGroupIdFromAtomId(atomId: number, searchBySgroups?: boolean): number | null;
     getGroupIdsFromAtomId(atomId: number | undefined): number[];
-    getGroupFromAtomId(atomId: number | undefined): SGroup | undefined;
+    getGroupFromAtomId(atomId: number | undefined, searchBySgroups?: boolean): SGroup | undefined;
     getGroupsFromAtomId(atomId: number | undefined): SGroup[];
     getGroupIdFromBondId(bondId: number): number | null;
     getGroupFromBondId(atomId: number): SGroup | undefined;
@@ -157,4 +158,7 @@ export declare class Struct {
     } | null): boolean | null | undefined;
     disableInitiallySelected(): void;
     enableInitiallySelected(): void;
+    applyMonomersTransformations(): void;
+    applyStereoBondsToExpandedMonomers(): void;
+    private flipBondAndSetStereo;
 }

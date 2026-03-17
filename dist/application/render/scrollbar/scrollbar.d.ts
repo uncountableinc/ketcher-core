@@ -12,11 +12,12 @@ export declare abstract class Scrollbar {
     protected DIST_TO_EDGE: number;
     protected COLOR: string;
     protected constructor(render: Render);
+    destroy(): void;
     update(): void;
-    protected redraw(): any;
-    protected updateAttr(): any;
+    protected redraw(): RaphaelElement;
+    protected updateAttr(): RaphaelElement;
     protected hide(): null;
-    protected draw(): import("raphael").RaphaelElement<"SVG" | "VML", SVGRectElement | Element>;
+    protected draw(): RaphaelElement;
     protected onDragStart(_x: number, _y: number, event: MouseEvent): void;
     protected onDragEnd(event: MouseEvent): void;
     abstract hasOffset(): boolean;

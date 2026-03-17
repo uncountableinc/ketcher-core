@@ -54,6 +54,8 @@ declare class ReStruct {
     molecule: Struct;
     atoms: Map<number, ReAtom>;
     bonds: Map<number, ReBond>;
+    visibleAtoms: Map<number, ReAtom>;
+    visibleBonds: Map<number, ReBond>;
     reloops: Map<number, ReLoop>;
     rxnPluses: Map<number, ReRxnPlus>;
     rxnArrows: Map<number, ReRxnArrow>;
@@ -70,17 +72,18 @@ declare class ReStruct {
     private initialized;
     private layers;
     connectedComponents: Pool;
-    private ccFragmentType;
+    private readonly ccFragmentType;
     private structChanged;
-    private atomsChanged;
-    private simpleObjectsChanged;
-    private rxnArrowsChanged;
-    private rxnPlusesChanged;
-    private enhancedFlagsChanged;
-    private bondsChanged;
-    private textsChanged;
-    private imagesChanged;
-    private multitailArrowsChanged;
+    needRecalculateVisibleAtomsAndBonds: boolean;
+    private readonly atomsChanged;
+    private readonly simpleObjectsChanged;
+    private readonly rxnArrowsChanged;
+    private readonly rxnPlusesChanged;
+    private readonly enhancedFlagsChanged;
+    private readonly bondsChanged;
+    private readonly textsChanged;
+    private readonly imagesChanged;
+    private readonly multitailArrowsChanged;
     private snappingBonds;
     constructor(molecule: any, render: Render | {
         skipRaphaelInitialization: boolean;
@@ -95,6 +98,8 @@ declare class ReStruct {
     assignConnectedComponents(): void;
     initLayers(): void;
     addReObjectPath(group: LayerMap, visel: Visel, path: any, pos?: Vec2 | null, visible?: boolean): void;
+    moveReObjectOnTopOfLayer(visel: Visel, layerKey: LayerMap): void;
+    movePathOnTopOfLayer(path: any, layerKey: LayerMap): void;
     clearMarks(): void;
     markItemRemoved(): void;
     markBond(bid: number, mark: number): void;
@@ -116,7 +121,9 @@ declare class ReStruct {
     private getBoundingBoxForSelection;
     translate(d: any): void;
     scale(s: number): void;
+    /** Visel is a shorthand for VISual ELement */
     clearVisels(): void;
+    recalculateVisibleAtomsAndBonds(): void;
     update(force: boolean): boolean;
     updateLoops(): void;
     showLoops(): void;

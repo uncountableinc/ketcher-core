@@ -1,35 +1,38 @@
+export declare const UNRESOLVED_MONOMER_COLOR = "#585858";
+export declare const BAD_VALENCE_WARNING_COLOR = "#F00";
+export declare const BAD_VALENCE_LINE_OFFSET = 2;
 export declare const MONOMER_SYMBOLS_IDS: {
     AminoAcid: {
         hover: string;
-        selected: string;
         body: string;
+        autochainPreview: string;
     };
     CHEM: {
         hover: string;
-        selected: string;
         body: string;
+        autochainPreview: string;
     };
     Sugar: {
         hover: string;
-        selected: string;
         body: string;
         variant: string;
+        autochainPreview: string;
     };
     Base: {
         hover: string;
-        selected: string;
         body: string;
         variant: string;
+        autochainPreview: string;
     };
     Phosphate: {
         hover: string;
-        selected: string;
         body: string;
         variant: string;
+        autochainPreview: string;
     };
     RNA: {
         hover: string;
-        selected: string;
         body: string;
+        autochainPreview: string;
     };
 };

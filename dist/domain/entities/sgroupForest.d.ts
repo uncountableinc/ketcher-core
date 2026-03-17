@@ -38,4 +38,4 @@ export declare class SGroupForest {
     private resetParentLink;
     remove(id: any): void;
 }
-export declare function checkOverlapping(struct: Struct, atoms: number[] | undefined, sGroupType: 'queryComponent' | 'common'): boolean;
+export declare function checkOverlapping(struct: Struct, sGroupType: 'queryComponent' | 'common', atoms?: number[]): boolean;

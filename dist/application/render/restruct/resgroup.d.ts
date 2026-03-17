@@ -18,9 +18,16 @@ import ReStruct from './restruct';
 import { Render } from '../raphaelRender';
 import ReObject from './reobject';
 import { RaphaelPaper } from 'raphael';
+export declare const SUPERATOM_CLASS_TEXT: {
+    BASE: string;
+    SUGAR: string;
+    PHOSPHATE: string;
+};
+export declare function paperPathFromSVGElement(element: any): any;
 declare class ReSGroup extends ReObject {
     item: SGroup | undefined;
     render: Render;
+    private expandedMonomerAttachmentPoints?;
     constructor(sgroup: SGroup);
     static isSelectable(): boolean;
     /**
@@ -29,15 +36,16 @@ declare class ReSGroup extends ReObject {
      * @returns {*}
      */
     draw(remol: ReStruct, sgroup: SGroup): any;
-    getTextHighlightDimensions(padding: number | undefined, render: Render): {
+    getTextHighlightDimensions(render: Render, padding?: number): {
         startX: number;
         startY: number;
         width: number;
         height: number;
     };
     getContractedSelectionContour(render: Render): any;
-    makeSelectionPlate(restruct: ReStruct, _paper: RaphaelPaper, options: any): any | void;
+    makeSelectionPlate(restruct: ReStruct, _paper: RaphaelPaper, options: any): any;
     drawHover(render: Render): void;
+    setHover(hover: boolean, render: Render): void;
     show(restruct: ReStruct): void;
 }
 export default ReSGroup;

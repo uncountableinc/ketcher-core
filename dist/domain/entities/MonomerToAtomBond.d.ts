@@ -11,4 +11,6 @@ export declare class MonomerToAtomBond extends BaseBond {
     setRenderer(renderer: MonomerToAtomBondRenderer | MonomerToAtomBondSequenceRenderer): void;
     get firstEndEntity(): BaseMonomer;
     get secondEndEntity(): Atom;
+    get isHorizontal(): boolean;
+    get isVertical(): boolean;
 }

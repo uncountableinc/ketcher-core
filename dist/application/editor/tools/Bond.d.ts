@@ -18,16 +18,12 @@ import { BaseTool } from "./Tool";
 import { BaseMonomer } from "../../../domain/entities/BaseMonomer";
 import { AttachmentPointName } from "../../../domain/types";
 import { ToolName } from "./..";
-export declare enum MACROMOLECULES_BOND_TYPES {
-    SINGLE = "single",
-    HYDROGEN = "hydrogen"
-}
 declare class PolymerBond implements BaseTool {
-    private editor;
+    private readonly editor;
     private bondRenderer?;
     private isBondConnectionModalOpen;
-    private history;
-    private bondType;
+    private readonly history;
+    private readonly bondType;
     constructor(editor: CoreEditor, options: {
         toolName: ToolName;
     });

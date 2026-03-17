@@ -9,7 +9,7 @@ export declare class PeptideRenderer extends BaseMonomerRenderer {
     protected get modificationConfig(): {
         backgroundId: string;
         requiresFill: boolean;
-    };
+    } | undefined;
     protected appendBody(rootElement: Selection<SVGGElement, void, HTMLElement, never>, theme: any): Selection<SVGUseElement, this, HTMLElement, never>;
     get textColor(): string;
     show(theme: any): void;

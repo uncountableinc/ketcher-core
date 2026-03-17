@@ -1,5 +1,5 @@
 import { BaseMonomer, Chem, Peptide, Phosphate, RNABase, Struct, Sugar, PolymerBond } from "../entities";
-import { IKetAttachmentPoint, IKetIdtAliases, KetAmbiguousMonomerTemplateOption, KetAmbiguousMonomerTemplateSubType, KetMonomerClass } from "../../application/formatters/types/ket";
+import { AmbiguousMonomerTransformation, IKetAttachmentPoint, IKetIdtAliases, KetAmbiguousMonomerTemplateOption, KetAmbiguousMonomerTemplateSubType, KetMonomerClass, MonomerTransformation } from "../../application/formatters/types/ket";
 import { D3SvgElementSelection } from "../../application/render/types";
 import { UsageInMacromolecule } from "../../application/render";
 import { MonomerToAtomBond } from "../entities/MonomerToAtomBond";
@@ -18,17 +18,23 @@ export declare enum AttachmentPointName {
     R8 = "R8",
     HYDROGEN = "hydrogen"
 }
-export declare type MonomerItemType = {
+export declare type MonomerItemBase = {
     label: string;
-    colorScheme?: MonomerColorScheme;
+    isAmbiguous?: boolean;
     favorite?: boolean;
+};
+export declare type MonomerItemType = MonomerItemBase & {
+    colorScheme?: MonomerColorScheme;
     struct: Struct;
     props: {
         id?: string;
+        MonomerNaturalAnalogThreeLettersCode?: string;
         MonomerNaturalAnalogCode: string;
         MonomerName: string;
         MonomerFullName?: string;
         Name: string;
+        aliasHELM?: string;
+        aliasAxoLabs?: string;
         BranchMonomer?: string;
         MonomerCaps?: Partial<Record<AttachmentPointName, string>>;
         MonomerCode?: string;
@@ -37,22 +43,24 @@ export declare type MonomerItemType = {
         isMicromoleculeFragment?: boolean;
         idtAliases?: IKetIdtAliases;
         unresolved?: boolean;
+        modificationTypes?: string[];
+        hidden?: boolean;
     };
     attachmentPoints?: IKetAttachmentPoint[];
     seqId?: number;
-    isAmbiguous?: boolean;
     isAntisense?: boolean;
     isSense?: boolean;
+    expanded?: boolean;
+    transformation?: MonomerTransformation;
 };
-export declare type AmbiguousMonomerType = {
+export declare type AmbiguousMonomerType = MonomerItemBase & {
     id: string;
     monomers: BaseMonomer[];
     subtype: KetAmbiguousMonomerTemplateSubType;
-    label: string;
     options: KetAmbiguousMonomerTemplateOption[];
     idtAliases?: IKetIdtAliases;
     isAmbiguous: true;
-    favorite?: boolean;
+    transformation?: AmbiguousMonomerTransformation;
 };
 export declare type MonomerOrAmbiguousType = MonomerItemType | AmbiguousMonomerType;
 export declare const attachmentPointNames: string[];

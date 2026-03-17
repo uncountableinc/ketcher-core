@@ -12,6 +12,9 @@ export interface StartNewSequenceEventData {
 export declare class SequenceMode extends BaseMode {
     private _isEditMode;
     private _isEditInRNABuilderMode;
+    private _isAntisenseEditMode;
+    private _isSyncEditMode;
+    private isFirstInit;
     private selectionStarted;
     private selectionStartCaretPosition;
     private mousemoveCounter;
@@ -20,6 +23,16 @@ export declare class SequenceMode extends BaseMode {
     set isEditMode(isEditMode: boolean);
     get isEditInRNABuilderMode(): boolean;
     set isEditInRNABuilderMode(isEditInRNABuilderMode: boolean);
+    get isAntisenseEditMode(): boolean;
+    get isSyncEditMode(): boolean;
+    private get needToEditSense();
+    private get needToEditAntisense();
+    private turnOnAntisenseEditMode;
+    private turnOffAntisenseEditMode;
+    private setAntisenseEditMode;
+    turnOnSyncEditMode(): void;
+    turnOffSyncEditMode(): void;
+    resetEditMode(): void;
     initialize(needScroll?: boolean, needRemoveSelection?: boolean, needReArrangeChains?: boolean): Command;
     turnOnEditMode(sequenceItemRenderer?: BaseSequenceItemRenderer, needToRemoveSelection?: boolean): void;
     turnOffEditMode(): void;
@@ -40,7 +53,9 @@ export declare class SequenceMode extends BaseMode {
     private deleteBondToNextNodeInChain;
     private finishNodesDeletion;
     private tryToCreatePolymerBond;
+    private splitCurrentChain;
     private handleNodesDeletion;
+    private isNodeExistAndNonEmpty;
     get keyboardEventHandlers(): {
         delete: {
             shortcut: string[];
@@ -55,6 +70,14 @@ export declare class SequenceMode extends BaseMode {
             handler: () => void;
         };
         'start-new-sequence': {
+            shortcut: string[];
+            handler: () => void;
+        };
+        'break-editting-chain': {
+            shortcut: string[];
+            handler: () => void;
+        };
+        'break-complimentary-chain': {
             shortcut: string[];
             handler: () => void;
         };
@@ -83,7 +106,7 @@ export declare class SequenceMode extends BaseMode {
             handler: (event: any) => void;
         };
     };
-    private deleteSelection;
+    deleteSelection(): boolean;
     isPasteAllowedByMode(drawingEntitiesManager: DrawingEntitiesManager): boolean;
     private isR1Free;
     private isR2Free;
@@ -100,6 +123,7 @@ export declare class SequenceMode extends BaseMode {
     private presetHasNeededAttachmentPoints;
     private selectionsCantPreserveConnectionsWithPreset;
     private checkNodeInsertionPossibility;
+    private isSelectionsContainAntisenseChains;
     insertMonomerFromLibrary(monomerItem: MonomerItemType): void;
     private createRnaPresetNode;
     private replaceSelectionWithPreset;
@@ -113,5 +137,9 @@ export declare class SequenceMode extends BaseMode {
     private getNewSequenceItemPosition;
     scrollForView(): void;
     private unselectAllEntities;
+    private createHydrogenBondForTwoStrandedNode;
+    private deleteHydrogenBondsForNode;
+    establishHydrogenBond(sequenceItemRenderer: BaseSequenceItemRenderer): void;
+    deleteHydrogenBond(sequenceItemRenderer: BaseSequenceItemRenderer): void;
     destroy(): void;
 }

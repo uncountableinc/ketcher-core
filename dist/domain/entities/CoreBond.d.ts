@@ -2,6 +2,7 @@ import { DrawingEntity } from "./DrawingEntity";
 import { Vec2 } from "./vec2";
 import { Atom } from "./CoreAtom";
 import { BondRenderer } from "../../application/render/renderers/BondRenderer";
+import { BondCIP } from "./types";
 export declare enum BondType {
     None = 0,
     Single = 1,
@@ -25,17 +26,18 @@ export declare enum BondStereo {
 export declare class Bond extends DrawingEntity {
     firstAtom: Atom;
     secondAtom: Atom;
-    bondIdInMicroMode: any;
+    bondIdInMicroMode: number;
     type: BondType;
     stereo: BondStereo;
+    cip: BondCIP | null;
     endPosition: Vec2;
     renderer: BondRenderer | undefined;
-    cycles: never[];
-    constructor(firstAtom: Atom, secondAtom: Atom, bondIdInMicroMode: any, type?: BondType, stereo?: BondStereo);
+    constructor(firstAtom: Atom, secondAtom: Atom, bondIdInMicroMode: number, type?: BondType, stereo?: BondStereo, cip?: BondCIP | null);
     setRenderer(renderer: BondRenderer): void;
     get startPosition(): Vec2;
     get center(): Vec2;
     moveBondStartAbsolute(x: any, y: any): void;
     moveBondEndAbsolute(x: any, y: any): void;
     moveToLinkedAtoms(): void;
+    moveToLinkedEntities(): void;
 }

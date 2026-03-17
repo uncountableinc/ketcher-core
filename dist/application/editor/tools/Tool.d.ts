@@ -1,4 +1,4 @@
-import { MonomerItemType, Entities } from "../../../domain/types";
+import { MonomerItemType, Entities, MonomerOrAmbiguousType } from "../../../domain/types";
 import { IKetMonomerGroupTemplate } from "../../formatters";
 interface ToolEventHandler {
     click?(event: Event): void;
@@ -42,6 +42,7 @@ interface ToolEventHandler {
     mouseDownOnSequenceItem?(event: Event): void;
     doubleClickOnSequenceItem?(event: Event): void;
     mouseUpAtom?(event: Event): void;
+    selectEntities?(event: Event): void;
 }
 export interface IRnaPreset {
     name?: string;
@@ -58,9 +59,11 @@ export interface IRnaLabeledPreset extends Omit<IRnaPreset, 'base' | 'sugar' | '
 export declare type LabeledNodesWithPositionInSequence = {
     type: Entities;
     nodeIndexOverall: number;
+    hasAntisense: boolean;
     baseLabel?: string;
     sugarLabel?: string;
     phosphateLabel?: string;
+    rnaBaseMonomerItem?: MonomerOrAmbiguousType;
     isNucleosideConnectedAndSelectedWithPhosphate?: boolean;
     hasR1Connection?: boolean;
 };
@@ -73,10 +76,7 @@ export interface BaseTool extends Tool {
     destroy(): void;
 }
 export declare type PeptideToolOptions = MonomerItemType;
-export declare type ToolOptions = any;
-export declare type ToolConstructorInterface = {
-    new (editor: any, ...args: ToolOptions[]): Tool | BaseTool;
-};
+export declare type ToolConstructorInterface = new (editor: any, ...args: any[]) => Tool | BaseTool;
 export declare type ToolEventHandlerName = keyof ToolEventHandler;
 export declare function isBaseTool(tool: Tool | BaseTool | undefined): tool is BaseTool;
 export {};

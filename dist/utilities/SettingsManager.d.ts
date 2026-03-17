@@ -13,11 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
+import { LayoutMode } from "../application/editor";
 export declare const KETCHER_SAVED_SETTINGS_KEY = "ketcher_editor_saved_settings";
 export declare const KETCHER_SAVED_OPTIONS_KEY = "ketcher-opts";
+export declare type EditorLineLength = Record<Exclude<LayoutMode, 'flex-layout-mode'>, number>;
+export declare const SetEditorLineLengthAction = "SetEditorLineLength";
 interface SavedSettings {
     selectionTool?: any;
     disableCustomQuery?: boolean;
+    editorLineLength?: EditorLineLength;
+    monomerLibraryUpdates?: string[];
 }
 interface SavedOptions {
     ignoreChiralFlag?: boolean;
@@ -25,16 +30,24 @@ interface SavedOptions {
     disableQueryElements?: string[] | null;
 }
 export declare class SettingsManager {
-    static _disableCustomQuery?: boolean;
+    private static disableCustomQueryValue?;
+    private static persistMonomerLibraryUpdatesValue;
     static getSettings(): SavedSettings;
     static saveSettings(settings: SavedSettings): void;
     static getOptions(): SavedOptions;
     static saveOptions(options: SavedOptions): void;
     static get selectionTool(): any;
     static set selectionTool(selectionTool: any);
+    static get editorLineLength(): EditorLineLength;
+    static set editorLineLength(newEditorLineLength: Partial<EditorLineLength>);
     static get disableCustomQuery(): boolean | undefined;
     static set disableCustomQuery(disableCustomQuery: boolean | undefined);
     static get ignoreChiralFlag(): boolean | undefined;
     static set ignoreChiralFlag(ignoreChiralFlag: boolean | undefined);
+    static get monomerLibraryUpdates(): string[];
+    static set monomerLibraryUpdates(monomerLibraryUpdates: string[]);
+    static addMonomerLibraryUpdate(newUpdate: string): void;
+    static get persistMonomerLibraryUpdates(): boolean;
+    static set persistMonomerLibraryUpdates(value: boolean | undefined);
 }
 export {};

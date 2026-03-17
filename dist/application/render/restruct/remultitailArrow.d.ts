@@ -23,9 +23,9 @@ export interface MultitailArrowClosestReferencePosition {
 }
 export declare class ReMultitailArrow extends ReObject {
     multitailArrow: MultitailArrow;
-    static CUBIC_BEZIER_OFFSET: number;
-    static FRAME_OFFSET: number;
-    static SELECTION_POINT_OFFSET_FROM_SPINE: number;
+    static readonly CUBIC_BEZIER_OFFSET = 6;
+    static readonly FRAME_OFFSET = 0.175;
+    static readonly SELECTION_POINT_OFFSET_FROM_SPINE = 0.1;
     static isSelectable(): boolean;
     static getTailIdFromRefName(name: string): number | null;
     constructor(multitailArrow: MultitailArrow);
@@ -33,14 +33,14 @@ export declare class ReMultitailArrow extends ReObject {
     getSelectionPointOffset(options: RenderOptions): number;
     getReferencePositions(renderOptions: RenderOptions): ReturnType<MultitailArrow['getReferencePositions']>;
     getReferenceLines(renderOptions: RenderOptions, referencePositions?: import("../../../domain/entities").MultitailArrowsReferencePositions): import("../../../domain/entities").MultitailArrowsReferenceLines;
-    drawSingleLineHover(builder: PathBuilder, renderOptions: RenderOptions, lineStart: Vec2, lineEnd: Vec2, verticalDirection: -1 | 1, horizontalDirection: -1 | 1): void;
+    static drawSingleLineHover(builder: PathBuilder, offset: number, lineStart: Vec2, lineEnd: Vec2, verticalDirection: -1 | 1, horizontalDirection: -1 | 1): void;
     buildFrame(renderOptions: RenderOptions): string;
-    drawHover(render: Render): import("raphael").RaphaelPath<"SVG" | "VML">;
+    drawHover(render: Render): any;
     getSelectionPointsFromReferencePoint(point: Vec2, topSpine: Vec2, name: string, spineOffset: number): {
         [x: string]: Vec2;
     };
     addTestSelectionPoints(reStruct: ReStruct, paper: RaphaelPaper, renderOptions: RenderOptions): void;
-    makeSelectionPlate(reStruct: ReStruct, paper: RaphaelPaper, options: RenderOptions): import("raphael").RaphaelSet<"SVG" | "VML">;
+    makeSelectionPlate(reStruct: ReStruct, paper: RaphaelPaper, options: RenderOptions): any;
     show(reStruct: ReStruct, renderOptions: RenderOptions): void;
     private getClosestArrowPartPosition;
     private getTailArrayFromPool;

@@ -17,7 +17,7 @@ import { MolSerializerOptions } from './mol.types';
 import { Serializer } from '../serializers.types';
 import { Struct } from "../../entities";
 export declare class MolSerializer implements Serializer<Struct> {
-    static DefaultOptions: MolSerializerOptions;
+    static readonly DefaultOptions: MolSerializerOptions;
     readonly options: MolSerializerOptions;
     constructor(options?: Partial<MolSerializerOptions>);
     deserialize(content: string): Struct;

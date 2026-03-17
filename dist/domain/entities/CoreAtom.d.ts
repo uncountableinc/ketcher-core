@@ -5,6 +5,7 @@ import { Bond } from "./CoreBond";
 import { AtomLabel } from "../constants";
 import { AtomRenderer } from "../../application/render/renderers/AtomRenderer";
 import { MonomerToAtomBond } from './MonomerToAtomBond';
+import { AtomCIP } from './types';
 export declare enum AtomRadical {
     None = 0,
     Single = 1,
@@ -17,15 +18,17 @@ export interface AtomProperties {
     isotope?: number | null;
     radical?: AtomRadical;
     alias?: string | null;
+    cip?: AtomCIP | null;
+    stereoLabel?: string | null;
 }
 export declare class Atom extends DrawingEntity {
     monomer: BaseMonomer;
-    atomIdInMicroMode: any;
+    atomIdInMicroMode: number;
     label: AtomLabel;
     properties: AtomProperties;
     bonds: Array<Bond | MonomerToAtomBond>;
     renderer: AtomRenderer | undefined;
-    constructor(position: Vec2, monomer: BaseMonomer, atomIdInMicroMode: any, label: AtomLabel, properties?: AtomProperties);
+    constructor(position: Vec2, monomer: BaseMonomer, atomIdInMicroMode: number, label: AtomLabel, properties?: AtomProperties);
     get center(): Vec2;
     addBond(bond: Bond | MonomerToAtomBond): void;
     deleteBond(bondId: number): void;
@@ -37,6 +40,8 @@ export declare class Atom extends DrawingEntity {
     get hasCharge(): boolean;
     get hasExplicitValence(): boolean;
     get hasExplicitIsotope(): boolean;
+    get hasBadValence(): boolean;
+    get hasStereoLabel(): boolean;
     private get radicalAmount();
     private get valenceWithoutHydrogen();
     calculateValence(): {

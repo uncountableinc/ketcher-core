@@ -8,7 +8,7 @@ export declare class PhosphateRenderer extends BaseMonomerRenderer {
     get textColor(): "#fff" | "#333333";
     protected get modificationConfig(): {
         backgroundId: string;
-    };
+    } | undefined;
     protected appendBody(rootElement: Selection<SVGGElement, void, HTMLElement, never>, theme: any): Selection<SVGUseElement, this, HTMLElement, never>;
     show(theme: any): void;
     get enumerationElementPosition(): undefined;

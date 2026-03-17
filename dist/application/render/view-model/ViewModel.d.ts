@@ -20,6 +20,10 @@ export declare class ViewModel {
     private loopHasSelfIntersections;
     private loopIsConvex;
     private findLoops;
+    getLargestSectorFromAtomNeighbours(atom: Atom): {
+        neighborAngle: number;
+        largestAngle: number;
+    };
     private clearState;
     initialize(bonds: Bond[]): void;
 }

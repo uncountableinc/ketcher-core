@@ -35,8 +35,10 @@ export declare enum ChemicalMimeType {
     DNA = "chemical/x-dna-sequence",
     PEPTIDE = "chemical/x-peptide-sequence",
     IDT = "chemical/x-idt",
+    AXOLABS = "chemical/x-axo-labs",
     HELM = "chemical/x-helm",
-    RDF = "chemical/x-rdf"
+    RDF = "chemical/x-rdf",
+    MonomerLibrary = "chemical/x-monomer-library"
 }
 export interface WithStruct {
     struct: string;
@@ -87,6 +89,22 @@ export interface CalculateCipResult extends WithStruct, WithFormat {
 export interface ExplicitHydrogensData extends WithStruct, WithOutputFormat {
     mode?: 'auto' | 'fold' | 'unfold';
 }
+export declare type CalculateMacromoleculePropertiesData = WithStruct;
+export interface SingleChainMacromoleculeProperties {
+    grossFormula?: string;
+    mass?: number;
+    monomerCount: {
+        nucleotides?: Record<string, number>;
+        peptides?: Record<string, number>;
+    };
+    pKa?: number;
+    extinctionCoefficient?: number;
+    hydrophobicity?: number[];
+    Tm?: number;
+}
+export interface CalculateMacromoleculePropertiesResult {
+    properties: string;
+}
 export interface ExplicitHydrogensResult extends WithStruct, WithFormat {
 }
 export declare type CalculateProps = 'molecular-weight' | 'most-abundant-mass' | 'monoisotopic-mass' | 'gross' | 'mass-composition';
@@ -118,6 +136,7 @@ export interface GenerateImageOptions extends StructServiceOptions {
     stereoStyle?: 'ext' | 'old' | 'none;';
 }
 export interface StructService {
+    addKetcherId: (id: string) => void;
     info: () => Promise<InfoResult>;
     convert: (data: ConvertData, options?: StructServiceOptions) => Promise<ConvertResult>;
     layout: (data: LayoutData, options?: StructServiceOptions) => Promise<LayoutResult>;
@@ -132,5 +151,6 @@ export interface StructService {
     getInChIKey: (struct: string) => Promise<string>;
     generateImageAsBase64: (data: string, options?: GenerateImageOptions) => Promise<string>;
     toggleExplicitHydrogens: (data: ExplicitHydrogensData, options?: StructServiceOptions) => Promise<ExplicitHydrogensResult>;
+    calculateMacromoleculeProperties: (data: CalculateMacromoleculePropertiesData, options?: StructServiceOptions) => Promise<CalculateMacromoleculePropertiesResult>;
     destroy?: () => void;
 }

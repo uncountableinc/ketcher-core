@@ -24,6 +24,7 @@ declare class BaseOperation {
     data: any;
     constructor(type: OperationType, priority?: number);
     execute(_restruct: ReStruct): void;
+    /** Returns inverted of this */
     perform(restruct: ReStruct): BaseOperation;
     invert(): BaseOperation;
     isInvertible(): boolean;

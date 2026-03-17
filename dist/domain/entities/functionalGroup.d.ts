@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-import { ReSGroup } from "../../application/render";
+import type { ReSGroup } from "../../application/render";
 import { Atom } from './atom';
 import { Bond } from './bond';
 import { Pool } from './pool';
@@ -37,7 +37,7 @@ export declare class FunctionalGroup {
     static findFunctionalGroupByBond(molecule: Struct, functionalGroups: Pool<FunctionalGroup>, bondId: number | null, isFunctionalGroupReturned: true): FunctionalGroup | null;
     static findFunctionalGroupBySGroup(functionalGroups: Pool<FunctionalGroup>, sGroup?: SGroup): FunctionalGroup | undefined;
     static clone(functionalGroup: FunctionalGroup): FunctionalGroup;
-    static isAtomInContractedFunctionalGroup(atom: Atom, sgroups: any, functionalGroups: any, sgroupsFromReStruct: boolean): boolean;
+    static isAtomInContractedFunctionalGroup(atom: Atom, sgroups: Map<number, ReSGroup> | Pool<SGroup>, functionalGroups: any): boolean;
     static isBondInContractedFunctionalGroup(bond: Bond, sGroups: Map<number, ReSGroup> | Pool<SGroup>, functionalGroups: Pool<FunctionalGroup>): boolean;
     static isHalfBondInContractedFunctionalGroup(halfBond: HalfBond, struct: Struct): boolean;
     static isContractedFunctionalGroup(sgroup: any, functionalGroups: any): boolean;

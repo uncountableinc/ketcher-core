@@ -21,6 +21,11 @@ import { Vec2 } from './vec2';
 import { ReStruct } from '../../application/render';
 import { FunctionalGroup, Pool, SGroupAttachmentPoint } from "./";
 import { ReSGroup } from "../../application/render";
+export declare enum SUPERATOM_CLASS {
+    SUGAR = "SUGAR",
+    BASE = "BASE",
+    PHOSPHATE = "PHOSPHATE"
+}
 export declare class SGroupBracketParams {
     readonly c: Vec2;
     readonly d: Vec2;
@@ -30,7 +35,7 @@ export declare class SGroupBracketParams {
     constructor(c: Vec2, d: Vec2, w: number, h: number);
 }
 export declare class SGroup {
-    static TYPES: {
+    static readonly TYPES: {
         SUP: string;
         MUL: string;
         SRU: string;
@@ -47,6 +52,7 @@ export declare class SGroup {
         ANY: string;
         GEN: string;
         queryComponent: string;
+        nucleotideComponent: string;
     };
     type: string;
     id: number;
@@ -129,18 +135,16 @@ export declare class SGroup {
     static getCrossBonds(mol: any, parentAtomSet: Pile<number>): {
         [key: number]: Array<number>;
     };
-    static bracketPos(sGroup: any, mol: any, crossBondsPerAtom?: {
-        [key: number]: Array<number>;
-    }, remol?: ReStruct, render?: any): void;
+    static bracketPos(sGroup: any, mol: any, remol?: ReStruct, render?: any): void;
     static getBracketParameters(mol: any, crossBondsPerAtom: {
         [key: number]: Array<Bond>;
     }, atomSet: Pile<number>, bb: any, d: any, n: any): Array<any>;
-    static getObjBBox(atoms: any, mol: any, useCollapsedSgroupsPosition?: boolean): Box2Abs;
-    static getAtoms(mol: any, sg: any): Array<any>;
+    static getObjBBox(atoms: number[], mol: Struct, useCollapsedSgroupsPosition?: boolean): Box2Abs;
+    static getAtoms(mol: Struct, sg: SGroup | undefined): number[];
     static getBonds(mol: any, sg: any): Array<any>;
     static prepareMulForSaving(sgroup: any, mol: any): void;
     static getMassCentre(mol: any, atoms: any): Vec2;
-    static isAtomInContractedSGroup: (atom: any, sGroups: any) => boolean;
+    static readonly isAtomInContractedSGroup: (atom: any, sGroups: any) => boolean;
     static isBondInContractedSGroup(bond: Bond, sGroups: Map<number, ReSGroup> | Pool<SGroup>): boolean;
     static isSuperAtom(sGroup?: SGroup): boolean;
     static isDataSGroup(sGroup: SGroup): boolean;

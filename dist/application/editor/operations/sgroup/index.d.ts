@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-import { SGroup } from "../../../../domain/entities";
+import { BaseMonomer, SGroup } from "../../../../domain/entities";
 import { ReStruct } from '../../../render';
 import { BaseOperation } from '../base';
 declare type Data = {
@@ -25,8 +25,9 @@ declare type Data = {
     oldSgroup?: SGroup;
 };
 declare class SGroupCreate extends BaseOperation {
+    private readonly monomer?;
     data: Data;
-    constructor(sgroupId?: any, type?: any, pp?: any, expanded?: boolean, name?: string, oldSgroup?: SGroup);
+    constructor(sgroupId?: any, type?: any, pp?: any, expanded?: boolean, name?: string, oldSgroup?: SGroup, monomer?: BaseMonomer | undefined);
     execute(restruct: ReStruct): void;
     invert(): SGroupDelete;
 }

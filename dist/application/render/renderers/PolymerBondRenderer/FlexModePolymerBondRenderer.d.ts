@@ -3,9 +3,10 @@ import { PolymerBond } from "../../../../domain/entities/PolymerBond";
 import { BaseRenderer } from '../BaseRenderer';
 export declare class FlexModePolymerBondRenderer extends BaseRenderer {
     readonly polymerBond: PolymerBond;
-    private editorEvents;
+    private readonly editorEvents;
     private selectionElement;
     private previousStateOfIsMonomersOnSameHorizontalLine;
+    private path;
     bodyElement?: D3SvgElementSelection<SVGLineElement, this>;
     constructor(polymerBond: PolymerBond);
     get rootBBox(): DOMRect | undefined;
@@ -14,8 +15,13 @@ export declare class FlexModePolymerBondRenderer extends BaseRenderer {
     private get scaledPosition();
     moveSelection(): void;
     appendBond(rootElement: any): D3SvgElementSelection<SVGLineElement, this> | undefined;
-    isMonomersOnSameHorizontalLine(): boolean;
+    generateLinearBondPath(): void;
+    generateEnvelopingBondPath(): void;
+    private addCornerBasedOnDirection;
+    private adjustPointForCorner;
     appendBondGraph(rootElement: any): D3SvgElementSelection<SVGLineElement, this> | undefined;
+    private getExpandedBoundingBox;
+    private getPointOnBBox;
     private appendRootElement;
     show(): void;
     drawSelection(): void;
@@ -25,6 +31,6 @@ export declare class FlexModePolymerBondRenderer extends BaseRenderer {
     private moveGraphBondStart;
     protected appendHoverAreaElement(): void;
     appendHover(): void;
-    removeHover(): D3SvgElementSelection<SVGLineElement | SVGGElement, void>;
+    removeHover(): string | D3SvgElementSelection<SVGGElement, void>;
     remove(): void;
 }

@@ -13,57 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-import { RenderersManager } from "../../../render/renderers/RenderersManager";
-import { Operation } from "../../../../domain/entities/Operation";
-import { BaseMonomer } from "../../../../domain/entities/BaseMonomer";
-import { AttachmentPointName } from "../../../../domain/types";
-export declare class MonomerAddOperation implements Operation {
-    addMonomerChangeModel: (monomer?: BaseMonomer) => BaseMonomer;
-    deleteMonomerChangeModel: (monomer: BaseMonomer) => void;
-    private callback?;
-    monomer: BaseMonomer;
-    priority: number;
-    constructor(addMonomerChangeModel: (monomer?: BaseMonomer) => BaseMonomer, deleteMonomerChangeModel: (monomer: BaseMonomer) => void, callback?: (() => void) | undefined);
-    execute(renderersManager: RenderersManager): void;
-    invert(renderersManager: RenderersManager): void;
-}
-export declare class MonomerMoveOperation implements Operation {
-    private monomerMoveModelChange;
-    private invertMonomerMoveModelChange;
-    monomer: BaseMonomer;
-    constructor(monomerMoveModelChange: () => BaseMonomer, invertMonomerMoveModelChange: () => BaseMonomer);
-    execute(renderersManager: RenderersManager): void;
-    invert(renderersManager: RenderersManager): void;
-}
-export declare class MonomerHoverOperation implements Operation {
-    private peptide;
-    private needRedrawAttachmentPoints;
-    constructor(peptide: BaseMonomer, needRedrawAttachmentPoints: boolean);
-    execute(renderersManager: RenderersManager): void;
-    invert(): void;
-}
-export declare class AttachmentPointHoverOperation implements Operation {
-    private peptide;
-    private attachmentPointName;
-    constructor(peptide: BaseMonomer, attachmentPointName: AttachmentPointName);
-    execute(renderersManager: RenderersManager): void;
-    invert(): void;
-}
-export declare class MonomerDeleteOperation implements Operation {
-    addMonomerChangeModel: (monomer: BaseMonomer) => BaseMonomer;
-    deleteMonomerChangeModel: (monomer: BaseMonomer) => void;
-    private callback?;
-    monomer: BaseMonomer;
-    priority: number;
-    constructor(monomer: BaseMonomer, addMonomerChangeModel: (monomer: BaseMonomer) => BaseMonomer, deleteMonomerChangeModel: (monomer: BaseMonomer) => void, callback?: (() => void) | undefined);
-    execute(renderersManager: RenderersManager): void;
-    invert(renderersManager: RenderersManager): void;
-}
-export declare class MonomerItemModifyOperation implements Operation {
-    updateMonomerItem: () => BaseMonomer;
-    revertMonomerItem: () => BaseMonomer;
-    monomer: BaseMonomer;
-    constructor(monomer: BaseMonomer, updateMonomerItem: () => BaseMonomer, revertMonomerItem: () => BaseMonomer);
-    execute(): void;
-    invert(): void;
-}
+export * from './AttachmentPointHoverOperation';
+export * from './FlipMonomerOperation';
+export * from './MonomerAddOperation';
+export * from './MonomerDeleteOperation';
+export * from './monomerFactory';
+export * from './MonomerHoverOperation';
+export * from './MonomerItemModifyOperation';
+export * from './MonomerMoveOperation';
+export * from './RotateMonomerOperation';
+export * from './ShiftMonomerOperation';

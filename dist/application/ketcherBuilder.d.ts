@@ -14,7 +14,6 @@
  * limitations under the License.
  ***************************************************************************/
 import { StructServiceOptions, StructServiceProvider } from "../domain/services";
-import { Editor } from "./editor";
 import { Ketcher } from './ketcher';
 export declare const DefaultStructServiceOptions: {
     'smart-layout': boolean;
@@ -27,6 +26,6 @@ export declare const DefaultStructServiceOptions: {
 };
 export declare class KetcherBuilder {
     #private;
-    withStructServiceProvider(structServiceProvider: StructServiceProvider): KetcherBuilder;
-    build(editor: Editor, serviceOptions?: StructServiceOptions): Ketcher;
+    withStructServiceProvider(structServiceProvider: StructServiceProvider): this;
+    build(serviceOptions?: StructServiceOptions): Ketcher;
 }

@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-import { AromatizeData, AromatizeResult, AutomapData, AutomapResult, CalculateCipData, CalculateCipResult, CalculateData, CalculateResult, CheckData, CheckResult, CleanData, CleanResult, ConvertData, ConvertResult, DearomatizeData, DearomatizeResult, ExplicitHydrogensData, ExplicitHydrogensResult, GenerateImageOptions, InfoResult, LayoutData, LayoutResult, RecognizeResult, StructService, StructServiceOptions } from "../../../domain/services";
-export declare function pickStandardServerOptions(options?: StructServiceOptions): {
+import { AromatizeData, AromatizeResult, AutomapData, AutomapResult, CalculateCipData, CalculateCipResult, CalculateData, CalculateMacromoleculePropertiesData, CalculateMacromoleculePropertiesResult, CalculateResult, CheckData, CheckResult, CleanData, CleanResult, ConvertData, ConvertResult, DearomatizeData, DearomatizeResult, ExplicitHydrogensData, ExplicitHydrogensResult, GenerateImageOptions, InfoResult, LayoutData, LayoutResult, RecognizeResult, StructService, StructServiceOptions } from "../../../domain/services";
+export declare function pickStandardServerOptions(ketcherId: string, options?: StructServiceOptions): {
     'dearomatize-on-load': string | number | boolean | undefined;
+    'aromaticity-model': string;
     'smart-layout': string | number | boolean | undefined;
     'ignore-stereochemistry-errors': string | number | boolean | undefined;
     'mass-skip-error-on-pseudoatoms': string | number | boolean | undefined;
@@ -28,7 +29,9 @@ export declare class RemoteStructService implements StructService {
     private readonly apiPath;
     private readonly defaultOptions;
     private readonly customHeaders?;
+    private ketcherId;
     constructor(apiPath: string, defaultOptions: StructServiceOptions, customHeaders?: Record<string, string>);
+    addKetcherId(ketcherId: string): void;
     getInChIKey(struct: string): Promise<string>;
     private getStandardServerOptions;
     info(): Promise<InfoResult>;
@@ -44,4 +47,5 @@ export declare class RemoteStructService implements StructService {
     recognize(blob: Blob, version: string): Promise<RecognizeResult>;
     generateImageAsBase64(data: string, options?: GenerateImageOptions): Promise<string>;
     toggleExplicitHydrogens(data: ExplicitHydrogensData, options?: StructServiceOptions): Promise<ExplicitHydrogensResult>;
+    calculateMacromoleculeProperties(data: CalculateMacromoleculePropertiesData, options?: StructServiceOptions): Promise<CalculateMacromoleculePropertiesResult>;
 }

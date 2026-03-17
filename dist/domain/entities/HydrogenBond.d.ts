@@ -16,4 +16,6 @@ export declare class HydrogenBond extends BaseBond {
     get firstEndEntity(): BaseMonomer;
     get secondEndEntity(): BaseMonomer | undefined;
     getAnotherMonomer(monomer: BaseMonomer): BaseMonomer | undefined;
+    get isHorizontal(): boolean;
+    get isVertical(): boolean;
 }

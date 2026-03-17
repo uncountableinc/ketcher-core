@@ -19,11 +19,14 @@ export declare type HistoryOperationType = 'undo' | 'redo';
 export declare class EditorHistory {
     historyStack: Command[] | [];
     historyPointer: number;
-    editor: CoreEditor | undefined;
+    editor: CoreEditor;
     private static _instance;
-    constructor(editor: CoreEditor);
+    private constructor();
+    static getInstance(editor: CoreEditor): EditorHistory;
+    private static isInstance;
     update(command: Command, megreWithLatestHistoryCommand?: boolean): void;
     undo(): void;
     redo(): void;
+    get previousCommand(): Command;
     destroy(): void;
 }

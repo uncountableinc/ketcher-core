@@ -29,14 +29,14 @@ interface ScrollBar {
     offsetEnd: number;
     maxWidth: number;
     maxHeight: number;
-    bar?: D3SvgElementSelection<SVGRectElement, void> | undefined;
+    bar?: D3SvgElementSelection<SVGRectElement, void>;
 }
 export declare class ZoomTool implements BaseTool {
-    canvas: D3SvgElementSelection<SVGSVGElement, void>;
+    canvas: D3SvgElementSelection<SVGGElement, void>;
     canvasWrapper: D3SvgElementSelection<SVGSVGElement, void>;
     private zoom;
     private zoomLevel;
-    private zoomTransform;
+    private _zoomTransform;
     private resizeObserver;
     drawingEntitiesManager: DrawingEntitiesManager;
     private zoomEventHandlers;
@@ -55,16 +55,18 @@ export declare class ZoomTool implements BaseTool {
     static initInstance(drawingEntitiesManager: DrawingEntitiesManager): ZoomTool;
     private constructor();
     initActions(): void;
-    setZoom(zoomLevel: number): void;
+    setZoomLevel(zoomLevel: number): void;
     getZoomLevel(): number;
     setZoomTransform(transform: ZoomTransform): void;
+    get zoomTransform(): ZoomTransform;
     zoomAction({ transform }: {
         transform: any;
     }): void;
-    subscribeOnZoomEvent(zoomEventHandler: (transform?: any) => void): void;
-    dispatchZoomEventHandlers(transform: any): void;
-    drawScrollBars(): void;
-    renderScrollBar(scrollBar: ScrollBar): void;
+    subscribeOnZoomEvent(zoomEventHandler: (transform?: ZoomTransform) => void): void;
+    unsubscribeOnZoomEvent(zoomEventHandler: (transform?: ZoomTransform) => void): void;
+    dispatchZoomEventHandlers(transform: ZoomTransform): void;
+    drawScrollBars(forceHide?: boolean): void;
+    renderScrollBar(scrollBar: ScrollBar, forceHide?: boolean): void;
     drawScrollBar(scrollBar: ScrollBar): void;
     updateScrollBarAttrs(scrollBar: ScrollBar): void;
     calculateDynamicAttr(scrollBar: ScrollBar): {
@@ -72,7 +74,7 @@ export declare class ZoomTool implements BaseTool {
         length: number;
     };
     dragged: (name: string) => (event: any) => void;
-    scrollTo(position: Vec2, stickToBottom?: boolean, xOffset?: any, yOffset?: any, isOffsetInPercents?: boolean): void;
+    scrollTo(position: Vec2, stickToBottom?: boolean, xOffset?: any, yOffset?: any, isOffsetInPercents?: boolean, needScrollVertical?: boolean): void;
     scrollBy(x: number, y: number): void;
     scrollToVerticalCenter(structCenterY: number): void;
     scrollToVerticalBottom(): void;
@@ -93,7 +95,11 @@ export declare class ZoomTool implements BaseTool {
     destroy(): void;
     isFitToCanvasHeight(height: any): boolean;
     zoomStructureToFitHalfOfCanvas(structureBbox: StructureBbox): void;
-    private get canvasWrapperHeight();
-    private get canvasWrapperSize();
+    get canvasWrapperHeight(): number;
+    get canvasWrapperWidth(): number;
+    get canvasWrapperSize(): {
+        width: number;
+        height: number;
+    };
 }
 export default ZoomTool;

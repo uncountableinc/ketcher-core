@@ -2,7 +2,7 @@ import { BaseSequenceRenderer } from "./BaseSequenceRenderer";
 import { MonomerToAtomBond, SubChainNode, Vec2 } from "../../../../domain/entities";
 export declare class MonomerToAtomBondSequenceRenderer extends BaseSequenceRenderer {
     monomerToAtomBond: MonomerToAtomBond;
-    private monomerNode;
+    private readonly monomerNode;
     constructor(monomerToAtomBond: MonomerToAtomBond, monomerNode: SubChainNode);
     private get monomer();
     private get atom();

@@ -7,19 +7,20 @@ import { BaseRenderer } from './BaseRenderer';
 export declare const MONOMER_CSS_CLASS = "monomer";
 export declare abstract class BaseMonomerRenderer extends BaseRenderer {
     monomer: BaseMonomer;
-    private monomerSelectedElementId;
-    private monomerHoveredElementId;
-    private scale?;
-    private editorEvents;
-    private editor;
+    private readonly monomerHoveredElementId;
+    monomerSymbolElementId: string;
+    monomerAutochainPreviewElementId: string;
+    private readonly scale?;
+    private readonly editorEvents;
+    private readonly editor;
     private selectionCircle?;
     private selectionBorder?;
     bodyElement?: D3SvgElementSelection<SVGUseElement, this>;
     private freeSectorsList;
     private attachmentPoints;
     private hoveredAttachmentPoint;
-    private monomerSymbolElement?;
-    monomerSize: {
+    private readonly monomerSymbolElement?;
+    readonly monomerSize: {
         width: number;
         height: number;
     };
@@ -29,7 +30,8 @@ export declare abstract class BaseMonomerRenderer extends BaseRenderer {
     CHAIN_START_TERMINAL_INDICATOR_TEXT: string;
     CHAIN_END_TERMINAL_INDICATOR_TEXT: string;
     static isSelectable(): boolean;
-    protected constructor(monomer: BaseMonomer, monomerSelectedElementId: string, monomerHoveredElementId: string, monomerSymbolElementId: string, scale?: number | undefined);
+    static get selectionCircleRadius(): number;
+    protected constructor(monomer: BaseMonomer, monomerHoveredElementId: string, monomerSymbolElementId: string, monomerAutochainPreviewElementId: string, scale?: number | undefined);
     private isSnakeBondForAttachmentPoint;
     static get monomerSize(): {
         width: number;
@@ -47,8 +49,9 @@ export declare abstract class BaseMonomerRenderer extends BaseRenderer {
     appendAttachmentPoint(attachmentPointName: AttachmentPointName, customAngle?: number): AttachmentPoint;
     removeAttachmentPoints(): void;
     hoverAttachmentPoint(attachmentPointName: AttachmentPointName): void;
-    protected appendRootElement(canvas: D3SvgElementSelection<SVGSVGElement, void>): D3SvgElementSelection<SVGGElement, void>;
+    protected appendRootElement(canvas: D3SvgElementSelection<SVGSVGElement, void> | D3SvgElementSelection<SVGGElement, void>): D3SvgElementSelection<SVGGElement, void>;
     protected appendLabel(rootElement: D3SvgElementSelection<SVGGElement, void>): void;
+    setLabelVisibility(isVisible: boolean): void;
     appendHover(hoverAreaElement: D3SvgElementSelection<SVGGElement, void>): import("d3-selection").Selection<SVGUseElement, void, HTMLElement, never>;
     removeHover(): void;
     static getScaledMonomerPosition(positionInAngstoms: Vec2, monomerSize?: {
@@ -56,6 +59,7 @@ export declare abstract class BaseMonomerRenderer extends BaseRenderer {
         height: number;
     }): Vec2;
     get scaledMonomerPosition(): Vec2;
+    get scaledPosition(): Vec2;
     appendSelection(): void;
     removeSelection(): void;
     protected abstract appendBody(rootElement: D3SvgElementSelection<SVGGElement, void>, theme?: any): any;

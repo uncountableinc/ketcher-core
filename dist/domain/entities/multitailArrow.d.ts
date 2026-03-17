@@ -2,7 +2,7 @@ import { BaseMicromoleculeEntity } from "./BaseMicromoleculeEntity";
 import { Vec2 } from "./vec2";
 import { Pool } from "./pool";
 import { KetFileNode } from "../serializers";
-import { FixedPrecisionCoordinates } from "./";
+import { FixedPrecisionCoordinates } from "./fixedPrecision";
 export declare type Line = [Vec2, Vec2];
 export interface MultitailArrowsReferencePositions {
     head: Vec2;
@@ -45,21 +45,38 @@ export declare class MultitailArrow extends BaseMicromoleculeEntity {
     private headOffsetY;
     private tailLength;
     private tailsYOffset;
-    static KET_MIN_DISTANCE: FixedPrecisionCoordinates;
-    static MIN_TAIL_DISTANCE: FixedPrecisionCoordinates;
-    static MIN_HEAD_LENGTH: FixedPrecisionCoordinates;
-    static MIN_TAIL_LENGTH: FixedPrecisionCoordinates;
-    static MIN_TOP_BOTTOM_OFFSET: FixedPrecisionCoordinates;
-    static MIN_HEIGHT: FixedPrecisionCoordinates;
-    static TOP_TAIL_NAME: string;
-    static BOTTOM_TAIL_NAME: string;
-    static TAILS_NAME: string;
+    static readonly KET_MIN_DISTANCE: FixedPrecisionCoordinates;
+    static readonly MIN_TAIL_DISTANCE: FixedPrecisionCoordinates;
+    static readonly MIN_HEAD_LENGTH: FixedPrecisionCoordinates;
+    static readonly MIN_TAIL_LENGTH: FixedPrecisionCoordinates;
+    static readonly MIN_TOP_BOTTOM_OFFSET: FixedPrecisionCoordinates;
+    static readonly MIN_HEIGHT: FixedPrecisionCoordinates;
+    static readonly TOP_TAIL_NAME = "topTail";
+    static readonly BOTTOM_TAIL_NAME = "bottomTail";
+    static readonly TAILS_NAME = "tails";
     static canAddTail(distance: TailDistance['distance']): boolean;
     static fromTwoPoints(topLeft: Vec2, bottomRight: Vec2): MultitailArrow;
     static validateKetNode(ketFileData: KetFileMultitailArrowNode): string | null;
+    static getConstructorParamsFromKetNode(ketFileNode: KetFileNode<KetFileMultitailArrowNode>): {
+        spineTopX: FixedPrecisionCoordinates;
+        spineTopY: FixedPrecisionCoordinates;
+        height: FixedPrecisionCoordinates;
+        headOffsetX: FixedPrecisionCoordinates;
+        headOffsetY: FixedPrecisionCoordinates;
+        tailsLength: FixedPrecisionCoordinates;
+        tailsYOffset: Pool<FixedPrecisionCoordinates>;
+    };
     static fromKetNode(ketFileNode: KetFileNode<KetFileMultitailArrowNode>): MultitailArrow;
     static fromFloatingPointCoordinates(spineTop: Vec2, height: number, headOffset: Vec2, tailLength: number, tailsYOffset: Pool<number>): MultitailArrow;
     constructor(spineTopX: FixedPrecisionCoordinates, spineTopY: FixedPrecisionCoordinates, height: FixedPrecisionCoordinates, headOffsetX: FixedPrecisionCoordinates, headOffsetY: FixedPrecisionCoordinates, tailLength: FixedPrecisionCoordinates, tailsYOffset: Pool<FixedPrecisionCoordinates>);
+    static getReferencePositions(spineTopX: FixedPrecisionCoordinates, spineTopY: FixedPrecisionCoordinates, height: FixedPrecisionCoordinates, headOffsetX: FixedPrecisionCoordinates, headOffsetY: FixedPrecisionCoordinates, tailLength: FixedPrecisionCoordinates, tailsYOffset: Pool<FixedPrecisionCoordinates>): {
+        head: Vec2;
+        topTail: Vec2;
+        bottomTail: Vec2;
+        topSpine: Vec2;
+        bottomSpine: Vec2;
+        tails: Pool<Vec2>;
+    };
     getReferencePositions(): MultitailArrowsReferencePositions;
     getReferencePositionsArray(): Array<Vec2>;
     getReferenceLines(referencePositions: MultitailArrowsReferencePositions): MultitailArrowsReferenceLines;
@@ -78,6 +95,23 @@ export declare class MultitailArrow extends BaseMicromoleculeEntity {
     moveTail(offset: number, id: number, normalize?: true): number;
     moveTail(offset: number, name: typeof MultitailArrow.TOP_TAIL_NAME | typeof MultitailArrow.BOTTOM_TAIL_NAME): number;
     move(offset: Vec2): void;
+    static getParametersForKetNode(spineTopX: FixedPrecisionCoordinates, spineTopY: FixedPrecisionCoordinates, headOffsetX: FixedPrecisionCoordinates, headOffsetY: FixedPrecisionCoordinates, tailLength: FixedPrecisionCoordinates, tailsYOffset: Pool<FixedPrecisionCoordinates>, height: FixedPrecisionCoordinates, center: Vec2, isInitiallySelected?: boolean): {
+        type: string;
+        center: Vec2;
+        selected: boolean | undefined;
+        data: {
+            head: {
+                position: Vec2;
+            };
+            spine: {
+                pos: [Vec2, Vec2];
+            };
+            tails: {
+                pos: Vec2[];
+            };
+            zOrder: 0;
+        };
+    };
     toKetNode(): KetFileNode<KetFileMultitailArrowNode>;
 }
 export {};

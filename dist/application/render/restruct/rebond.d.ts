@@ -17,6 +17,7 @@ import { Bond, Vec2 } from "../../../domain/entities";
 import ReObject from './reobject';
 import ReStruct from './restruct';
 import { Render } from '../raphaelRender';
+import { Visel } from "./..";
 declare class ReBond extends ReObject {
     b: Bond;
     doubleBondShift: number;
@@ -39,14 +40,16 @@ declare class ReBond extends ReObject {
     static isSelectable(): boolean;
     private static getAtomPositionForBond;
     static bondRecalc(bond: ReBond, restruct: ReStruct, options: any): void;
-    drawHover(render: Render): import("raphael").RaphaelPath<"SVG" | "VML"> | null;
+    drawHover(render: Render, drawOutline?: boolean): any;
     getSelectionPoints(render: Render, isHighlight?: boolean): Vec2[];
-    getSelectionContour(render: Render, isHighlight: boolean): import("raphael").RaphaelPath<"SVG" | "VML">;
-    makeHoverPlate(render: Render): import("raphael").RaphaelPath<"SVG" | "VML"> | null;
+    getSelectionContour(render: Render, isHighlight: boolean): any;
+    makeHoverPlate(render: Render, drawOutline?: boolean): any;
     makeSelectionPlate(restruct: ReStruct, _: any, options: any): any;
-    private isPlateShouldBeHidden;
+    private readonly isPlateShouldBeHidden;
     private makeHighlitePlate;
     show(restruct: ReStruct, bid: number, options: any): void;
+    private addTestIds;
+    drawFragmentSelectionPreview(render: Render, atomIdToDrawArrows: number): Visel | null;
 }
 export declare function getBondLineShift(cos: number, sin: number): number;
 export default ReBond;

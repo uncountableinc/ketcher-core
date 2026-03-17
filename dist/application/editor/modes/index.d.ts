@@ -5,6 +5,7 @@ export * from './FlexMode';
 export * from './SequenceMode';
 export * from './SnakeMode';
 export * from './types';
+export * from './helpers';
 export declare const modesMap: {
     'flex-layout-mode': typeof FlexMode;
     'snake-layout-mode': typeof SnakeMode;

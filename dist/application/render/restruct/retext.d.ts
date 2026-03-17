@@ -19,7 +19,7 @@ import ReObject from './reobject';
 import ReStruct from './restruct';
 import { RaphaelBaseElement } from 'raphael';
 declare class ReText extends ReObject {
-    private item;
+    private readonly item;
     paths: Array<Array<RaphaelBaseElement>>;
     constructor(text: Text);
     static isSelectable(): boolean;

@@ -13,4 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
+import { ReStruct } from "../../render";
+export declare const removeInfoLabelFromAtoms: (restruct: ReStruct) => void;
 export declare function fromChain(restruct: any, p0: any, v: any, nSect: any, atomId: any): any[];

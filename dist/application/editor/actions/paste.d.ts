@@ -24,7 +24,7 @@ declare type CreatedItems = {
     simpleObjects: number[];
     multitailArrows: number[];
 };
-export declare function fromPaste(restruct: any, pstruct: any, point: any, angle?: number, isPreview?: boolean): [Action, {
+export declare function fromPaste(restruct: any, pstruct: any, point: any, angle?: number, isPreview?: boolean, needMoveFromTopLeftPoint?: boolean): [Action, {
     atoms: number[];
     bonds: number[];
 }, CreatedItems];

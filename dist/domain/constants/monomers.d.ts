@@ -1,4 +1,3 @@
-import { Sugar, UnsplitNucleotide, RNABase, Phosphate, Peptide, Chem } from "../entities/internal";
 export declare enum RNA_DNA_NON_MODIFIED_PART {
     SUGAR_RNA = "R",
     SUGAR_DNA = "dR",
@@ -28,15 +27,32 @@ export declare enum StandardAmbiguousRnaBase {
     R = "R",
     S = "S"
 }
+export declare enum StandardAmbiguousPeptide {
+    B = "B",
+    J = "J",
+    Z = "Z",
+    X = "X"
+}
 export declare const rnaDnaNaturalAnalogues: string[];
+export declare const rnaDnaAmbiguousSymbols: string[];
+export declare const peptideAmbiguousSymbols: string[];
 export declare const unknownNaturalAnalogues: string[];
 export declare const peptideNaturalAnalogues: string[];
 export declare const NO_NATURAL_ANALOGUE = "X";
-export declare const MONOMER_CLASS_TO_CONSTRUCTOR: {
-    CHEM: typeof Chem;
-    AminoAcid: typeof Peptide;
-    Phosphate: typeof Phosphate;
-    Sugar: typeof Sugar;
-    Base: typeof RNABase;
-    RNA: typeof UnsplitNucleotide;
+export declare const MONOMER_CONST: {
+    AMINO_ACID: string;
+    PEPTIDE: string;
+    CHEM: string;
+    RNA: string;
+    DNA: string;
+    MODDNA: string;
+    R: string;
+    P: string;
+    SUGAR: string;
+    BASE: string;
+    PHOSPHATE: string;
 };
+export declare const CREATE_MONOMER_TOOL_NAME = "create-monomer";
+export declare const MonomerSize = 0.75;
+export declare const HalfMonomerSize: number;
+export declare const StandardBondLength: number;

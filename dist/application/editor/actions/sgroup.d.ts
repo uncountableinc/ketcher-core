@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-import { SGroupAttachmentPoint } from "../../../domain/entities";
+import { BaseMonomer, SGroupAttachmentPoint } from "../../../domain/entities";
 import { Action } from './action';
 import Restruct from "../../render/restruct/restruct";
 export declare function fromSeveralSgroupAddition(restruct: Restruct, type: any, atoms: any, attrs: any): any;
@@ -26,8 +26,8 @@ export declare function setExpandMonomerSGroup(restruct: Restruct, sgid: number,
 }): Action;
 export declare function expandSGroupWithMultipleAttachmentPoint(restruct: any): Action;
 export declare function sGroupAttributeAction(id: any, attrs: any): Action;
-export declare function fromSgroupDeletion(restruct: any, id: any, needPerform?: boolean): Action;
-export declare function fromSgroupAddition(restruct: any, type: any, atoms: any, attrs: any, sgid: any, attachmentPoints: any, pp?: any, expanded?: any, name?: any, oldSgroup?: any): Action;
+export declare function fromSgroupDeletion(restruct: Restruct, id: any, needPerform?: boolean): Action;
+export declare function fromSgroupAddition(restruct: any, type: any, atoms: any, attrs: any, sgid: any, attachmentPoints: any, pp?: any, expanded?: any, name?: any, oldSgroup?: any, monomer?: BaseMonomer): Action;
 export declare function fromSgroupAction(context: any, restruct: any, newSg: any, sourceAtoms: any, selection: any): any;
 export declare function removeAtomFromSgroupIfNeeded(action: any, restruct: any, id: any): boolean;
 export declare function removeSgroupIfNeeded(action: any, restruct: Restruct, atoms: any): void;

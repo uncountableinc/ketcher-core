@@ -13,5 +13,6 @@ export declare const macromoleculesFilesInputFormats: {
         peptide: string;
     };
     idt: string;
+    'axo-labs': string;
     helm: string;
 };

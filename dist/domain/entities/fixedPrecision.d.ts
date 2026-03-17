@@ -1,5 +1,5 @@
 export declare class FixedPrecisionCoordinates {
-    static MULTIPLIER: number;
+    static readonly MULTIPLIER: number;
     readonly value: number;
     static fromFloatingPrecision(value: number): FixedPrecisionCoordinates;
     constructor(value: number | FixedPrecisionCoordinates);

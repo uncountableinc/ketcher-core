@@ -76,5 +76,7 @@ export declare enum attachmentPointNumberToAngle {
 export declare const sectorsList: number[];
 export declare function checkFor0and360(sectorsList: number[]): number[];
 export declare function getAttachmentPointLabelWithBinaryShift(attachmentPointNumber: number): string;
+export declare function isSingleRGroupAttachmentPoint(rGroupLabel: number): boolean;
 export declare function getAttachmentPointLabel(attachmentPointNumber: number): AttachmentPointName;
 export declare function getAttachmentPointNumberFromLabel(attachmentPointLabel: AttachmentPointName): number;
+export declare const getNextFreeAttachmentPoint: (attachmentPoints: AttachmentPointName[], skipR1AndR2?: boolean) => AttachmentPointName;

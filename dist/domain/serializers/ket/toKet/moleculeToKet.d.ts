@@ -14,4 +14,8 @@
  * limitations under the License.
  ***************************************************************************/
 import { Struct, BaseMonomer } from "../../../entities";
+export interface MoleculesSelection {
+    atoms: Set<number>;
+    bonds: Set<number>;
+}
 export declare function moleculeToKet(struct: Struct, monomer?: BaseMonomer): any;

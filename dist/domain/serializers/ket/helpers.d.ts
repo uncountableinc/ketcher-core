@@ -13,16 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-import { Vec2, Struct } from "../../entities";
+import { Struct, Vec2 } from "../../entities";
 import { EditorSelection } from "../../../application/editor";
+import { KetMonomerClass, MonomerTransformation } from "../../../application/formatters";
+import { MonomerItemType } from "../../types";
 export declare const getNodeWithInvertedYCoord: <T>(node: T) => T;
 export declare const setMonomerTemplatePrefix: (templateName: string) => string;
 export declare const setMonomerPrefix: (monomerId: number) => string;
+export declare const setMonomerGroupTemplatePrefix: (templateName: string) => string;
 export declare const setAmbiguousMonomerTemplatePrefix: (templateName: string) => string;
 export declare const setAmbiguousMonomerPrefix: (monomerId: number) => string;
 export declare const getKetRef: (entityId: string) => {
     $ref: string;
 };
+export declare const getMonomerTemplateRefFromMonomerItem: (monomerItem: MonomerItemType) => string;
+export declare const getHELMClassByKetMonomerClass: (monomerClass: KetMonomerClass) => string;
+export declare const fillNaturalAnalogueForPhosphateAndSugar: (naturalAnalogue: string, monomerClass: KetMonomerClass) => string;
 /**
  *
  * System coordinates for browser and for chemistry files format (mol, ket, etc.) area are different.
@@ -32,4 +38,12 @@ export declare const getKetRef: (entityId: string) => {
  *
  */
 export declare const switchIntoChemistryCoordSystem: (position: Vec2) => Vec2;
-export declare const populateStructWithSelection: (populatedStruct: Struct, selection?: EditorSelection) => Struct;
+export declare const modifyTransformation: (transformation: MonomerTransformation) => Partial<{
+    rotate: number;
+    shift: Partial<{
+        x: number;
+        y: number;
+    }>;
+    flip: import("../../../application/editor").FlipDirection;
+}>;
+export declare const populateStructWithSelection: (populatedStruct: Struct, selection?: EditorSelection, resetSelection?: boolean) => Struct;

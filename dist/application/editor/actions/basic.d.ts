@@ -14,5 +14,8 @@
  * limitations under the License.
  ***************************************************************************/
 import { Action } from './action';
-export declare function fromNewCanvas(restruct: any, struct: any): Action;
+import { Struct } from "../../../domain/entities";
+import { ReStruct } from "../../render";
+/** Get action applied {@link struct} to {@link restruct}. */
+export declare function fromNewCanvas(restruct: ReStruct, struct: Struct): Action;
 export declare function fromDescriptorsAlign(restruct: any): Action;

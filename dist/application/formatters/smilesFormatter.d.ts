@@ -13,14 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-import { KetSerializer, SmiSerializer } from "../../domain/serializers";
-import { StructFormatter, SupportedFormat } from './structFormatter.types';
-import { StructService, StructServiceOptions } from "../../domain/services";
-import { Struct } from "../../domain/entities";
-export declare class SmilesFormatter implements StructFormatter {
-    #private;
-    constructor(smiSerializer: SmiSerializer, structService: StructService, ketSerializer: KetSerializer, format: SupportedFormat, options?: StructServiceOptions);
-    getStructureFromStructAsync(struct: Struct): Promise<string>;
-    getStructureFromStringAsync(stringifiedStruct: string): Promise<Struct>;
+export declare class SmilesFormatter {
     static isContainsCoordinates(smiles: string): boolean;
 }

@@ -15,13 +15,14 @@
  ***************************************************************************/
 import { SGroup } from "./sgroup";
 import { Struct } from "./struct";
+import { BaseMonomer } from "./BaseMonomer";
 export declare class MonomerMicromolecule extends SGroup {
-    monomer: any;
-    constructor(type: string, monomer: any);
+    monomer: BaseMonomer;
+    constructor(type: string, monomer: BaseMonomer);
     get isMonomer(): boolean;
     getContractedPosition(struct: Struct): {
         position: import("./vec2").Vec2;
         atomId: number;
     };
-    static clone(monomerMicromolecule: MonomerMicromolecule, atomIdMap?: Map<number, number>): MonomerMicromolecule;
+    static clone(monomerMicromolecule: MonomerMicromolecule, atomIdMap?: Map<number, number>, needCloneAttachmentPoints?: boolean): MonomerMicromolecule;
 }

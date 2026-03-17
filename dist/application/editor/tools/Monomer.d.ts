@@ -17,8 +17,8 @@ import { BaseTool } from "./Tool";
 import { CoreEditor, EditorHistory } from "../internal";
 import { MonomerOrAmbiguousType } from "../../../domain/types";
 declare class MonomerTool implements BaseTool {
-    private editor;
-    private monomer;
+    private readonly editor;
+    private readonly monomer;
     private monomerPreview;
     private monomerPreviewRenderer;
     readonly MONOMER_PREVIEW_SCALE_FACTOR = 0.8;

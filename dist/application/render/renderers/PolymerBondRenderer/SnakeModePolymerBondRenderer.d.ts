@@ -1,9 +1,10 @@
 import { D3SvgElementSelection } from "../../types";
+import { BaseMonomer } from "../../../../domain/entities";
 import { PolymerBond } from "../../../../domain/entities/PolymerBond";
 import { BaseRenderer } from '../BaseRenderer';
 export declare class SnakeModePolymerBondRenderer extends BaseRenderer {
     readonly polymerBond: PolymerBond;
-    private editorEvents;
+    private readonly editorEvents;
     private isSnakeBond;
     private selectionElement;
     private path;
@@ -17,27 +18,20 @@ export declare class SnakeModePolymerBondRenderer extends BaseRenderer {
     get width(): number;
     get height(): number;
     private get scaledPosition();
+    getSideConnectionEndpointAngle(monomer: BaseMonomer): number;
     moveSelection(): void;
     appendBond(rootElement: any): D3SvgElementSelection<SVGLineElement, this> | undefined;
     appendSnakeBond(rootElement: any): D3SvgElementSelection<SVGLineElement, this> | undefined;
-    private drawPartOfSideConnection;
     private appendSideConnectionBond;
     private getMonomerWidth;
     private getMonomerHeight;
-    isMonomersOnSameHorizontalLine(): boolean;
+    private get isSideChainLikeBackbone();
     private updateSnakeBondPath;
     private isSecondMonomerTopRight;
     private isSecondMonomerBottomRight;
     private isSecondMonomerBottomLeft;
     private isSecondMonomerTopLeft;
     private isSecondMonomerLeft;
-    private addLineFromTopToRight;
-    private addLineFromLeftToTop;
-    private addLineFromBottomToRight;
-    private addLineFromLeftToBottom;
-    private addLineFromTopToLeft;
-    private addLineFromRightToTop;
-    private addLineFromRightToBottom;
     private addLine;
     private addRandomLine;
     appendBondGraph(rootElement: any): D3SvgElementSelection<SVGLineElement, this> | undefined;
@@ -53,7 +47,7 @@ export declare class SnakeModePolymerBondRenderer extends BaseRenderer {
     private moveGraphBondStart;
     protected appendHoverAreaElement(): void;
     appendHover(): void;
-    removeHover(): D3SvgElementSelection<SVGLineElement | SVGGElement, void>;
+    removeHover(): string | D3SvgElementSelection<SVGGElement, void>;
     private calculateIsSnakeBond;
     remove(): void;
 }

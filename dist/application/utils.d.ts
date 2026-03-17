@@ -5,14 +5,16 @@ import { Ketcher } from './ketcher';
 import { StructService } from "../domain/services";
 import { EditorSelection } from './editor/editor.types';
 declare class KetcherProvider {
-    private ketcherInstance;
-    setKetcherInstance(ketcherInstance: Ketcher): void;
-    getKetcher(): Ketcher;
+    private readonly ketcherInstances;
+    addKetcherInstance(instance: Ketcher): void;
+    removeKetcherInstance(id: any): void;
+    getIndexById(id: string): number;
+    getKetcher(id?: string): Ketcher;
 }
 declare const ketcherProvider: KetcherProvider;
 export { ketcherProvider };
-export declare function getStructure(structureFormat: SupportedFormat | undefined, formatterFactory: FormatterFactory, struct: Struct, drawingEntitiesManager?: DrawingEntitiesManager, selection?: EditorSelection): Promise<string>;
+export declare function getStructure(ketcherId: string, formatterFactory: FormatterFactory, struct: Struct, structureFormat?: SupportedFormat, drawingEntitiesManager?: DrawingEntitiesManager, selection?: EditorSelection): Promise<string>;
 export declare function prepareStructToRender(structStr: string, structService: StructService, ketcherInstance: Ketcher): Promise<Struct>;
 export declare function parseStruct(structStr: string, structService: StructService, ketcherInstance: Ketcher): Promise<Struct>;
 export declare function deleteAllEntitiesOnCanvas(): void;
-export declare function parseAndAddMacromoleculesOnCanvas(struct: string, structService: StructService): Promise<void>;
+export declare function parseAndAddMacromoleculesOnCanvas(struct: string, structService: StructService, mergeWithLatestHistoryCommand?: boolean): Promise<void>;

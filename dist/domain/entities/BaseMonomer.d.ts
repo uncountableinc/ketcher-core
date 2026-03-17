@@ -1,6 +1,6 @@
 import { DrawingEntity, DrawingEntityConfig } from './DrawingEntity';
 import { Vec2 } from "./vec2";
-import { AttachmentPointName, AttachmentPointsToBonds, MonomerItemType } from "../types";
+import { AttachmentPointName, AttachmentPointsToBonds, MonomerItemType, MonomerBond } from "../types";
 import { PolymerBond } from "./PolymerBond";
 import { BaseMonomerRenderer } from "../../application/render/renderers/BaseMonomerRenderer";
 import { IKetAttachmentPoint } from "../../application/formatters/types/ket";
@@ -23,7 +23,6 @@ export declare abstract class BaseMonomer extends DrawingEntity {
     potentialAttachmentPointsToBonds: AttachmentPointsToBonds;
     attachmentPointsVisible: boolean;
     monomerItem: MonomerItemType;
-    isMonomerInRnaChainRow: boolean;
     hydrogenBonds: HydrogenBond[];
     constructor(monomerItem: MonomerItemType, _position?: Vec2, config?: BaseMonomerConfig);
     get label(): string;
@@ -35,7 +34,7 @@ export declare abstract class BaseMonomer extends DrawingEntity {
     setChosenSecondAttachmentPoint(attachmentPoint: AttachmentPointName | null): void;
     setPotentialSecondAttachmentPoint(attachmentPoint: AttachmentPointName | null): void;
     setPotentialBond(attachmentPoint: string | undefined, potentialBond?: PolymerBond | HydrogenBond | null): void;
-    getAttachmentPointByBond(bond: PolymerBond | MonomerToAtomBond | HydrogenBond): AttachmentPointName | undefined;
+    getAttachmentPointByBond(bond: MonomerBond): AttachmentPointName | undefined;
     abstract getValidSourcePoint(monomer?: BaseMonomer): AttachmentPointName | undefined;
     abstract getValidTargetPoint(monomer: BaseMonomer): string | undefined;
     getPotentialAttachmentPointByBond(bond: PolymerBond): AttachmentPointName | undefined;
@@ -45,11 +44,16 @@ export declare abstract class BaseMonomer extends DrawingEntity {
     get R2AttachmentPoint(): AttachmentPointName | undefined;
     get hasFreeAttachmentPoint(): boolean;
     isAttachmentPointExistAndFree(attachmentPoint: AttachmentPointName): boolean;
-    setRenderer(renderer: BaseMonomerRenderer): void;
-    forEachBond(callback: (polymerBond: PolymerBond | MonomerToAtomBond | HydrogenBond, attachmentPointName: AttachmentPointName) => void): void;
-    setBond(attachmentPointName: AttachmentPointName, bond: PolymerBond | MonomerToAtomBond | HydrogenBond): void;
+    setRenderer(renderer: BaseMonomerRenderer | BaseSequenceItemRenderer): void;
+    forEachBond(callback: (polymerBond: MonomerBond, attachmentPointName: AttachmentPointName) => void): void;
+    setBond(attachmentPointName: AttachmentPointName, bond: MonomerBond): void;
     unsetBond(attachmentPointName?: AttachmentPointName, bondToDelete?: HydrogenBond | PolymerBond): void;
     get covalentBonds(): (PolymerBond | MonomerToAtomBond)[];
+    get polymerBonds(): PolymerBond[];
+    get monomerToAtomBonds(): MonomerToAtomBond[];
+    get bonds(): Array<PolymerBond | HydrogenBond | MonomerToAtomBond>;
+    get bondsSortedByLength(): Array<PolymerBond | HydrogenBond | MonomerToAtomBond>;
+    get polymerBondsSortedByLength(): Array<PolymerBond | HydrogenBond>;
     get hasBonds(): boolean;
     hasHydrogenBondWithMonomer(monomer: BaseMonomer): HydrogenBond | undefined;
     hasPotentialBonds(): boolean;
@@ -78,10 +82,11 @@ export declare abstract class BaseMonomer extends DrawingEntity {
     private getMonomerDefinitionAttachmentPoints;
     get superatomAttachmentPoints(): readonly import("./sGroupAttachmentPoint").SGroupAttachmentPoint[];
     getAttachmentPointDictFromAtoms(): AttachmentPointsToBonds;
-    get startBondAttachmentPoint(): AttachmentPointName | "R1" | "R2" | undefined;
+    get startBondAttachmentPoint(): AttachmentPointName | undefined;
     abstract get SubChainConstructor(): typeof RnaSubChain | typeof ChemSubChain | typeof PhosphateSubChain | typeof PeptideSubChain;
     isMonomerTypeDifferentForChaining(monomerToChain: SubChainNode | BaseMonomer): boolean;
     get isModification(): boolean;
     get sideConnections(): PolymerBond[];
     get monomerCaps(): Partial<Record<AttachmentPointName, string>> | undefined;
+    recalculateAttachmentPoints(): void;
 }

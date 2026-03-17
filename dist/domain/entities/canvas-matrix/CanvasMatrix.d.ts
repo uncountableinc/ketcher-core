@@ -8,10 +8,10 @@ interface MatrixConfig {
 }
 export declare class CanvasMatrix {
     chainsCollection: ChainsCollection;
-    private matrixConfig;
-    private matrix;
-    private initialMatrixWidth;
-    private monomerToCell;
+    private readonly matrixConfig;
+    private readonly matrix;
+    private readonly initialMatrixWidth;
+    private readonly monomerToCell;
     polymerBondToCells: Map<PolymerBond, Cell[]>;
     polymerBondToConnections: Map<PolymerBond, Connection[]>;
     constructor(chainsCollection: ChainsCollection, matrixConfig?: MatrixConfig);

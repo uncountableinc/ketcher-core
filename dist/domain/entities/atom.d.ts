@@ -18,6 +18,8 @@ import { Point, Vec2 } from './vec2';
 import { Pile } from './pile';
 import { Struct } from './struct';
 import { BaseMicromoleculeEntity, initiallySelectedType } from "./BaseMicromoleculeEntity";
+import { AtomCIP } from './types';
+import { SGroup } from "./sgroup";
 /**
  * Return unions of Pick.
  * Difference with <Partial<Pick<O,P>>>  that this type always require at least one property
@@ -42,12 +44,6 @@ export declare enum StereoLabel {
     Abs = "abs",
     And = "&",
     Or = "or"
-}
-declare enum CIP {
-    S = "S",
-    R = "R",
-    s = "s",
-    r = "r"
 }
 export declare type Aromaticity = 'aromatic' | 'aliphatic';
 export declare type Chirality = 'clockwise' | 'anticlockwise';
@@ -83,7 +79,7 @@ export interface AtomAttributes {
     rglabel?: string | null;
     charge?: number | null;
     radical?: number;
-    cip?: CIP | null;
+    cip?: AtomCIP | null;
     isotope?: number | null;
     alias?: string | null;
     pseudo?: string;
@@ -97,7 +93,7 @@ export interface AtomAttributes {
 }
 export declare type AtomPropertiesInContextMenu = SubsetOfFields<AtomAttributes, 'hCount' | 'ringBondCount' | 'substitutionCount' | 'unsaturatedAtom' | 'implicitHCount'>;
 export declare class Atom extends BaseMicromoleculeEntity {
-    static PATTERN: {
+    static readonly PATTERN: {
         RADICAL: {
             NONE: number;
             SINGLET: number;
@@ -111,7 +107,7 @@ export declare class Atom extends BaseMicromoleculeEntity {
             EITHER: number;
         };
     };
-    static attrlist: {
+    static readonly attrlist: {
         alias: null;
         label: string;
         isotope: null;
@@ -150,7 +146,7 @@ export declare class Atom extends BaseMicromoleculeEntity {
     isPreview: boolean;
     hCount: number;
     radical: number;
-    cip: CIP | null;
+    cip: AtomCIP | null;
     charge: number | null;
     explicitValence: number;
     ringBondCount: number;
@@ -190,7 +186,7 @@ export declare class Atom extends BaseMicromoleculeEntity {
      */
     setRGAttachmentPointForDisplayPurpose(): void;
     static getConnectedBondIds(struct: Struct, atomId: number): number[];
-    static getAttrHash(atom: Atom): any;
+    static getAttrHash(atom: Atom): Partial<Record<"hCount" | "ringBondCount" | "substitutionCount" | "unsaturatedAtom" | "implicitHCount" | "stereoParity" | "stereoLabel" | "exactChangeFlag" | "invRet" | "aam" | "isPreview" | "queryProperties" | "explicitValence" | "attachmentPoints" | "rglabel" | "charge" | "radical" | "cip" | "isotope" | "alias" | "atomList" | "label", unknown>>;
     static attrGetDefault(attr: string): any;
     static isHeteroAtom(label: string): boolean;
     static isInAromatizedRing(struct: Struct, atomId: number): boolean;
@@ -201,13 +197,25 @@ export declare class Atom extends BaseMicromoleculeEntity {
     isPseudo(): boolean;
     hasRxnProps(): boolean;
     calcValence(connectionCount: number): boolean;
+    private calculateValenceResult;
+    private calculateUndefinedGroupValence;
+    private calculateGroup1Valence;
+    private calculateGroup2Valence;
+    private calculateGroup3Valence;
+    private calculateGroup4Valence;
+    private calculateGroup5Valence;
+    private calculateGroup6Valence;
+    private calculateGroup7Valence;
+    private calculateGroup8Valence;
+    private overrideHydrogenCountIfNeeded;
+    private applyValenceResult;
     calcValenceMinusHyd(conn: number): number;
-    static getSuperAtomAttachmentPointByAttachmentAtom(struct: Struct, atomId: number): import("./sGroupAttachmentPoint").SGroupAttachmentPoint | undefined;
-    static getSuperAtomAttachmentPointByLeavingGroup(struct: Struct, atomId: number): import("./sGroupAttachmentPoint").SGroupAttachmentPoint | undefined;
-    static isSuperatomLeavingGroupAtom(struct: Struct, atomId?: number): boolean;
+    static getSuperAtomAttachmentPointByAttachmentAtom(struct: Struct, atomId: number, searchBySgroups?: boolean): import("./sGroupAttachmentPoint").SGroupAttachmentPoint | undefined;
+    static getSuperAtomAttachmentPointByLeavingGroup(structOrSgroup: Struct | SGroup, atomId: number, searchBySgroups?: boolean): import("./sGroupAttachmentPoint").SGroupAttachmentPoint | undefined;
+    static isSuperatomLeavingGroupAtom(structOrSgroup: Struct | SGroup, atomId?: number, searchBySgroups?: boolean): boolean;
     static isSuperatomAttachmentAtom(struct: Struct, atomId?: number): boolean;
-    static getAttachmentAtomExternalConnections(struct: Struct, attachmentAtomId?: number, leavingGroupAtomid?: number): import("./pool").Pool<import("./bond").Bond> | undefined;
-    static isHiddenLeavingGroupAtom(struct: Struct, atomId: number): number | false | null | undefined;
+    static getAttachmentAtomExternalConnections(struct: Struct, attachmentAtomId?: number, leavingGroupAtomid?: number, searchBySgroups?: boolean): import("./pool").Pool<import("./bond").Bond> | undefined;
+    static isHiddenLeavingGroupAtom(struct: Struct, atomId: number, searchBySgroups?: boolean, includeAtomsInCollapsedSgroups?: boolean): number | false | null | undefined;
 }
-export declare function radicalElectrons(radical: any): 0 | 1 | 2;
+export declare function radicalElectrons(radical: unknown): 0 | 1 | 2;
 export {};

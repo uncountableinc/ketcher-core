@@ -157,14 +157,7 @@ export function fromPaste(
   pstruct.sgroups.forEach((sg: SGroup) => {
     const newsgid = restruct.molecule.sgroups.newId();
     const sgAtoms = sg.atoms.map((aid) => aidMap.get(aid));
-    let attachmentPoints;
-    try {
-      attachmentPoints = sg.cloneAttachmentPoints(aidMap);
-    } catch (e) {
-      // For macromolecules, attachment points may reference atoms not in aidMap
-      // This is expected behavior, use empty array instead
-      attachmentPoints = [];
-    }
+    const attachmentPoints = sg.cloneAttachmentPoints(aidMap);
     if (
       sg.isNotContractible(pstruct) &&
       !(sg instanceof MonomerMicromolecule)
@@ -183,8 +176,7 @@ export function fromPaste(
       sg.data.name,
       sg,
     );
-    sgAction.operations.reverse();
-    sgAction.operations.forEach((oper) => {
+    sgAction.operations.reverse().forEach((oper) => {
       action.addOp(oper);
     });
   });
@@ -198,8 +190,6 @@ export function fromPaste(
     const operation = new RxnArrowAdd(
       rxnArrow.pos.map((p) => p.add(offset)),
       rxnArrow.mode,
-      undefined,
-      rxnArrow.height,
     ).perform(restruct);
     action.addOp(operation);
     items.rxnArrows.push(operation.data.id);
@@ -268,13 +258,10 @@ export function fromPaste(
 function getStructCenter(struct: Struct): Vec2 {
   const isOnlyOneSGroup = struct.sgroups.size === 1;
   if (isOnlyOneSGroup) {
-    const sgroupIterator = struct.sgroups.keys().next();
-    if (!sgroupIterator.done) {
-      const onlyOneStructsSgroupId = sgroupIterator.value;
-      const sgroup = struct.sgroups.get(onlyOneStructsSgroupId);
-      if (sgroup?.isContracted()) {
-        return sgroup.getContractedPosition(struct).position;
-      }
+    const onlyOneStructsSgroupId = struct.sgroups.keys().next().value;
+    const sgroup = struct.sgroups.get(onlyOneStructsSgroupId) as SGroup;
+    if (sgroup.isContracted()) {
+      return sgroup.getContractedPosition(struct).position;
     }
   }
   if (struct.atoms.size > 0) {

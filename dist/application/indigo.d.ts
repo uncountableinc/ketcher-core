@@ -20,9 +20,6 @@ declare type ConvertOptions = {
     outputFormat?: ChemicalMimeType;
     inputFormat?: ChemicalMimeType;
     sequenceType?: SequenceType;
-    outputContentType?: ChemicalMimeType;
-    monomerLibrarySavingMode?: string;
-    molfileSavingSkipDate?: string;
 };
 declare type AutomapOptions = {
     mode?: AutomapMode;

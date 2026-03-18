@@ -32,14 +32,14 @@ interface IForEachNodeParams {
 }
 
 export class SequenceViewModel {
-  private readonly nodes: ITwoStrandedChainItem[] = [];
+  private nodes: ITwoStrandedChainItem[] = [];
   public chains: SequenceViewModelChain[] = [];
-  private readonly monomerToTwoStrandedSnakeLayoutNode: Map<
+  private monomerToTwoStrandedSnakeLayoutNode: Map<
     BaseMonomer,
     ITwoStrandedChainItem
   > = new Map();
 
-  private readonly chainToHasAntisense: Map<Chain, boolean> = new Map();
+  private chainToHasAntisense: Map<Chain, boolean> = new Map();
 
   constructor(public chainsCollection: ChainsCollection) {
     this.fillNodes(chainsCollection);
@@ -201,20 +201,26 @@ export class SequenceViewModel {
               currentTwoStrandedSnakeLayoutNode.antisenseNode =
                 currentNodeBeforeHydrogenConnectionToBase;
               currentTwoStrandedSnakeLayoutNode.antisenseChain = chain;
-            } else if (currentTwoStrandedSnakeLayoutNodeIndex < 0) {
-              this.nodes.unshift({
-                antisenseNode: currentNodeBeforeHydrogenConnectionToBase,
-                antisenseChain: chain,
-                senseNodeIndex: lastSenseNodeIndex,
-                chain: lastTwoStrandedNodeWithHydrogenBond.chain,
-              });
             } else {
-              this.nodes.splice(currentTwoStrandedSnakeLayoutNodeIndex + 1, 0, {
-                antisenseNode: currentNodeBeforeHydrogenConnectionToBase,
-                antisenseChain: chain,
-                senseNodeIndex: lastSenseNodeIndex,
-                chain: lastTwoStrandedNodeWithHydrogenBond.chain,
-              });
+              if (currentTwoStrandedSnakeLayoutNodeIndex < 0) {
+                this.nodes.unshift({
+                  antisenseNode: currentNodeBeforeHydrogenConnectionToBase,
+                  antisenseChain: chain,
+                  senseNodeIndex: lastSenseNodeIndex,
+                  chain: lastTwoStrandedNodeWithHydrogenBond.chain,
+                });
+              } else {
+                this.nodes.splice(
+                  currentTwoStrandedSnakeLayoutNodeIndex + 1,
+                  0,
+                  {
+                    antisenseNode: currentNodeBeforeHydrogenConnectionToBase,
+                    antisenseChain: chain,
+                    senseNodeIndex: lastSenseNodeIndex,
+                    chain: lastTwoStrandedNodeWithHydrogenBond.chain,
+                  },
+                );
+              }
             }
           }
 
@@ -341,15 +347,15 @@ export class SequenceViewModel {
             nextConnectedAntisenseNode,
           );
         }
-      } else if (
-        !lastHandledAntisenseChain ||
-        (node.antisenseChain &&
-          node.antisenseChain !== lastHandledAntisenseChain)
-      ) {
-        antisenseNodeIndex = 0;
-        node.antisenseNodeIndex = antisenseNodeIndex;
-        antisenseNodeIndex++;
       } else {
+        if (
+          !lastHandledAntisenseChain ||
+          (node.antisenseChain &&
+            node.antisenseChain !== lastHandledAntisenseChain)
+        ) {
+          antisenseNodeIndex = 0;
+        }
+
         node.antisenseNodeIndex = antisenseNodeIndex;
         antisenseNodeIndex++;
       }
@@ -370,10 +376,11 @@ export class SequenceViewModel {
 
     this.nodes.forEach((node, nodeIndex) => {
       if (
-        previousTwoStrandedNode?.antisenseNode &&
+        previousTwoStrandedNode &&
+        previousTwoStrandedNode.antisenseNode &&
         node.antisenseNode &&
-        previousTwoStrandedNode?.chain === node.chain &&
-        previousTwoStrandedNode?.antisenseChain !== node.antisenseChain
+        previousTwoStrandedNode.chain === node.chain &&
+        previousTwoStrandedNode.antisenseChain !== node.antisenseChain
       ) {
         const nextConnectedSenseNode = getNextConnectedNode(
           previousHandledSenseNode as SubChainNode,
@@ -384,7 +391,7 @@ export class SequenceViewModel {
           this.nodes.splice(nodeIndex, 0, {
             senseNode: new BackBoneSequenceNode(
               previousHandledSenseNode as SubChainNode,
-              nextConnectedSenseNode,
+              nextConnectedSenseNode as SubChainNode,
             ),
             senseNodeIndex: previousTwoStrandedNode.senseNodeIndex,
             antisenseNode: new EmptySequenceNode(),

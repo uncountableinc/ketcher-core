@@ -39,5 +39,4 @@ export declare class Bond extends DrawingEntity {
     moveBondStartAbsolute(x: any, y: any): void;
     moveBondEndAbsolute(x: any, y: any): void;
     moveToLinkedAtoms(): void;
-    moveToLinkedEntities(): void;
 }

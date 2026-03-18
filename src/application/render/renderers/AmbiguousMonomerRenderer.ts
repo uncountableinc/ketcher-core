@@ -18,8 +18,8 @@ type PreviewAttachmentPointParams = {
 };
 
 export class AmbiguousMonomerRenderer extends BaseMonomerRenderer {
-  private readonly monomerRenderer: BaseMonomerRenderer;
-  private readonly monomerSymbolElementsIds: {
+  private monomerRenderer: BaseMonomerRenderer;
+  private monomerSymbolElementsIds: {
     selected: string;
     hover: string;
     body: string;
@@ -34,7 +34,6 @@ export class AmbiguousMonomerRenderer extends BaseMonomerRenderer {
       monomer,
       monomerSymbolElementsIds.hover,
       monomerSymbolElementsIds.body,
-      monomerSymbolElementsIds.autochainPreview,
       scale,
     );
 
@@ -56,7 +55,7 @@ export class AmbiguousMonomerRenderer extends BaseMonomerRenderer {
       .data([this])
       .attr(
         'href',
-        this.monomerSymbolElementsIds.variant ??
+        this.monomerSymbolElementsIds.variant ||
           this.monomerSymbolElementsIds.body,
       )
       .attr('fill', '#fff')

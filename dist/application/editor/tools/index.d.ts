@@ -18,4 +18,3 @@ import { ToolName } from "./types";
 export declare const toolsMap: Record<ToolName, ToolConstructorInterface>;
 export * from './Tool';
 export * from './Zoom';
-export * from './select';

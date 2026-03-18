@@ -3,8 +3,8 @@ import { BaseSequenceRenderer } from "./BaseSequenceRenderer";
 import { SubChainNode, Vec2 } from "../../../../domain/entities";
 export declare class PolymerBondSequenceRenderer extends BaseSequenceRenderer {
     polymerBond: PolymerBond;
-    private readonly firstNode?;
-    private readonly secondNode?;
+    private firstNode?;
+    private secondNode?;
     private selectionElement;
     constructor(polymerBond: PolymerBond, firstNode?: SubChainNode | undefined, secondNode?: SubChainNode | undefined);
     private get isHydrogenBond();

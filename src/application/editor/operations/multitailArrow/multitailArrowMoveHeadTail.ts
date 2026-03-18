@@ -5,11 +5,11 @@ import { MULTITAIL_ARROW_KEY } from 'domain/constants';
 
 export class MultitailArrowMoveHeadTail extends BaseOperation {
   constructor(
-    private readonly id: number,
+    private id: number,
     private offset: number,
-    private readonly name: string,
-    private readonly tailId: number | null,
-    private readonly normalize?: true,
+    private name: string,
+    private tailId: number | null,
+    private normalize?: true,
   ) {
     super(OperationType.MULTITAIL_ARROW_MOVE_HEAD_TAIL);
   }

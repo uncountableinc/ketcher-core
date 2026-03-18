@@ -6,9 +6,9 @@ import { FixedPrecisionCoordinates } from 'domain/entities';
 
 export class MultitailArrowAddTail extends BaseOperation {
   constructor(
-    private readonly itemId: number,
+    private itemId: number,
     private tailId?: number,
-    private readonly coordinate?: FixedPrecisionCoordinates,
+    private coordinate?: FixedPrecisionCoordinates,
   ) {
     super(OperationType.MULTITAIL_ARROW_ADD_TAIL);
   }
@@ -31,10 +31,7 @@ export class MultitailArrowAddTail extends BaseOperation {
 
 export class MultitailArrowRemoveTail extends BaseOperation {
   private coordinate?: FixedPrecisionCoordinates;
-  constructor(
-    private readonly itemId: number,
-    private readonly tailId: number,
-  ) {
+  constructor(private itemId: number, private tailId: number) {
     super(OperationType.MULTITAIL_ARROW_REMOVE_TAIL);
   }
 

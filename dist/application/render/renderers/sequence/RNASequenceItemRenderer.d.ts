@@ -12,7 +12,7 @@ export declare abstract class RNASequenceItemRenderer extends BaseSequenceItemRe
     constructor(node: Nucleoside | Nucleotide, _firstNodeInChainPosition: Vec2, _monomerIndexInChain: number, _isLastMonomerInChain: boolean, _chain: Chain, _nodeIndexOverall: number, _editingNodeIndexOverall: number, monomerSize: {
         width: number;
         height: number;
-    }, scaledMonomerPosition: Vec2, _twoStrandedNode: ITwoStrandedChainItem, _previousRowsWithAntisense?: number);
+    }, scaledMonomerPosition: Vec2, _previousRowsWithAntisense: number | undefined, _twoStrandedNode: ITwoStrandedChainItem);
     get symbolToDisplay(): string;
     protected drawCommonModification(node: Nucleoside | Nucleotide): void;
 }

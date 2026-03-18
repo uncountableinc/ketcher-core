@@ -1,5 +1,4 @@
 import { KetSerializer } from 'domain/serializers';
-import { IKetMacromoleculesContent } from 'application/formatters';
 
 export const parseMonomersLibrary = (monomersDataRaw: string | JSON) => {
   const monomersLibraryParsedJson =
@@ -13,17 +12,3 @@ export const parseMonomersLibrary = (monomersDataRaw: string | JSON) => {
 
   return { monomersLibraryParsedJson, monomersLibrary };
 };
-
-export const getEmptyMonomersLibraryJson =
-  function (): IKetMacromoleculesContent {
-    // TODO fix types
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    return {
-      root: {
-        templates: [],
-        nodes: [],
-        connections: [],
-      },
-    };
-  };

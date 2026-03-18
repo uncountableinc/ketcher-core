@@ -17,6 +17,7 @@
 import {
   Box2Abs,
   FunctionalGroup,
+  Pile,
   SGroup,
   Vec2,
   MonomerMicromolecule,
@@ -35,11 +36,12 @@ import { tfx } from 'utilities';
 import BracketParams from '../bracket-params';
 import { RaphaelPaper } from 'raphael';
 import { RenderOptions } from '../render.types';
-import paperjs from 'paper';
 interface SGroupdrawBracketsOptions {
   set: any;
   render: Render;
   sgroup: SGroup;
+  crossBonds: { [key: number]: Array<number> };
+  atomSet: Pile;
   bracketBox: Box2Abs;
   direction: Vec2;
   lowerIndexText?: string | null;
@@ -53,38 +55,6 @@ export const SUPERATOM_CLASS_TEXT = {
   [SUPERATOM_CLASS.SUGAR]: 'Sugar',
   [SUPERATOM_CLASS.PHOSPHATE]: 'Phosphate',
 };
-
-// Helper function to convert SVG elements into Paper.js paths
-export function paperPathFromSVGElement(element) {
-  const tagName = element.tagName;
-  let path;
-
-  if (tagName === 'circle') {
-    // Convert circle to Paper.js Path.Circle
-    const cx = parseFloat(element.getAttribute('cx'));
-    const cy = parseFloat(element.getAttribute('cy'));
-    const r = parseFloat(element.getAttribute('r'));
-    path = new paperjs.Path.Circle(new paperjs.Point(cx, cy), r);
-  } else if (tagName === 'rect') {
-    // Convert rectangle to Paper.js Path.Rectangle
-    const x = parseFloat(element.getAttribute('x'));
-    const y = parseFloat(element.getAttribute('y'));
-    const width = parseFloat(element.getAttribute('width'));
-    const height = parseFloat(element.getAttribute('height'));
-    path = new paperjs.Path.Rectangle(
-      new paperjs.Rectangle(x, y, width, height),
-      new paperjs.Size(
-        parseFloat(element.getAttribute('rx') || '0'),
-        parseFloat(element.getAttribute('ry') || '0'),
-      ),
-    );
-  } else if (tagName === 'path') {
-    // Use the `d` attribute directly for Path data
-    const d = element.getAttribute('d');
-    path = new paperjs.CompoundPath(d);
-  }
-  return path;
-}
 
 class ReSGroup extends ReObject {
   public item: SGroup | undefined;
@@ -109,6 +79,8 @@ class ReSGroup extends ReObject {
   draw(remol: ReStruct, sgroup: SGroup): any {
     this.render = remol.render;
     let set = this.render.paper.set();
+    const atomSet = new Pile(sgroup.atoms);
+    const crossBonds = SGroup.getCrossBonds(remol.molecule, atomSet);
     SGroup.bracketPos(sgroup, remol.molecule, remol, this.render);
     const bracketBox = sgroup.bracketBox;
     const direction = sgroup.bracketDirection;
@@ -118,6 +90,8 @@ class ReSGroup extends ReObject {
         set,
         render: this.render,
         sgroup,
+        crossBonds,
+        atomSet,
         bracketBox,
         direction,
       };
@@ -206,8 +180,8 @@ class ReSGroup extends ReObject {
   }
 
   getTextHighlightDimensions(
-    render: Render,
     padding = 0,
+    render: Render,
   ): { startX: number; startY: number; width: number; height: number } {
     let startX = 0;
     let startY = 0;
@@ -241,8 +215,8 @@ class ReSGroup extends ReObject {
     const { fontszInPx, radiusScaleFactor } = options;
     const radius = fontszInPx * radiusScaleFactor * 2;
     const { startX, startY, width, height } = this.getTextHighlightDimensions(
-      render,
       fontszInPx / 2,
+      render,
     );
     return paper.rect(startX, startY, width, height, radius);
   }
@@ -251,7 +225,7 @@ class ReSGroup extends ReObject {
     restruct: ReStruct,
     _paper: RaphaelPaper,
     options: any,
-  ): any {
+  ): any | void {
     const sgroup = this.item;
     const functionalGroups = restruct.molecule.functionalGroups;
     const render = restruct.render;
@@ -272,9 +246,7 @@ class ReSGroup extends ReObject {
     if (sGroupItem) {
       const { a0, a1, b0, b1 } = getHighlighPathInfo(sGroupItem, render);
       const functionalGroups = render.ctab.molecule.functionalGroups;
-      const hoversToCombine: Array<any> = [];
-      const otherHovers = paper.set();
-
+      const set = paper.set();
       if (
         FunctionalGroup.isContractedFunctionalGroup(
           sGroupItem.id,
@@ -284,7 +256,6 @@ class ReSGroup extends ReObject {
         sGroupItem.hovering = this.getContractedSelectionContour(render).attr(
           options.hoverStyle,
         );
-        hoversToCombine.push(sGroupItem.hovering);
       } else if (!this.selected) {
         sGroupItem.hovering = paper
           .path(
@@ -301,64 +272,20 @@ class ReSGroup extends ReObject {
             tfx(b0.y),
           )
           .attr(options.hoverStyle);
-        otherHovers.push(sGroupItem.hovering);
       }
+      set.push(sGroupItem.hovering);
 
       SGroup.getAtoms(render.ctab.molecule, sGroupItem).forEach((aid) => {
         const atom = render?.ctab?.atoms?.get(aid);
 
-        hoversToCombine.push(atom?.makeHoverPlate(render));
+        set.push(atom?.makeHoverPlate(render));
       }, this);
       SGroup.getBonds(render.ctab.molecule, sGroupItem).forEach((bid) => {
-        hoversToCombine.push(
-          render?.ctab?.bonds?.get(bid)?.makeHoverPlate(render),
-        );
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore: raphael typing issues
+        set.push(render?.ctab?.bonds?.get(bid)?.makeHoverPlate(render));
       }, this);
-
-      const elements: Element[] = [];
-
-      hoversToCombine.forEach((item) => {
-        if (item?.node) {
-          elements.push(item.node);
-          item.node.remove();
-        }
-      });
-
-      paperjs.setup(document.createElement('canvas')); // Paper.js works on an offscreen canvas
-
-      // Generate Paper.js paths from all SVG elements
-      let combinedPath: any = null;
-
-      elements.forEach((el) => {
-        const paperPath = paperPathFromSVGElement(el);
-
-        if (!paperPath) {
-          return;
-        }
-
-        if (!paperPath.closed) {
-          paperPath.closePath();
-        }
-
-        if (!combinedPath) {
-          combinedPath = paperPath;
-        } else {
-          combinedPath = combinedPath.unite(paperPath);
-        }
-      });
-
-      if (!combinedPath) {
-        return;
-      }
-
-      const combinedPathD = combinedPath.pathData;
-
-      render.ctab.addReObjectPath(
-        LayerMap.hovering,
-        this.visel,
-        paper.path(combinedPathD).attr(options.hoverStyle),
-      );
-      render.ctab.addReObjectPath(LayerMap.hovering, this.visel, otherHovers);
+      render.ctab.addReObjectPath(LayerMap.hovering, this.visel, set);
     }
   }
 
@@ -418,6 +345,8 @@ class ReSGroup extends ReObject {
 function SGroupdrawBrackets({
   set,
   render,
+  crossBonds,
+  atomSet,
   bracketBox,
   direction,
   lowerIndexText,
@@ -425,9 +354,19 @@ function SGroupdrawBrackets({
   indexAttribute,
   superatomClass,
 }: SGroupdrawBracketsOptions): void {
+  const attachmentPoints = [...atomSet].reduce((arr, atomId) => {
+    const rgroupAttachmentPointIds =
+      render.ctab.molecule.getRGroupAttachmentPointsByAtomId(atomId);
+    return [...arr, ...rgroupAttachmentPointIds];
+  }, []);
+  const crossBondsPerAtom = Object.values(crossBonds);
+  const crossBondsValues = crossBondsPerAtom.flat();
   const brackets = getBracketParameters(bracketBox, direction);
   let rightBracketIndex = -1;
-
+  const isBracketContainAttachment =
+    crossBondsValues.length === 2 &&
+    crossBondsPerAtom.length === 1 &&
+    !!attachmentPoints.length;
   for (let i = 0; i < brackets.length; ++i) {
     const bracket = brackets[i];
     const path = draw.bracket(
@@ -438,6 +377,7 @@ function SGroupdrawBrackets({
       bracket.width,
       bracket.height,
       render.options,
+      isBracketContainAttachment,
     );
     set.push(path);
     if (
@@ -638,7 +578,7 @@ function drawAttachedDat(restruct: ReStruct, sgroup: SGroup): any {
   const paper = render.paper;
   const set = paper.set();
 
-  SGroup.getAtoms(restruct.molecule, sgroup).forEach((aid) => {
+  SGroup.getAtoms(restruct, sgroup).forEach((aid) => {
     const atom = restruct.atoms.get(aid);
     if (atom) {
       const p = Scale.modelToCanvas(atom.a.pp, options);
@@ -660,23 +600,13 @@ function drawAttachedDat(restruct: ReStruct, sgroup: SGroup): any {
 
 // We decided that brackets will be always calculated using bounding box to avoid complexity.
 // See the PR discussion for more details.
+// FIXME: Unclear how to reconcile
+// - Tony
 // const USE_BOUNDING_BOX_FOR_BRACKETS = true;
 
 function getBracketParameters(bracketBox: Box2Abs, direction: Vec2) {
   const brackets: BracketParams[] = [];
   const bracketDirection = direction.rotateSC(1, 0);
-
-  // FIXME: Unclear how to reconcile.
-  // - Tony
-  // if (USE_BOUNDING_BOX_FOR_BRACKETS) {
-  //   getBracketParamersWithCrossBondsLessThan2(
-  //     direction,
-  //     bracketDirection,
-  //     bracketBox,
-  //     brackets,
-  //   );
-  //   return brackets;
-  // }
   const bracketWidth = Math.min(0.25, bracketBox.sz().x * 0.3);
   const leftCenter = Vec2.lc2(
     direction,

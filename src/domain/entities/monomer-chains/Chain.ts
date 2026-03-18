@@ -33,11 +33,6 @@ export class Chain {
 
   public id: number;
 
-  private nodesChanged = true;
-  private nodesCache: SubChainNode[] = [];
-  private monomersCache: BaseMonomer[] = [];
-  private bondsCache: PolymerBond[] = [];
-
   constructor(firstMonomer?: BaseMonomer, isCyclic?: boolean) {
     this.id = id++;
     if (firstMonomer) {
@@ -48,23 +43,6 @@ export class Chain {
 
     if (isCyclic) {
       this.isCyclic = isCyclic;
-    }
-  }
-
-  private recalculateNodes() {
-    // TODO if node.monomers change somewhere else, we will have incorrect cache
-    if (
-      this.nodesChanged ||
-      this.subChains.some((subChain) => subChain.modified)
-    ) {
-      this.nodesCache = this.subChains.flatMap((subChain) => subChain.nodes);
-      this.monomersCache = this.nodesCache.flatMap((node) => node.monomers);
-      this.bondsCache = this.subChains.flatMap((subChain) => subChain.bonds);
-
-      this.nodesChanged = false;
-      this.subChains.forEach((subChain) => {
-        subChain.modified = false;
-      });
     }
   }
 
@@ -79,7 +57,6 @@ export class Chain {
   }
 
   public add(monomer: BaseMonomer) {
-    this.nodesChanged = true;
     this.createSubChainIfNeed(monomer);
 
     if (
@@ -92,13 +69,7 @@ export class Chain {
     }
 
     if (monomer instanceof AmbiguousMonomer) {
-      // If this ambiguous monomer can be part of a linker group (CHEM, Sugar, Phosphate, or Base class
-      // connected to other linker-valid monomers), add it as a LinkerSequenceNode
-      if (LinkerSequenceNode.isPartOfLinker(monomer)) {
-        this.lastSubChain.add(new LinkerSequenceNode(monomer));
-      } else {
-        this.lastSubChain.add(new AmbiguousMonomerSequenceNode(monomer));
-      }
+      this.lastSubChain.add(new AmbiguousMonomerSequenceNode(monomer));
       return;
     }
 
@@ -137,7 +108,7 @@ export class Chain {
     this.createSubChainIfNeed(node.monomer);
 
     this.lastSubChain.add(node);
-    this.nodesChanged = true;
+
     return this;
   }
 
@@ -159,8 +130,12 @@ export class Chain {
   }
 
   public get nodes() {
-    this.recalculateNodes();
-    return this.nodesCache;
+    const nodes: SubChainNode[] = [];
+    this.subChains.forEach((subChain) => {
+      nodes.push(...subChain.nodes);
+    });
+
+    return nodes;
   }
 
   public get lastNode():
@@ -168,7 +143,6 @@ export class Chain {
     | MonomerSequenceNode
     | Nucleoside
     | Nucleotide
-    | LinkerSequenceNode
     | undefined {
     return this.lastSubChain?.lastNode;
   }
@@ -271,14 +245,18 @@ export class Chain {
     return this.length === 1 && this.firstNode instanceof EmptySequenceNode;
   }
 
+  // TODO: This method while being called multiple times (e.g. in isOverlappingCyclicBond) causes performance issues, consider memoization
   public get monomers() {
-    this.recalculateNodes();
-    return this.monomersCache;
+    return this.nodes.reduce(
+      (monomers: BaseMonomer[], node) => [...monomers, ...node.monomers],
+      [],
+    );
   }
 
   // TODO: Currently the only place where bonds are pushed is in SequenceModeRenderer thus it doesn't provide correct data. Collect all bonds in `fromMonomers` method
   public get bonds() {
-    this.recalculateNodes();
-    return this.bondsCache;
+    return this.subChains.reduce((bonds: PolymerBond[], subChain) => {
+      return [...bonds, ...subChain.bonds];
+    }, []);
   }
 }

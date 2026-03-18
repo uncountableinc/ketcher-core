@@ -37,7 +37,7 @@ export interface BondAttributes {
     endSgroup?: SGroup;
 }
 export declare class Bond extends BaseMicromoleculeEntity {
-    static readonly PATTERN: {
+    static PATTERN: {
         TYPE: {
             SINGLE: number;
             DOUBLE: number;
@@ -72,7 +72,7 @@ export declare class Bond extends BaseMicromoleculeEntity {
             MADE_OR_BROKEN_AND_CHANGED: number;
         };
     };
-    static readonly attrlist: {
+    static attrlist: {
         type: number;
         stereo: number;
         topology: number;
@@ -125,6 +125,6 @@ export declare class Bond extends BaseMicromoleculeEntity {
     clone(aidMap?: Map<number, number> | null): Bond;
     getAttachedSGroups(struct: Struct): Pile<number>;
     isExternalBondBetweenMonomers(struct: Struct): boolean;
-    static isBondToHiddenLeavingGroup(struct: Struct, bond: Bond, includeAtomsInCollapsedSgroups?: boolean): boolean | 0 | null | undefined;
+    static isBondToHiddenLeavingGroup(struct: Struct, bond: Bond): boolean | 0 | null | undefined;
     static isBondToExpandedMonomer(struct: Struct, bond: Bond): boolean;
 }

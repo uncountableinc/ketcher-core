@@ -4,8 +4,8 @@ import { EmptyMonomer } from "./EmptyMonomer";
 import { BaseMonomer } from "./BaseMonomer";
 export declare class EmptySequenceNode {
     renderer?: BaseSequenceItemRenderer;
-    readonly monomer: EmptyMonomer;
-    private readonly monomersCache;
+    monomer: EmptyMonomer;
+    constructor();
     get SubChainConstructor(): typeof EmptySubChain;
     get firstMonomerInNode(): EmptyMonomer;
     get lastMonomerInNode(): EmptyMonomer;

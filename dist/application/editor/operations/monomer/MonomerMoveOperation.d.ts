@@ -17,8 +17,8 @@ import { Operation } from "../../../../domain/entities/Operation";
 import { BaseMonomer } from "../../../../domain/entities";
 import { RenderersManager } from "../../../render/renderers/RenderersManager";
 export declare class MonomerMoveOperation implements Operation {
-    private readonly monomerMoveModelChange;
-    private readonly invertMonomerMoveModelChange;
+    private monomerMoveModelChange;
+    private invertMonomerMoveModelChange;
     monomer: BaseMonomer;
     constructor(monomerMoveModelChange: () => BaseMonomer, invertMonomerMoveModelChange: () => BaseMonomer);
     execute(renderersManager: RenderersManager): void;

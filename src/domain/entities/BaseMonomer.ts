@@ -4,14 +4,15 @@ import {
   AttachmentPointName,
   AttachmentPointsToBonds,
   MonomerItemType,
-  MonomerBond,
 } from 'domain/types';
 import { PolymerBond } from 'domain/entities/PolymerBond';
 import { BaseMonomerRenderer } from 'application/render/renderers/BaseMonomerRenderer';
 import { BaseRenderer } from 'application/render/renderers/BaseRenderer';
 import { getAttachmentPointLabel } from 'domain/helpers/attachmentPointCalculations';
+import assert from 'assert';
 import {
   IKetAttachmentPoint,
+  IKetAttachmentPointType,
   KetMonomerClass,
 } from 'application/formatters/types/ket';
 import { RnaSubChain } from 'domain/entities/monomer-chains/RnaSubChain';
@@ -39,6 +40,7 @@ export abstract class BaseMonomer extends DrawingEntity {
 
   public attachmentPointsVisible = false;
   public monomerItem: MonomerItemType;
+  public isMonomerInRnaChainRow = false;
   public hydrogenBonds: HydrogenBond[] = [];
 
   constructor(
@@ -52,7 +54,7 @@ export abstract class BaseMonomer extends DrawingEntity {
     this.monomerItem.expanded = monomerItem.expanded;
     this.recalculateAttachmentPoints();
     this.monomerItem.attachmentPoints =
-      this.monomerItem.attachmentPoints ??
+      this.monomerItem.attachmentPoints ||
       this.getMonomerDefinitionAttachmentPoints();
     this.chosenFirstAttachmentPointForBond = null;
     this.potentialSecondAttachmentPointForBond = null;
@@ -73,7 +75,7 @@ export abstract class BaseMonomer extends DrawingEntity {
     for (let i = 1; i <= maxAttachmentPointNumber; i++) {
       const attachmentPointLabel = getAttachmentPointLabel(i);
 
-      if (attachmentPointLabel in this.attachmentPointsToBonds) {
+      if (this.attachmentPointsToBonds[attachmentPointLabel] !== undefined) {
         attachmentPointList.push(attachmentPointLabel);
       }
     }
@@ -122,7 +124,7 @@ export abstract class BaseMonomer extends DrawingEntity {
   }
 
   public getAttachmentPointByBond(
-    bond: MonomerBond,
+    bond: PolymerBond | MonomerToAtomBond | HydrogenBond,
   ): AttachmentPointName | undefined {
     if (bond instanceof HydrogenBond) {
       return this.hydrogenBonds.find((hydrogenBond) => hydrogenBond === bond)
@@ -173,7 +175,7 @@ export abstract class BaseMonomer extends DrawingEntity {
   private getMaxAttachmentPointNumber() {
     let maxAttachmentPointNumber = 1;
     for (const attachmentPoint in this.attachmentPointsToBonds) {
-      const match = /R(\d+)/.exec(attachmentPoint);
+      const match = attachmentPoint.match(/R(\d+)/);
       if (match) {
         const pointNumber = parseInt(match[1]);
         if (!isNaN(pointNumber) && pointNumber > maxAttachmentPointNumber) {
@@ -218,7 +220,7 @@ export abstract class BaseMonomer extends DrawingEntity {
 
   public forEachBond(
     callback: (
-      polymerBond: MonomerBond,
+      polymerBond: PolymerBond | MonomerToAtomBond | HydrogenBond,
       attachmentPointName: AttachmentPointName,
     ) => void,
   ) {
@@ -236,7 +238,10 @@ export abstract class BaseMonomer extends DrawingEntity {
     });
   }
 
-  public setBond(attachmentPointName: AttachmentPointName, bond: MonomerBond) {
+  public setBond(
+    attachmentPointName: AttachmentPointName,
+    bond: PolymerBond | MonomerToAtomBond | HydrogenBond,
+  ) {
     if (!(bond instanceof HydrogenBond)) {
       this.attachmentPointsToBonds[attachmentPointName] = bond;
 
@@ -269,16 +274,10 @@ export abstract class BaseMonomer extends DrawingEntity {
     return compact(values(this.attachmentPointsToBonds));
   }
 
-  public get polymerBonds(): PolymerBond[] {
+  public get polymerBonds() {
     return this.covalentBonds.filter(
-      (bond): bond is PolymerBond => bond instanceof PolymerBond,
-    );
-  }
-
-  public get monomerToAtomBonds(): MonomerToAtomBond[] {
-    return this.bonds.filter(
-      (bond): bond is MonomerToAtomBond => bond instanceof MonomerToAtomBond,
-    );
+      (bond) => bond instanceof PolymerBond,
+    ) as PolymerBond[];
   }
 
   public get bonds(): Array<PolymerBond | HydrogenBond | MonomerToAtomBond> {
@@ -437,29 +436,39 @@ export abstract class BaseMonomer extends DrawingEntity {
   } {
     const attachmentPointDictionary = {};
     const attachmentPointsList: AttachmentPointName[] = [];
-
+    const attachmentPointTypeToNumber: {
+      [key in IKetAttachmentPointType]: (
+        attachmentPointNumber?: number,
+      ) => number;
+    } = {
+      left: () => 1,
+      right: () => 2,
+      side: (attachmentPointNumber) => {
+        assert(attachmentPointNumber);
+        return (
+          attachmentPointNumber +
+          Number(!('R1' in attachmentPointDictionary)) +
+          Number(!('R2' in attachmentPointDictionary))
+        );
+      },
+    };
     attachmentPoints.forEach((attachmentPoint, attachmentPointIndex) => {
       const attachmentPointNumber = attachmentPointIndex + 1;
-      let calculatedAttachmentPointNumber: number;
+      let calculatedAttachmentPointNumber;
       if (attachmentPoint.type) {
-        if (attachmentPoint.type === 'left') {
-          calculatedAttachmentPointNumber = 1;
-        } else if (attachmentPoint.type === 'right') {
-          calculatedAttachmentPointNumber = 2;
-        } else if (attachmentPoint.type === 'side') {
-          calculatedAttachmentPointNumber =
-            attachmentPointNumber +
-            ('R1' in attachmentPointDictionary ? 0 : 1) +
-            ('R2' in attachmentPointDictionary ? 0 : 1);
-        } else {
-          // compatibility, should not happen according to types
-          calculatedAttachmentPointNumber = attachmentPointNumber;
-        }
+        const getLabelByTypeAction =
+          attachmentPointTypeToNumber[attachmentPoint.type];
+        calculatedAttachmentPointNumber =
+          typeof getLabelByTypeAction === 'function'
+            ? attachmentPointTypeToNumber[attachmentPoint.type](
+                attachmentPointNumber,
+              )
+            : attachmentPointNumber;
       } else {
         calculatedAttachmentPointNumber = attachmentPointNumber;
       }
       const calculatedLabel =
-        attachmentPoint.label ?? `R${calculatedAttachmentPointNumber}`;
+        attachmentPoint.label || `R${calculatedAttachmentPointNumber}`;
       attachmentPointDictionary[calculatedLabel] = null;
       attachmentPointsList.push(calculatedLabel as AttachmentPointName);
     });
@@ -506,7 +515,7 @@ export abstract class BaseMonomer extends DrawingEntity {
         type:
           this.attachmentPointNumberToType[
             superatomAttachmentPoint.attachmentPointNumber
-          ] ?? this.attachmentPointNumberToType.moreThanTwo,
+          ] || this.attachmentPointNumberToType.moreThanTwo,
       });
     });
     return monomerDefinitionAttachmentPoints;
@@ -587,12 +596,12 @@ export abstract class BaseMonomer extends DrawingEntity {
       this.monomerItem.props.MonomerNaturalAnalogThreeLettersCode;
     const naturalAnalogCode = this.monomerItem.props.MonomerNaturalAnalogCode;
     const namesToCompareNaturalAnalog = [
-      this.label,
-      this.monomerItem.props.MonomerName,
+      ...([this.label] || []),
+      ...([this.monomerItem.props.MonomerName] || []),
     ];
     const naturalAnaloguesToCompare = [
-      ...(naturalAnalogThreeLettersCode ? [naturalAnalogThreeLettersCode] : []),
-      naturalAnalogCode,
+      ...([naturalAnalogThreeLettersCode] || []),
+      ...([naturalAnalogCode] || []),
     ];
 
     return namesToCompareNaturalAnalog.every(

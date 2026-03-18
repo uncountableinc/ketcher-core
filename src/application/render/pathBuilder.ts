@@ -20,12 +20,12 @@ export class PathBuilder {
     }
   }
 
-  addMovement(to: Point2D): this {
+  addMovement(to: Point2D): PathBuilder {
     this.pathParts.push(`M${PathBuilder.generatePoint(to)}`);
     return this;
   }
 
-  addLine(to: Point2D, from?: Point2D): this {
+  addLine(to: Point2D, from?: Point2D): PathBuilder {
     if (from) {
       this.addMovement(from);
     }
@@ -33,21 +33,21 @@ export class PathBuilder {
     return this;
   }
 
-  addClosedLine(to: Point2D, from?: Point2D): this {
+  addClosedLine(to: Point2D, from?: Point2D): PathBuilder {
     this.addLine(to, from);
     const index = this.pathParts.length - 1;
     this.pathParts[index] = this.pathParts[index].concat('Z');
     return this;
   }
 
-  addQuadraticBezierCurve(control: Point2D, to: Point2D): this {
+  addQuadraticBezierCurve(control: Point2D, to: Point2D): PathBuilder {
     this.pathParts.push(
       `Q${PathBuilder.generatePoint(control)} ${PathBuilder.generatePoint(to)}`,
     );
     return this;
   }
 
-  addPathParts(pathParts: Array<string>): this {
+  addPathParts(pathParts: Array<string>): PathBuilder {
     this.pathParts = this.pathParts.concat(pathParts);
     return this;
   }
@@ -57,7 +57,7 @@ export class PathBuilder {
     arrowLength: number,
     tipXOffset = 7,
     tipYOffset = 5,
-  ): this {
+  ): PathBuilder {
     const endX = start.x + arrowLength;
     const end = new Vec2(endX, start.y);
     const tipX = endX - tipXOffset;
@@ -72,7 +72,7 @@ export class PathBuilder {
     arrowLength: number,
     triangleLength = 8,
     triangleWidth = 4,
-  ): this {
+  ): PathBuilder {
     const endX = start.x + arrowLength;
     const end = new Vec2(endX, start.y);
     const triangleBottom = new Vec2(endX - triangleLength, end.y);
@@ -89,7 +89,7 @@ export class PathBuilder {
     spineX: number,
     tailLength: number,
     cubicBezierOffset = 6,
-  ): this {
+  ): PathBuilder {
     const tailX = spineX - tailLength;
     const tailStart = spineX - cubicBezierOffset;
 

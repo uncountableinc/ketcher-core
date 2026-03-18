@@ -16,7 +16,8 @@
 import { CoreEditor } from "../internal";
 import { BaseTool } from "./Tool";
 declare class ClearTool implements BaseTool {
-    private readonly editor;
+    private editor;
+    private history;
     constructor(editor: CoreEditor);
     destroy(): void;
 }

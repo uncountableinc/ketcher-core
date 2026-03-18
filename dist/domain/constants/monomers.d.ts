@@ -27,15 +27,7 @@ export declare enum StandardAmbiguousRnaBase {
     R = "R",
     S = "S"
 }
-export declare enum StandardAmbiguousPeptide {
-    B = "B",
-    J = "J",
-    Z = "Z",
-    X = "X"
-}
 export declare const rnaDnaNaturalAnalogues: string[];
-export declare const rnaDnaAmbiguousSymbols: string[];
-export declare const peptideAmbiguousSymbols: string[];
 export declare const unknownNaturalAnalogues: string[];
 export declare const peptideNaturalAnalogues: string[];
 export declare const NO_NATURAL_ANALOGUE = "X";
@@ -52,7 +44,6 @@ export declare const MONOMER_CONST: {
     BASE: string;
     PHOSPHATE: string;
 };
-export declare const CREATE_MONOMER_TOOL_NAME = "create-monomer";
 export declare const MonomerSize = 0.75;
 export declare const HalfMonomerSize: number;
 export declare const StandardBondLength: number;

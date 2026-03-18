@@ -4,9 +4,9 @@ import { VerticalScrollbar } from './scrollbar-vertical';
 import { HorizontalScrollbar } from './scrollbar-horizontal';
 
 export class ScrollbarContainer {
-  readonly #scrollOffset: ScrollOffset;
-  readonly #verticalBar: VerticalScrollbar;
-  readonly #horizontalBar: HorizontalScrollbar;
+  #scrollOffset: ScrollOffset;
+  #verticalBar: VerticalScrollbar;
+  #horizontalBar: HorizontalScrollbar;
 
   constructor(render: Render) {
     this.#scrollOffset = new ScrollOffset(render);

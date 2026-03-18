@@ -1,6 +1,6 @@
 import { BaseTool, CoreEditor } from "./..";
 export declare class HandTool implements BaseTool {
-    private readonly editor;
+    private editor;
     private readonly dragBehavior;
     constructor(editor: CoreEditor);
     private handleDragStart;

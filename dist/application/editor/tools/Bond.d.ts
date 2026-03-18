@@ -19,11 +19,11 @@ import { BaseMonomer } from "../../../domain/entities/BaseMonomer";
 import { AttachmentPointName } from "../../../domain/types";
 import { ToolName } from "./..";
 declare class PolymerBond implements BaseTool {
-    private readonly editor;
+    private editor;
     private bondRenderer?;
     private isBondConnectionModalOpen;
-    private readonly history;
-    private readonly bondType;
+    private history;
+    private bondType;
     constructor(editor: CoreEditor, options: {
         toolName: ToolName;
     });

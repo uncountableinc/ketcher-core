@@ -1,15 +1,10 @@
-import { IRnaPreset } from "../../../editor";
-import { BaseMonomer, HydrogenBond, PolymerBond, Vec2 } from "../../../../domain/entities";
+import { HydrogenBond, PolymerBond } from "../../../../domain/entities";
 import { AngleSnapViewParams } from './AngleSnapView';
 import { DistanceSnapViewParams } from './DistanceSnapView';
 import { ModifyAminoAcidsViewParams } from './ModifyAminoAcidsView';
 import { LineLengthHighlightViewParams } from './LineLengthHighlightView';
-import { MonomerItemType } from "../../../../domain/types";
-import { SelectionViewParams } from './SelectionView';
-import { GroupCenterSnapViewParams } from "./GroupCenterSnapView";
-import { RotationViewParams } from './RotationView';
 export declare class TransientDrawingView {
-    private readonly views;
+    private views;
     private readonly topLayer;
     private readonly defaultLayer;
     constructor();
@@ -21,18 +16,10 @@ export declare class TransientDrawingView {
     hideAngleSnap(): void;
     showDistanceSnap(params: DistanceSnapViewParams): void;
     hideDistanceSnap(): void;
-    showGroupCenterSnap(params: GroupCenterSnapViewParams): void;
-    hideGroupCenterSnap(): void;
     showModifyAminoAcidsView(params: ModifyAminoAcidsViewParams): void;
     hideModifyAminoAcidsView(): void;
     showLineLengthHighlight(params: LineLengthHighlightViewParams): void;
     hideLineLengthHighlight(): void;
-    showAutochainPreview(monomerOrRnaItem: MonomerItemType | IRnaPreset, position: Vec2, selectedMonomerToConnect?: BaseMonomer): void;
-    hideAutochainPreview(): void;
-    showSelection(params: SelectionViewParams): void;
-    hideSelection(): void;
-    showRotation(params: RotationViewParams): void;
-    hideRotation(): void;
     clear(): void;
     update(): void;
 }

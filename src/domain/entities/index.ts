@@ -64,4 +64,3 @@ export * from './HydrogenBond';
 export * from './BackBoneSequenceNode';
 export * from './DrawingEntitiesManager.replaceMonomer';
 export * from './Command';
-export { Atom as CoreAtom } from './CoreAtom';

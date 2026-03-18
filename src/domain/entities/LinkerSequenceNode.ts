@@ -9,8 +9,6 @@ import { Chem } from 'domain/entities/Chem';
 import { Phosphate } from 'domain/entities/Phosphate';
 import { RNABase } from 'domain/entities/RNABase';
 import { Sugar } from 'domain/entities/Sugar';
-import { AmbiguousMonomer } from 'domain/entities/AmbiguousMonomer';
-import { KetMonomerClass } from 'application/formatters';
 
 export class LinkerSequenceNode {
   constructor(public monomer: BaseMonomer) {}
@@ -56,12 +54,7 @@ export class LinkerSequenceNode {
       monomer instanceof RNABase ||
       (monomer instanceof Sugar &&
         !isValidNucleotide(monomer) &&
-        !isValidNucleoside(monomer)) ||
-      (monomer instanceof AmbiguousMonomer &&
-        (monomer.monomerClass === KetMonomerClass.CHEM ||
-          monomer.monomerClass === KetMonomerClass.Sugar ||
-          monomer.monomerClass === KetMonomerClass.Phosphate ||
-          monomer.monomerClass === KetMonomerClass.Base))
+        !isValidNucleoside(monomer))
     );
   }
 

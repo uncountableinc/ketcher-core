@@ -11,7 +11,7 @@ export declare class PolymerBond extends BaseBond {
     secondMonomer?: BaseMonomer;
     renderer?: FlexOrSequenceOrSnakeModePolymerBondRenderer;
     hasAntisenseInRow?: boolean;
-    nextRowPositionX?: number;
+    nextRowPositionX?: number | undefined;
     constructor(firstMonomer: BaseMonomer, secondMonomer?: BaseMonomer);
     setFirstMonomer(monomer: BaseMonomer): void;
     setSecondMonomer(monomer: BaseMonomer): void;

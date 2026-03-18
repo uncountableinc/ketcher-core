@@ -101,6 +101,7 @@ class AtomDelete extends BaseOperation {
       this.data.pos = this.data.atom.pp;
     }
 
+    // notifyAtomRemoved(aid);
     const restructedAtom = restruct.atoms.get(aid);
     if (!restructedAtom) {
       return;

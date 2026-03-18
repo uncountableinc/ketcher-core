@@ -34,7 +34,7 @@ interface StyledPath {
   stylesApplied: boolean;
 }
 class ReSimpleObject extends ReObject {
-  private readonly item: any;
+  private item: any;
   private selectionSet: any;
   private selectionPointsSet: any;
 
@@ -143,13 +143,8 @@ class ReSimpleObject extends ReObject {
     });
 
     const minDist: MinDistanceWithReferencePoint = dist.reduce(
-      (acc, current) => {
-        if (!acc) {
-          return current;
-        }
-
-        return acc.minDist < current.minDist ? acc : current;
-      },
+      (acc, current) =>
+        !acc ? current : acc.minDist < current.minDist ? acc : current,
       null,
     );
 
@@ -416,12 +411,10 @@ class ReSimpleObject extends ReObject {
     return this.selectionSet;
   }
 
-  showPoints() {
-    this.selectionPointsSet?.show();
-  }
-
-  hidePoints() {
-    this.selectionPointsSet?.hide();
+  togglePoints(displayFlag: boolean) {
+    displayFlag
+      ? this.selectionPointsSet?.show()
+      : this.selectionPointsSet?.hide();
   }
 
   show(restruct: ReStruct, options: any): void {

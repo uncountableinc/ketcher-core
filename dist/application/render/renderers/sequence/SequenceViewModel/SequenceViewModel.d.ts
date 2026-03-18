@@ -9,10 +9,10 @@ interface IForEachNodeParams {
 }
 export declare class SequenceViewModel {
     chainsCollection: ChainsCollection;
-    private readonly nodes;
+    private nodes;
     chains: SequenceViewModelChain[];
-    private readonly monomerToTwoStrandedSnakeLayoutNode;
-    private readonly chainToHasAntisense;
+    private monomerToTwoStrandedSnakeLayoutNode;
+    private chainToHasAntisense;
     constructor(chainsCollection: ChainsCollection);
     private addNode;
     private fillSenseNodes;

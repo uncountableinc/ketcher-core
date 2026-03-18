@@ -11,15 +11,15 @@ interface MatrixConfig {
 }
 
 export class CanvasMatrix {
-  private readonly matrix: Matrix<Cell>;
-  private readonly initialMatrixWidth: number;
-  private readonly monomerToCell: Map<BaseMonomer, Cell> = new Map();
+  private matrix: Matrix<Cell>;
+  private initialMatrixWidth: number;
+  private monomerToCell: Map<BaseMonomer, Cell> = new Map();
   public polymerBondToCells: Map<PolymerBond, Cell[]> = new Map();
   public polymerBondToConnections: Map<PolymerBond, Connection[]> = new Map();
 
   constructor(
     public chainsCollection: ChainsCollection,
-    private readonly matrixConfig: MatrixConfig = {
+    private matrixConfig: MatrixConfig = {
       initialMatrix: new Matrix<Cell>(),
     },
   ) {
@@ -41,15 +41,12 @@ export class CanvasMatrix {
   ): void {
     // set offsets for connections with overlappings
     const currentConnections = new Map<PolymerBond, Set<Connection>>();
-    let iterationMethod: typeof this.matrix.forEach;
-
-    if (direction === 180) {
-      iterationMethod = this.matrix.forEach.bind(this.matrix);
-    } else if (direction === 0) {
-      iterationMethod = this.matrix.forEachRightToLeft.bind(this.matrix);
-    } else {
-      iterationMethod = this.matrix.forEachBottomToTop.bind(this.matrix);
-    }
+    const iterationMethod =
+      direction === 180
+        ? this.matrix.forEach.bind(this.matrix)
+        : direction === 0
+        ? this.matrix.forEachRightToLeft.bind(this.matrix)
+        : this.matrix.forEachBottomToTop.bind(this.matrix);
 
     iterationMethod((cell) => {
       const biggestOffsetInCell = cell.connections.reduce(

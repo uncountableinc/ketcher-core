@@ -20,8 +20,8 @@ import { RenderersManager } from 'application/render/renderers/RenderersManager'
 
 export class MonomerHoverOperation implements Operation {
   constructor(
-    private readonly peptide: BaseMonomer,
-    private readonly needRedrawAttachmentPoints: boolean,
+    private peptide: BaseMonomer,
+    private needRedrawAttachmentPoints: boolean,
   ) {}
 
   public execute(renderersManager: RenderersManager) {

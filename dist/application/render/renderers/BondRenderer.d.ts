@@ -13,7 +13,6 @@ export declare class BondRenderer extends BaseRenderer {
     private getDoubleBondShift;
     private shiftPositionIfAtomLabelVisible;
     private get cipElementId();
-    private getBondFromMoleculeStruct;
     appendSelection(): void;
     removeSelection(): void;
     appendHover(): D3SvgElementSelection<SVGGElement, void> | D3SvgElementSelection<SVGUseElement, void> | D3SvgElementSelection<SVGCircleElement, void> | D3SvgElementSelection<SVGRectElement, void> | D3SvgElementSelection<SVGPathElement, void>;
@@ -27,11 +26,6 @@ export declare class BondRenderer extends BaseRenderer {
     private get halfEdges();
     private get bondVectors();
     show(): void;
-    private get topologyElementId();
-    private get reactingCenterElementId();
-    private appendBondProperties;
-    private appendTopologyMark;
-    private appendReactingCenterMark;
     private appendStereochemistry;
     remove(): void;
     move(): void;

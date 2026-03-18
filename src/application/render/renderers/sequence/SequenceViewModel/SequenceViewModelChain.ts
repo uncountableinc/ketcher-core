@@ -6,7 +6,7 @@ export interface ISequenceViewModelRow {
 }
 
 export class SequenceViewModelChain {
-  private readonly rows: ISequenceViewModelRow[] = [];
+  private rows: ISequenceViewModelRow[] = [];
 
   public get lastRow() {
     return this.rows[this.rows.length - 1];

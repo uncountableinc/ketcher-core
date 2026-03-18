@@ -20,8 +20,8 @@ import { BaseMonomer } from "../../../../domain/entities/BaseMonomer";
 import { HydrogenBond } from "../../../../domain/entities";
 import { LayoutMode } from "../..";
 export declare class PolymerBondAddOperation implements Operation {
-    private readonly addPolymerBondChangeModel;
-    private readonly deletePolymerBondChangeModel;
+    private addPolymerBondChangeModel;
+    private deletePolymerBondChangeModel;
     polymerBond: any;
     priority: number;
     constructor(addPolymerBondChangeModel: (polymerBond?: PolymerBond | HydrogenBond) => PolymerBond | HydrogenBond, deletePolymerBondChangeModel: (polymerBond: any) => void);
@@ -30,8 +30,8 @@ export declare class PolymerBondAddOperation implements Operation {
 }
 export declare class PolymerBondDeleteOperation implements Operation {
     polymerBond: PolymerBond | HydrogenBond;
-    private readonly deletePolymerBondChangeModel;
-    private readonly finishPolymerBondCreationModelChange;
+    private deletePolymerBondChangeModel;
+    private finishPolymerBondCreationModelChange;
     priority: number;
     constructor(polymerBond: PolymerBond | HydrogenBond, deletePolymerBondChangeModel: () => void, finishPolymerBondCreationModelChange: (polymerBond?: PolymerBond | HydrogenBond) => PolymerBond | HydrogenBond);
     execute(renderersManager: RenderersManager): void;
@@ -51,14 +51,14 @@ export declare class PolymerBondShowInfoOperation implements Operation {
 }
 export declare class PolymerBondCancelCreationOperation implements Operation {
     polymerBond: PolymerBond;
-    private readonly secondMonomer?;
+    private secondMonomer?;
     constructor(polymerBond: PolymerBond, secondMonomer?: BaseMonomer | undefined);
     execute(renderersManager: RenderersManager): void;
     invert(): void;
 }
 export declare class PolymerBondFinishCreationOperation implements Operation {
-    private readonly finishPolymerBondCreationModelChange;
-    private readonly deletePolymerBondCreationModelChange;
+    private finishPolymerBondCreationModelChange;
+    private deletePolymerBondCreationModelChange;
     polymerBond: any;
     priority: number;
     constructor(finishPolymerBondCreationModelChange: (polymerBond?: PolymerBond) => PolymerBond, deletePolymerBondCreationModelChange: (polymerBond: any) => void);
@@ -70,15 +70,15 @@ export declare class SelectLayoutModeOperation implements Operation {
     _onInvert: () => void;
     mode: LayoutMode;
     prevMode: any;
-    private readonly onExecute;
-    private readonly onInvert;
+    private onExecute;
+    private onInvert;
     constructor(_onExecute: () => void, _onInvert: () => void, mode: LayoutMode, prevMode: any);
     execute(): void;
     invert(): void;
 }
 export declare class ReconnectPolymerBondOperation implements Operation {
-    private readonly reconnectPolymerBondModelChange;
-    private readonly revertReconnectPolymerBondModelChange;
+    private reconnectPolymerBondModelChange;
+    private revertReconnectPolymerBondModelChange;
     polymerBond: any;
     constructor(reconnectPolymerBondModelChange: () => PolymerBond, revertReconnectPolymerBondModelChange: () => PolymerBond);
     execute(renderersManager: RenderersManager): void;

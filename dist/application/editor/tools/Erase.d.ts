@@ -16,8 +16,8 @@
 import { CoreEditor } from "../internal";
 import { BaseTool } from "./Tool";
 declare class EraserTool implements BaseTool {
-    private readonly editor;
-    private readonly history;
+    private editor;
+    private history;
     constructor(editor: CoreEditor);
     mousedown(event: any): void;
     mouseOverDrawingEntity(event: any): void;

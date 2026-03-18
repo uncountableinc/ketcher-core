@@ -109,10 +109,13 @@ function prepareSruForSaving(sgroup, mol) {
     }
   }, sgroup);
   if (xBonds.length !== 0 && xBonds.length !== 2) {
-    const error = new Error('Unsupported cross-bonds number');
-    error.id = sgroup.id;
-    error['error-type'] = 'cross-bond-number';
-    throw error;
+    // TODO fix this eslint error
+    // eslint-disable-next-line no-throw-literal
+    throw {
+      id: sgroup.id,
+      'error-type': 'cross-bond-number',
+      message: 'Unsupported cross-bonds number',
+    };
   }
   sgroup.bonds = xBonds;
 }
@@ -122,18 +125,23 @@ function prepareCopForSaving(sgroup, mol) {
   mol.bonds.forEach((bond, bid) => {
     const a1 = mol.atoms.get(bond.begin);
     const a2 = mol.atoms.get(bond.end);
+    /* eslint-disable no-mixed-operators */
     if (
       (a1.sgs.has(sgroup.id) && !a2.sgs.has(sgroup.id)) ||
       (a2.sgs.has(sgroup.id) && !a1.sgs.has(sgroup.id))
     ) {
+      /* eslint-enable no-mixed-operators */
       xBonds.push(bid);
     }
   }, sgroup);
   if (xBonds.length !== 0 && xBonds.length !== 2) {
-    const error = new Error('Unsupported cross-bonds number');
-    error.id = sgroup.id;
-    error['error-type'] = 'cross-bond-number';
-    throw error;
+    // TODO fix this eslint error
+    // eslint-disable-next-line no-throw-literal
+    throw {
+      id: sgroup.id,
+      'error-type': 'cross-bond-number',
+      message: 'Unsupported cross-bonds number',
+    };
   }
   sgroup.bonds = xBonds;
 }
@@ -405,13 +413,14 @@ function bracketsToMolfile(mol, sg, idstr) {
     n,
   );
   const lines = [];
-  for (const bracket of brackets) {
+  for (let i = 0; i < brackets.length; ++i) {
+    const bracket = brackets[i];
     const a0 = bracket.c.addScaled(bracket.n, -0.5 * bracket.h).yComplement();
     const a1 = bracket.c.addScaled(bracket.n, 0.5 * bracket.h).yComplement();
     let line = 'M  SDI ' + idstr + utils.paddedNum(4, 3);
     const coord = [a0.x, a0.y, a1.x, a1.y];
-    for (const coordValue of coord) {
-      line += utils.paddedNum(coordValue, 10, 4);
+    for (let j = 0; j < coord.length; ++j) {
+      line += utils.paddedNum(coord[j], 10, 4);
     }
     lines.push(line);
   }

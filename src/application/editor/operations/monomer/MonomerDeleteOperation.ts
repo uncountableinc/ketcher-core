@@ -25,7 +25,7 @@ export class MonomerDeleteOperation implements Operation {
     monomer: BaseMonomer,
     public addMonomerChangeModel: (monomer: BaseMonomer) => BaseMonomer,
     public deleteMonomerChangeModel: (monomer: BaseMonomer) => void,
-    private readonly callback?: () => void,
+    private callback?: () => void,
   ) {
     this.monomer = monomer;
   }

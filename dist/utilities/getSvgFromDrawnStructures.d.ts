@@ -1,6 +1,1 @@
-declare type Margins = {
-    horizontal: number;
-    vertical: number;
-};
-export declare const getSvgFromDrawnStructures: (canvas: SVGSVGElement, type: 'preview' | 'file', margins?: Margins | number) => string | undefined;
-export {};
+export declare const getSvgFromDrawnStructures: (canvas: SVGSVGElement, type: 'preview' | 'file', margin?: number) => string | undefined;

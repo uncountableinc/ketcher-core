@@ -8,13 +8,12 @@ import { MolfileFormat } from "../domain/serializers";
 import { Struct } from "../domain/entities";
 import { EventEmitter } from 'events';
 import { LogSettings } from "../utilities";
-import { ExportImageParams, SupportedImageFormats, SupportedModes, UpdateMonomersLibraryParams } from "./ketcher.types";
+import { ExportImageParams, SupportedImageFormats, SupportedModes } from "./ketcher.types";
 declare type SetMoleculeOptions = {
     position?: {
         x: number;
         y: number;
     };
-    needZoom?: boolean;
 };
 export declare class Ketcher {
     #private;
@@ -23,7 +22,6 @@ export declare class Ketcher {
     structService: StructService;
     _indigo: Indigo;
     changeEvent: Subscription;
-    libraryUpdateEvent: Subscription;
     get editor(): Editor;
     get eventBus(): EventEmitter;
     constructor(structService: StructService, formatterFactory: FormatterFactory);
@@ -32,12 +30,10 @@ export declare class Ketcher {
     get indigo(): Indigo;
     get settings(): {};
     addEditor(editor: Editor): void;
-    setSettings(settings: Record<string, string | boolean>): any;
+    setSettings(settings: Record<string, string>): any;
     getSmiles(isExtended?: boolean): Promise<string>;
-    getExtendedSmiles(): Promise<string>;
     getMolfile(molfileFormat?: MolfileFormat): Promise<string>;
     getIdt(): Promise<string>;
-    getAxoLabs(): Promise<string>;
     getRxn(molfileFormat?: MolfileFormat): Promise<string>;
     getKet(): Promise<string>;
     getFasta(): Promise<string>;
@@ -55,7 +51,6 @@ export declare class Ketcher {
     setMolecule(structStr: string, options?: SetMoleculeOptions): Promise<void | undefined>;
     setHelm(helmStr: string): Promise<void | undefined>;
     addFragment(structStr: string, options?: SetMoleculeOptions): Promise<void | undefined>;
-    circularLayoutMonomers(): Promise<void>;
     layout(): Promise<void>;
     calculate(options?: CalculateData): Promise<CalculateResult>;
     /**
@@ -68,11 +63,6 @@ export declare class Ketcher {
     generateImage(data: string, options?: GenerateImageOptions): Promise<Blob>;
     reinitializeIndigo(structService: StructService): void;
     sendCustomAction(name: string): void;
-    ensureMonomersLibraryDataInKetFormat(rawMonomersData: string | JSON, params?: UpdateMonomersLibraryParams): Promise<string>;
-    ensureMonomersLibraryDataInSdfFormat(rawMonomersData: string | JSON, params?: UpdateMonomersLibraryParams): Promise<string>;
-    updateMonomersLibrary(rawMonomersData: string | JSON, params?: UpdateMonomersLibraryParams): Promise<void>;
-    replaceMonomersLibrary(rawMonomersData: string | JSON, params?: UpdateMonomersLibraryParams): Promise<void>;
-    switchToMacromoleculesMode(): void;
-    switchToMoleculesMode(): void;
+    updateMonomersLibrary(rawMonomersData: string | JSON): void;
 }
 export {};

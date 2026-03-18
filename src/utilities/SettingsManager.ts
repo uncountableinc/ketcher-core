@@ -37,7 +37,6 @@ interface SavedSettings {
   selectionTool?: any;
   disableCustomQuery?: boolean;
   editorLineLength?: EditorLineLength;
-  monomerLibraryUpdates?: string[];
 }
 
 interface SavedOptions {
@@ -47,13 +46,12 @@ interface SavedOptions {
 }
 
 export class SettingsManager {
-  private static disableCustomQueryValue?: boolean;
-  private static persistMonomerLibraryUpdatesValue = true;
+  static _disableCustomQuery?: boolean;
 
   static getSettings(): SavedSettings {
     try {
       return JSON.parse(
-        localStorage.getItem(KETCHER_SAVED_SETTINGS_KEY) ?? '{}',
+        localStorage.getItem(KETCHER_SAVED_SETTINGS_KEY) || '{}',
       );
     } catch (e) {
       KetcherLogger.error(
@@ -75,7 +73,7 @@ export class SettingsManager {
   static getOptions(): SavedOptions {
     try {
       const optionsFromLocalStorage = JSON.parse(
-        localStorage.getItem(KETCHER_SAVED_OPTIONS_KEY) ?? '{}',
+        localStorage.getItem(KETCHER_SAVED_OPTIONS_KEY) || '{}',
       );
 
       // In 2.25 default bondLength was set to 2.1 by mistake.
@@ -124,7 +122,7 @@ export class SettingsManager {
   static set editorLineLength(newEditorLineLength: Partial<EditorLineLength>) {
     const settings = this.getSettings();
     const previousEditorLineLength =
-      settings.editorLineLength ?? DefaultEditorLineLength;
+      settings.editorLineLength || DefaultEditorLineLength;
     const editorLineLength = {
       ...previousEditorLineLength,
       ...newEditorLineLength,
@@ -143,11 +141,11 @@ export class SettingsManager {
   }
 
   static get disableCustomQuery() {
-    return this.disableCustomQueryValue;
+    return this._disableCustomQuery;
   }
 
   static set disableCustomQuery(disableCustomQuery: boolean | undefined) {
-    this.disableCustomQueryValue = disableCustomQuery;
+    this._disableCustomQuery = disableCustomQuery;
   }
 
   static get ignoreChiralFlag() {
@@ -162,35 +160,5 @@ export class SettingsManager {
       ...options,
       ignoreChiralFlag,
     });
-  }
-
-  static get monomerLibraryUpdates() {
-    const { monomerLibraryUpdates } = this.getSettings();
-    return monomerLibraryUpdates || [];
-  }
-
-  static set monomerLibraryUpdates(monomerLibraryUpdates: string[]) {
-    const settings = this.getSettings();
-
-    this.saveSettings({
-      ...settings,
-      monomerLibraryUpdates,
-    });
-  }
-
-  static addMonomerLibraryUpdate(newUpdate: string) {
-    const updates = this.monomerLibraryUpdates;
-    if (!updates.includes(newUpdate)) {
-      updates.push(newUpdate);
-      this.monomerLibraryUpdates = updates;
-    }
-  }
-
-  static get persistMonomerLibraryUpdates(): boolean {
-    return this.persistMonomerLibraryUpdatesValue;
-  }
-
-  static set persistMonomerLibraryUpdates(value: boolean | undefined) {
-    this.persistMonomerLibraryUpdatesValue = value ?? true;
   }
 }

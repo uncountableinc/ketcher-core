@@ -7,6 +7,6 @@ export declare type DistanceSnapViewParams = {
     alignedMonomers: BaseMonomer[] | undefined;
 };
 export declare class DistanceSnapView extends TransientView {
-    static readonly viewName = "DistanceSnapView";
+    static viewName: string;
     static show(transientLayer: D3SvgElementSelection<SVGGElement, void>, params: DistanceSnapViewParams): void;
 }

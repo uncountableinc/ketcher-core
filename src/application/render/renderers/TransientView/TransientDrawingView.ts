@@ -1,8 +1,8 @@
 import { select } from 'd3';
 import { D3SvgElementSelection } from 'application/render/types';
-import { IRnaPreset, ZoomTool } from 'application/editor';
+import { ZoomTool } from 'application/editor';
 import { drawnStructuresSelector } from 'application/editor/constants';
-import { BaseMonomer, HydrogenBond, PolymerBond, Vec2 } from 'domain/entities';
+import { HydrogenBond, PolymerBond } from 'domain/entities';
 import { BondSnapView } from './BondSnapView';
 import { AngleSnapView, AngleSnapViewParams } from './AngleSnapView';
 import { BaseMonomerRenderer } from 'application/render';
@@ -15,14 +15,6 @@ import {
   LineLengthHighlightView,
   LineLengthHighlightViewParams,
 } from './LineLengthHighlightView';
-import { AutochainPreviewView } from 'application/render/renderers/TransientView/AutochainPreviewView';
-import { MonomerItemType } from 'domain/types';
-import { SelectionView, SelectionViewParams } from './SelectionView';
-import {
-  GroupCentersnapView,
-  GroupCenterSnapViewParams,
-} from 'application/render/renderers/TransientView/GroupCenterSnapView';
-import { RotationView, RotationViewParams } from './RotationView';
 
 type ViewData<P> = {
   show: (layer: D3SvgElementSelection<SVGGElement, void>, params: P) => void;
@@ -33,7 +25,7 @@ type ViewData<P> = {
 };
 
 export class TransientDrawingView {
-  private readonly views: Map<string, ViewData<unknown>> = new Map();
+  private views: Map<string, ViewData<unknown>> = new Map();
 
   private readonly topLayer: D3SvgElementSelection<SVGGElement, void>;
   private readonly defaultLayer: D3SvgElementSelection<SVGGElement, void>;
@@ -137,18 +129,6 @@ export class TransientDrawingView {
     this.removeView(DistanceSnapView.viewName);
   }
 
-  public showGroupCenterSnap(params: GroupCenterSnapViewParams) {
-    this.addView(GroupCentersnapView.viewName, {
-      show: GroupCentersnapView.show,
-      params,
-      topLayer: true,
-    });
-  }
-
-  public hideGroupCenterSnap() {
-    this.removeView(GroupCentersnapView.viewName);
-  }
-
   public showModifyAminoAcidsView(params: ModifyAminoAcidsViewParams) {
     this.addView(ModifyAminoAcidsView.viewName, {
       show: ModifyAminoAcidsView.show,
@@ -171,44 +151,6 @@ export class TransientDrawingView {
 
   public hideLineLengthHighlight() {
     this.removeView(LineLengthHighlightView.viewName);
-  }
-
-  public showAutochainPreview(
-    monomerOrRnaItem: MonomerItemType | IRnaPreset,
-    position: Vec2,
-    selectedMonomerToConnect?: BaseMonomer,
-  ) {
-    this.addView(AutochainPreviewView.viewName, {
-      show: AutochainPreviewView.show,
-      params: { monomerOrRnaItem, position, selectedMonomerToConnect },
-    });
-  }
-
-  public hideAutochainPreview() {
-    this.removeView(AutochainPreviewView.viewName);
-  }
-
-  public showSelection(params: SelectionViewParams) {
-    this.addView(SelectionView.viewName, {
-      show: SelectionView.show,
-      params,
-    });
-  }
-
-  public hideSelection() {
-    this.removeView(SelectionView.viewName);
-  }
-
-  public showRotation(params: RotationViewParams) {
-    this.addView(RotationView.viewName, {
-      show: RotationView.show,
-      params,
-      topLayer: true,
-    });
-  }
-
-  public hideRotation() {
-    this.removeView(RotationView.viewName);
   }
 
   public clear() {

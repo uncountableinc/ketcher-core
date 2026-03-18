@@ -21,8 +21,8 @@ import { RenderersManager } from 'application/render/renderers/RenderersManager'
 export class MonomerMoveOperation implements Operation {
   public monomer: BaseMonomer;
   constructor(
-    private readonly monomerMoveModelChange: () => BaseMonomer,
-    private readonly invertMonomerMoveModelChange: () => BaseMonomer,
+    private monomerMoveModelChange: () => BaseMonomer,
+    private invertMonomerMoveModelChange: () => BaseMonomer,
   ) {
     this.monomer = this.monomerMoveModelChange();
   }

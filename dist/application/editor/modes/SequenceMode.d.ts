@@ -14,7 +14,6 @@ export declare class SequenceMode extends BaseMode {
     private _isEditInRNABuilderMode;
     private _isAntisenseEditMode;
     private _isSyncEditMode;
-    private isFirstInit;
     private selectionStarted;
     private selectionStartCaretPosition;
     private mousemoveCounter;

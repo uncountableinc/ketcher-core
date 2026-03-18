@@ -4,7 +4,7 @@ import { PolymerBond } from "../../../../domain/entities/PolymerBond";
 import { BaseRenderer } from '../BaseRenderer';
 export declare class SnakeModePolymerBondRenderer extends BaseRenderer {
     readonly polymerBond: PolymerBond;
-    private readonly editorEvents;
+    private editorEvents;
     private isSnakeBond;
     private selectionElement;
     private path;

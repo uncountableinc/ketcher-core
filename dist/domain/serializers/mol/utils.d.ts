@@ -61,7 +61,7 @@ declare namespace fmtInfo {
     }
     const rxnItemsPartition: number[];
 }
-declare function paddedNum(number: any, width: any, precision: any): string;
+declare function paddedNum(number: any, width: any, precision: any): any;
 /**
  * @param str {string}
  * @returns {number}

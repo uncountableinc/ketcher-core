@@ -54,7 +54,7 @@ function fromBondDeletion(
 ) {
   let action = new Action();
 
-  if (restruct.sgroups?.size > 0) {
+  if (restruct.sgroups && restruct.sgroups.size > 0) {
     restruct.sgroups.forEach((sgroup) => {
       if (sgroup.item?.type && sgroup.item?.type === 'SUP') {
         const beginAtomConnectedToBond = restruct.bonds.get(bid)?.b.begin;
@@ -147,7 +147,7 @@ export function fromFragmentDeletion(restruct, rawSelection) {
 
   selection.atoms.forEach((atomId) => {
     const sgroup = struct.getGroupFromAtomId(atomId);
-    if (sgroup?.isSuperatomWithoutLabel) {
+    if (sgroup && sgroup.isSuperatomWithoutLabel) {
       const attachmentPoints = sgroup.getAttachmentPoints();
       attachmentPoints.forEach((attachmentPoint) => {
         if (

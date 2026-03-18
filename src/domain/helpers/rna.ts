@@ -44,25 +44,11 @@ export function getRnaPartLibraryItem(
 }
 
 export function getPeptideLibraryItem(editor: CoreEditor, peptideName: string) {
-  return editor.monomersLibrary.find((libraryItem) => {
-    // Check for ambiguous peptides
-    if (isAmbiguousMonomerLibraryItem(libraryItem)) {
-      if (
-        AmbiguousMonomer.getMonomerClass(libraryItem.monomers) !==
-        KetMonomerClass.AminoAcid
-      ) {
-        return false;
-      }
-
-      return libraryItem.label === peptideName;
-    }
-
-    // Check for regular peptides
-    return (
+  return editor.monomersLibrary.find(
+    (libraryItem) =>
       libraryItem.props.MonomerType === MONOMER_CONST.PEPTIDE &&
-      libraryItem.props.MonomerName === peptideName
-    );
-  });
+      libraryItem.props.MonomerName === peptideName,
+  );
 }
 
 export function getSugarBySequenceType(sequenceType: SequenceType) {

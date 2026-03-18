@@ -1,7 +1,6 @@
 import { BaseMonomer } from "./BaseMonomer";
 export declare class MonomerSequenceNode {
-    readonly monomer: BaseMonomer;
-    private readonly monomersCache;
+    monomer: BaseMonomer;
     constructor(monomer: BaseMonomer);
     get SubChainConstructor(): typeof import("./monomer-chains/RnaSubChain").RnaSubChain | typeof import("./monomer-chains/ChemSubChain").ChemSubChain | typeof import("./monomer-chains/PhosphateSubChain").PhosphateSubChain | typeof import("./monomer-chains/PeptideSubChain").PeptideSubChain;
     get firstMonomerInNode(): BaseMonomer;

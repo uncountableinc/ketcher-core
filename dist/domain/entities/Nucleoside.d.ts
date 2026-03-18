@@ -7,9 +7,8 @@ import { BaseMonomer } from "./BaseMonomer";
 import { AmbiguousMonomer } from "./AmbiguousMonomer";
 import { RNA_DNA_NON_MODIFIED_PART } from "../constants/monomers";
 export declare class Nucleoside {
-    readonly sugar: Sugar;
-    readonly rnaBase: RNABase | AmbiguousMonomer;
-    private readonly monomersCache;
+    sugar: Sugar;
+    rnaBase: RNABase | AmbiguousMonomer;
     constructor(sugar: Sugar, rnaBase: RNABase | AmbiguousMonomer);
     static fromSugar(sugar: Sugar, needValidation?: boolean): Nucleoside;
     static createOnCanvas(rnaBaseName: string, position: Vec2, sugarName?: RNA_DNA_NON_MODIFIED_PART, isAntisense?: boolean): {

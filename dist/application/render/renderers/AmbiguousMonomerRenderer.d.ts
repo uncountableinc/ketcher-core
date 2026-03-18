@@ -11,8 +11,8 @@ declare type PreviewAttachmentPointParams = {
 };
 export declare class AmbiguousMonomerRenderer extends BaseMonomerRenderer {
     monomer: AmbiguousMonomer;
-    private readonly monomerRenderer;
-    private readonly monomerSymbolElementsIds;
+    private monomerRenderer;
+    private monomerSymbolElementsIds;
     constructor(monomer: AmbiguousMonomer, scale?: number);
     protected appendBody(rootElement: Selection<SVGGElement, void, HTMLElement, never>): Selection<SVGUseElement, this, HTMLElement, never>;
     get enumerationElementPosition(): void | {

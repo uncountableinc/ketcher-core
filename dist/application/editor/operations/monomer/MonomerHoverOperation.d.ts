@@ -17,8 +17,8 @@ import { Operation } from "../../../../domain/entities/Operation";
 import { BaseMonomer } from "../../../../domain/entities";
 import { RenderersManager } from "../../../render/renderers/RenderersManager";
 export declare class MonomerHoverOperation implements Operation {
-    private readonly peptide;
-    private readonly needRedrawAttachmentPoints;
+    private peptide;
+    private needRedrawAttachmentPoints;
     constructor(peptide: BaseMonomer, needRedrawAttachmentPoints: boolean);
     execute(renderersManager: RenderersManager): void;
     invert(): void;

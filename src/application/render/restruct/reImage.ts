@@ -157,7 +157,7 @@ export class ReImage extends ReObject {
         fill: 'none',
         'stroke-width': strokeWidth,
       });
-      if (element.node?.setAttribute) {
+      if (element.node && element.node.setAttribute) {
         element.node.setAttribute('data-testid', `imageResize-${key}`);
       }
 
@@ -184,11 +184,6 @@ export class ReImage extends ReObject {
       scaledTopLeftWithOffset.y,
       dimensions.x,
       dimensions.y,
-    );
-    image.node.setAttribute('data-testid', 'image');
-    image.node.setAttribute(
-      'data-image-id',
-      restruct.molecule.images.keyOf(this.image),
     );
     restruct.addReObjectPath(LayerMap.images, this.visel, image);
 
@@ -248,12 +243,10 @@ export class ReImage extends ReObject {
     );
   }
 
-  showPoints() {
-    this.selectionPointsSet?.show();
-  }
-
-  hidePoints() {
-    this.selectionPointsSet?.hide();
+  togglePoints(displayFlag: boolean) {
+    displayFlag
+      ? this.selectionPointsSet?.show()
+      : this.selectionPointsSet?.hide();
   }
 
   calculateDistanceToPoint(point: Vec2, renderOptions: RenderOptions): number {

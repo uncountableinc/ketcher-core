@@ -19,7 +19,7 @@ import { RenderersManager } from "../../../render/renderers/RenderersManager";
 export declare class MonomerDeleteOperation implements Operation {
     addMonomerChangeModel: (monomer: BaseMonomer) => BaseMonomer;
     deleteMonomerChangeModel: (monomer: BaseMonomer) => void;
-    private readonly callback?;
+    private callback?;
     monomer: BaseMonomer;
     priority: number;
     constructor(monomer: BaseMonomer, addMonomerChangeModel: (monomer: BaseMonomer) => BaseMonomer, deleteMonomerChangeModel: (monomer: BaseMonomer) => void, callback?: (() => void) | undefined);

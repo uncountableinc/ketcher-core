@@ -9,7 +9,7 @@ describe('EditorHistory', () => {
   beforeEach(() => {
     canvas = createPolymerEditorCanvas();
     editor = new CoreEditor({ theme: {}, canvas });
-    history = EditorHistory.getInstance(editor);
+    history = new EditorHistory(editor);
   });
 
   afterEach(() => {
@@ -17,13 +17,13 @@ describe('EditorHistory', () => {
   });
 
   it('should be a singletone', () => {
-    const historyInstance2 = EditorHistory.getInstance(editor);
+    const historyInstance2 = new EditorHistory(editor);
     expect(history).toBe(historyInstance2);
   });
 
   it('should create another instance after destroy', () => {
     history.destroy();
-    const historyInstance2 = EditorHistory.getInstance(editor);
+    const historyInstance2 = new EditorHistory(editor);
     expect(history).not.toBe(historyInstance2);
   });
 

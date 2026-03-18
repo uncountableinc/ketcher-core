@@ -24,11 +24,10 @@ import ReFrag from './refrag';
 import ReRGroup from './rergroup';
 import ReRxnArrow from './rerxnarrow';
 import ReRxnPlus from './rerxnplus';
-import ReSGroup, { paperPathFromSVGElement } from './resgroup';
+import ReSGroup from './resgroup';
 import ReSimpleObject from './resimpleObject';
 import ReStruct from './restruct';
 import ReText from './retext';
-import Visel from './visel';
 
 export * from './generalEnumTypes';
 export * from './reatom';
@@ -48,6 +47,4 @@ export {
   ReSimpleObject,
   ReText,
   ReStruct,
-  Visel,
-  paperPathFromSVGElement,
 };

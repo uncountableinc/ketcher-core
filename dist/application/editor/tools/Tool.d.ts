@@ -76,7 +76,10 @@ export interface BaseTool extends Tool {
     destroy(): void;
 }
 export declare type PeptideToolOptions = MonomerItemType;
-export declare type ToolConstructorInterface = new (editor: any, ...args: any[]) => Tool | BaseTool;
+export declare type ToolOptions = any;
+export declare type ToolConstructorInterface = {
+    new (editor: any, ...args: ToolOptions[]): Tool | BaseTool;
+};
 export declare type ToolEventHandlerName = keyof ToolEventHandler;
 export declare function isBaseTool(tool: Tool | BaseTool | undefined): tool is BaseTool;
 export {};

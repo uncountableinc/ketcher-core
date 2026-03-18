@@ -14,9 +14,3 @@ export type SupportedImageFormats = keyof typeof BlobTypes;
 export type ExportImageParams = {
   margin?: number;
 };
-
-export type UpdateMonomersLibraryParams = {
-  format: 'ket' | 'sdf';
-  shouldPersist?: boolean;
-  needDispatchLibraryUpdateEvent?: boolean;
-};

@@ -1,35 +1,37 @@
 import { D3SvgElementSelection } from "../../types";
 import { Vec2 } from "../../../../domain/entities";
-import { SubChainNode, SequenceNode } from "../../../../domain/entities/monomer-chains/types";
+import { SubChainNode } from "../../../../domain/entities/monomer-chains/types";
 import { BaseSequenceRenderer } from "./BaseSequenceRenderer";
 import { Chain } from "../../../../domain/entities/monomer-chains/Chain";
+import { BackBoneSequenceNode } from "../../../../domain/entities/BackBoneSequenceNode";
 import { ITwoStrandedChainItem } from "../../../../domain/entities/monomer-chains/ChainsCollection";
 export declare abstract class BaseSequenceItemRenderer extends BaseSequenceRenderer {
-    readonly node: SequenceNode;
-    private readonly firstNodeInChainPosition;
-    private readonly monomerIndexInChain;
-    private readonly isLastMonomerInChain;
-    private readonly chain;
-    private readonly nodeIndexOverall;
-    private readonly editingNodeIndexOverall;
-    readonly monomerSize: {
+    node: SubChainNode | BackBoneSequenceNode;
+    private firstNodeInChainPosition;
+    private monomerIndexInChain;
+    private isLastMonomerInChain;
+    private chain;
+    private nodeIndexOverall;
+    private editingNodeIndexOverall;
+    monomerSize: {
         width: number;
         height: number;
     };
-    readonly scaledMonomerPosition: Vec2;
-    readonly twoStrandedNode: ITwoStrandedChainItem;
-    private readonly previousRowsWithAntisense;
+    scaledMonomerPosition: Vec2;
+    private previousRowsWithAntisense;
+    twoStrandedNode: ITwoStrandedChainItem;
+    private editorEvents;
     textElement?: D3SvgElementSelection<SVGTextElement, void>;
     counterElement?: D3SvgElementSelection<SVGTextElement, void>;
     private selectionRectangle?;
     spacerElement?: D3SvgElementSelection<SVGGElement, void>;
     backgroundElement?: D3SvgElementSelection<SVGRectElement, void>;
     caretElement?: D3SvgElementSelection<SVGLineElement, void> | D3SvgElementSelection<SVGGElement, void>;
-    antisenseNodeRenderer?: this;
-    constructor(node: SequenceNode, firstNodeInChainPosition: Vec2, monomerIndexInChain: number, isLastMonomerInChain: boolean, chain: Chain, nodeIndexOverall: number, editingNodeIndexOverall: number, monomerSize: {
+    antisenseNodeRenderer?: this | undefined;
+    constructor(node: SubChainNode | BackBoneSequenceNode, firstNodeInChainPosition: Vec2, monomerIndexInChain: number, isLastMonomerInChain: boolean, chain: Chain, nodeIndexOverall: number, editingNodeIndexOverall: number, monomerSize: {
         width: number;
         height: number;
-    }, scaledMonomerPosition: Vec2, twoStrandedNode: ITwoStrandedChainItem, previousRowsWithAntisense?: number);
+    }, scaledMonomerPosition: Vec2, previousRowsWithAntisense: number, twoStrandedNode: ITwoStrandedChainItem);
     abstract get symbolToDisplay(): string;
     isEditingSymbol(editingNodeIndexOverall?: number): boolean;
     isNextSymbolEditing(editingNodeIndexOverall?: number): boolean;
@@ -40,7 +42,6 @@ export declare abstract class BaseSequenceItemRenderer extends BaseSequenceRende
     moveSelection(): void;
     get currentChain(): Chain;
     get currentChainNodesWithoutEmptyNodes(): SubChainNode[];
-    get scaledPosition(): Vec2;
     get scaledMonomerPositionForSequence(): Vec2;
     get center(): Vec2;
     protected get isSequenceEditModeTurnedOn(): boolean | undefined;
@@ -93,8 +94,9 @@ export declare abstract class BaseSequenceItemRenderer extends BaseSequenceRende
     redrawChainBeginning(): void;
     hoverAttachmentPoint(): void;
     updateAttachmentPoints(): void;
-    drawBackgroundElementHover(): void;
-    removeBackgroundElementHover(): void;
+    private drawBackgroundElementHover;
+    private removeBackgroundElementHover;
+    private appendEvents;
     private isSubChainNode;
     setAntisenseNodeRenderer(antisenseNodeRenderer: this): void;
 }

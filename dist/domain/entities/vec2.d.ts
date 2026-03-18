@@ -19,8 +19,8 @@ export interface Point {
     z?: number;
 }
 export declare class Vec2 {
-    static readonly ZERO: Vec2;
-    static readonly UNIT: Vec2;
+    static ZERO: Vec2;
+    static UNIT: Vec2;
     x: number;
     y: number;
     z: number;

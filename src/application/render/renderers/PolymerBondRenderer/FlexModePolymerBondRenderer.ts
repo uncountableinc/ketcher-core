@@ -6,6 +6,7 @@ import assert from 'assert';
 import { MonomerSize } from 'domain/constants';
 import { Vec2 } from 'domain/entities';
 import { DrawingEntitiesManager } from 'domain/entities/DrawingEntitiesManager';
+import { DrawingEntity } from 'domain/entities/DrawingEntity';
 import { PolymerBond } from 'domain/entities/PolymerBond';
 import { BaseRenderer } from '../BaseRenderer';
 import {
@@ -21,7 +22,7 @@ import {
 } from './helpers';
 
 export class FlexModePolymerBondRenderer extends BaseRenderer {
-  private readonly editorEvents: typeof editorEvents;
+  private editorEvents: typeof editorEvents;
   // TODO: Specify the types.
   private selectionElement;
   private previousStateOfIsMonomersOnSameHorizontalLine = false;
@@ -29,24 +30,24 @@ export class FlexModePolymerBondRenderer extends BaseRenderer {
   public declare bodyElement?: D3SvgElementSelection<SVGLineElement, this>;
 
   constructor(public readonly polymerBond: PolymerBond) {
-    super(polymerBond);
+    super(polymerBond as DrawingEntity);
     this.polymerBond.setRenderer(this);
     this.editorEvents = editorEvents;
   }
 
   public get rootBBox(): DOMRect | undefined {
     const rootNode = this.rootElement?.node();
-    if (!rootNode) return undefined;
+    if (!rootNode) return;
 
     return rootNode.getBBox();
   }
 
   public get width(): number {
-    return this.rootBBox?.width ?? 0;
+    return this.rootBBox?.width || 0;
   }
 
   public get height(): number {
-    return this.rootBBox?.height ?? 0;
+    return this.rootBBox?.height || 0;
   }
 
   private get scaledPosition(): PolymerBondRendererStartAndEndPositions {
@@ -178,10 +179,12 @@ export class FlexModePolymerBondRenderer extends BaseRenderer {
         } else {
           this.path = this.path.concat(generateCornerFromLeftToTop());
         }
-      } else if (cornerPoint.y < nextPoint.y) {
-        this.path = this.path.concat(generateCornerFromRightToBottom());
       } else {
-        this.path = this.path.concat(generateCornerFromRightToTop());
+        if (cornerPoint.y < nextPoint.y) {
+          this.path = this.path.concat(generateCornerFromRightToBottom());
+        } else {
+          this.path = this.path.concat(generateCornerFromRightToTop());
+        }
       }
     } else if (prevPoint.y !== cornerPoint.y && cornerPoint.x !== nextPoint.x) {
       if (prevPoint.y < cornerPoint.y) {
@@ -190,10 +193,12 @@ export class FlexModePolymerBondRenderer extends BaseRenderer {
         } else {
           this.path = this.path.concat(generateCornerFromTopToLeft());
         }
-      } else if (cornerPoint.x < nextPoint.x) {
-        this.path = this.path.concat(generateCornerFromBottomToRight());
       } else {
-        this.path = this.path.concat(generateCornerFromBottomToLeft());
+        if (cornerPoint.x < nextPoint.x) {
+          this.path = this.path.concat(generateCornerFromBottomToRight());
+        } else {
+          this.path = this.path.concat(generateCornerFromBottomToLeft());
+        }
       }
     }
   }
@@ -232,13 +237,13 @@ export class FlexModePolymerBondRenderer extends BaseRenderer {
       .attr('data-frommonomerid', this.polymerBond.firstMonomer.id)
       .attr('data-tomonomerid', this.polymerBond.secondMonomer?.id)
       .attr(
-        'data-fromattachmentpoint',
+        'data-fromconnectionpoint',
         this.polymerBond.firstMonomer.getAttachmentPointByBond(
           this.polymerBond,
         ),
       )
       .attr(
-        'data-toattachmentpoint',
+        'data-toconnectionpoint',
         this.polymerBond.secondMonomer?.getAttachmentPointByBond(
           this.polymerBond,
         ),
@@ -359,14 +364,18 @@ export class FlexModePolymerBondRenderer extends BaseRenderer {
   }
 
   protected appendHoverAreaElement(): void {
-    this.hoverAreaElement = this.rootElement
+    (<D3SvgElementSelection<SVGPathElement, void> | undefined>(
+      this.hoverAreaElement
+    )) = this.rootElement
       ?.append('path')
       .attr('d', this.path)
       .attr('fill', 'none')
       .attr('stroke', 'transparent')
       .attr('stroke-width', '10');
 
-    this.hoverCircleAreaElement = this.rootElement
+    (<D3SvgElementSelection<SVGCircleElement, void> | undefined>(
+      this.hoverCircleAreaElement
+    )) = this.rootElement
       ?.append('circle')
       .attr('cursor', 'pointer')
       .attr('r', '1')

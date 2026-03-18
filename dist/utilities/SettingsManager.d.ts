@@ -22,7 +22,6 @@ interface SavedSettings {
     selectionTool?: any;
     disableCustomQuery?: boolean;
     editorLineLength?: EditorLineLength;
-    monomerLibraryUpdates?: string[];
 }
 interface SavedOptions {
     ignoreChiralFlag?: boolean;
@@ -30,8 +29,7 @@ interface SavedOptions {
     disableQueryElements?: string[] | null;
 }
 export declare class SettingsManager {
-    private static disableCustomQueryValue?;
-    private static persistMonomerLibraryUpdatesValue;
+    static _disableCustomQuery?: boolean;
     static getSettings(): SavedSettings;
     static saveSettings(settings: SavedSettings): void;
     static getOptions(): SavedOptions;
@@ -44,10 +42,5 @@ export declare class SettingsManager {
     static set disableCustomQuery(disableCustomQuery: boolean | undefined);
     static get ignoreChiralFlag(): boolean | undefined;
     static set ignoreChiralFlag(ignoreChiralFlag: boolean | undefined);
-    static get monomerLibraryUpdates(): string[];
-    static set monomerLibraryUpdates(monomerLibraryUpdates: string[]);
-    static addMonomerLibraryUpdate(newUpdate: string): void;
-    static get persistMonomerLibraryUpdates(): boolean;
-    static set persistMonomerLibraryUpdates(value: boolean | undefined);
 }
 export {};

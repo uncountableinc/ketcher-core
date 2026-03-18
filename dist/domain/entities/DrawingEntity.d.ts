@@ -5,7 +5,7 @@ export interface DrawingEntityConfig {
 }
 export declare abstract class DrawingEntity {
     private _position;
-    private readonly config;
+    private config;
     selected: boolean;
     hovered: boolean;
     id: number;
@@ -20,7 +20,5 @@ export declare abstract class DrawingEntity {
     turnOffSelection(): void;
     abstract get center(): Vec2;
     selectIfLocatedInRectangle(rectangleTopLeftPoint: Vec2, rectangleBottomRightPoint: Vec2, isPreviousSelected?: boolean, shiftKey?: boolean): boolean;
-    selectIfLocatedInPolygon(polygonPoints: Vec2[], isPreviousSelected?: boolean, shiftKey?: boolean): boolean;
-    private isPointInPolygon;
     setBaseRenderer(renderer: BaseRenderer): void;
 }

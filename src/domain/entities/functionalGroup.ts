@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ***************************************************************************/
-import type { ReSGroup } from 'application/render';
+import { ReSGroup } from 'application/render';
 import assert from 'assert';
 import { FunctionalGroupsProvider } from '../helpers';
 import { Atom } from './atom';
@@ -24,7 +24,7 @@ import { Struct } from './struct';
 import { HalfBond } from './halfBond';
 
 export class FunctionalGroup {
-  readonly #sgroup: SGroup;
+  #sgroup: SGroup;
 
   constructor(sgroup: SGroup) {
     assert(sgroup != null);
@@ -179,21 +179,27 @@ export class FunctionalGroup {
 
   static isAtomInContractedFunctionalGroup(
     atom: Atom,
-    sgroups: Map<number, ReSGroup> | Pool<SGroup>,
+    sgroups,
     functionalGroups,
+    sgroupsFromReStruct: boolean,
   ): boolean {
-    return [...atom.sgs.values()].some((sgid) => {
-      const sgroup = sgroups.get(sgid);
-
-      if (!sgroup) {
-        return false;
-      }
-
-      return FunctionalGroup.isContractedFunctionalGroup(
-        'item' in sgroup ? sgroup.item : sgroup,
-        functionalGroups,
-      );
-    });
+    const contractedFunctionalGroups: number[] = [];
+    if (sgroupsFromReStruct) {
+      sgroups.forEach((sg) => {
+        if (
+          FunctionalGroup.isContractedFunctionalGroup(sg.item, functionalGroups)
+        ) {
+          contractedFunctionalGroups.push(sg.item.id);
+        }
+      });
+    } else {
+      sgroups.forEach((sg) => {
+        if (FunctionalGroup.isContractedFunctionalGroup(sg, functionalGroups)) {
+          contractedFunctionalGroups.push(sg.id);
+        }
+      });
+    }
+    return contractedFunctionalGroups.some((sg) => atom.sgs.has(sg));
   }
 
   static isBondInContractedFunctionalGroup(

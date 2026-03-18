@@ -7,8 +7,6 @@ export declare class UnsplitNucleotideRenderer extends BaseMonomerRenderer {
     CHAIN_START_TERMINAL_INDICATOR_TEXT: string;
     CHAIN_END_TERMINAL_INDICATOR_TEXT: string;
     constructor(monomer: UnsplitNucleotide, scale?: number);
-    get textColor(): any;
-    protected getMonomerColor(theme: any): any;
     protected appendBody(rootElement: Selection<SVGGElement, void, HTMLElement, never>, theme: any): Selection<SVGUseElement, this, HTMLElement, never>;
     show(theme: any): void;
     protected appendLabel(rootElement: D3SvgElementSelection<SVGGElement, void>): void;

@@ -1,5 +1,5 @@
 import { D3SvgElementSelection } from "../../types";
 export declare abstract class TransientView {
-    static readonly viewName: string;
+    static viewName: string;
     static show<P>(_transientLayer: D3SvgElementSelection<SVGGElement, void>, _params: P): void;
 }

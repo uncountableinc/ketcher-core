@@ -6,9 +6,9 @@ import util from 'application/render/util';
 import { Vec2 } from 'domain/entities';
 
 export class PreviewAttachmentPoint extends AttachmentPoint {
-  private readonly connected: boolean;
-  private readonly selected: boolean;
-  private readonly usage: UsageInMacromolecule;
+  private connected: boolean;
+  private selected: boolean;
+  private usage: UsageInMacromolecule;
 
   constructor(constructorParams: PreviewAttachmentPointConstructorParams) {
     super(constructorParams, true);

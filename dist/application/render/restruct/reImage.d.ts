@@ -23,8 +23,7 @@ export declare class ReImage extends ReObject {
     drawHover(render: Render): any[];
     makeSelectionPlate(reStruct: ReStruct, paper: RaphaelPaper, options: RenderOptions): RaphaelSet;
     getVBoxObj(): Box2Abs | null;
-    showPoints(): void;
-    hidePoints(): void;
+    togglePoints(displayFlag: boolean): void;
     calculateDistanceToPoint(point: Vec2, renderOptions: RenderOptions): number;
     calculateClosestReferencePosition(point: Vec2, renderOptions: RenderOptions): ClosestReferencePosition;
     isPointInsidePolygon(point: Vec2, renderOptions: RenderOptions): boolean;

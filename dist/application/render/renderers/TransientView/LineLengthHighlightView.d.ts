@@ -4,6 +4,6 @@ export declare type LineLengthHighlightViewParams = {
     currentPosition: number;
 };
 export declare class LineLengthHighlightView extends TransientView {
-    static readonly viewName = "LineLengthHighlightView";
+    static viewName: string;
     static show(transientLayer: D3SvgElementSelection<SVGGElement, void>, params: LineLengthHighlightViewParams): void;
 }

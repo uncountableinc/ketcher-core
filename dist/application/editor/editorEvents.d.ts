@@ -5,7 +5,6 @@ export interface IEditorEvents {
     selectMonomer: Subscription;
     selectPreset: Subscription;
     selectTool: Subscription;
-    selectSelectionTool: Subscription;
     createBondViaModal: Subscription;
     cancelBondCreationViaModal: Subscription;
     selectMode: Subscription;
@@ -21,7 +20,6 @@ export interface IEditorEvents {
     mouseOnMoveMonomer: Subscription;
     mouseLeaveMonomer: Subscription;
     mouseOverAttachmentPoint: Subscription;
-    mouseMoveAttachmentPoint: Subscription;
     mouseLeaveAttachmentPoint: Subscription;
     mouseUpAttachmentPoint: Subscription;
     mouseDownAttachmentPoint: Subscription;
@@ -66,14 +64,6 @@ export interface IEditorEvents {
     toggleLineLengthHighlighting: Subscription;
     setLibraryItemDragState: Subscription;
     placeLibraryItemOnCanvas: Subscription;
-    autochain: Subscription;
-    previewAutochain: Subscription;
-    removeAutochainPreview: Subscription;
-    switchToMacromoleculesMode: Subscription;
-    switchToMoleculesMode: Subscription;
-    layoutCircular: Subscription;
-    flipHorizontal: Subscription;
-    flipVertical: Subscription;
 }
 export declare let editorEvents: IEditorEvents;
 export declare function resetEditorEvents(): void;
@@ -95,10 +85,6 @@ export declare const hotkeysConfiguration: {
         shortcut: string[];
         handler: (editor: CoreEditor) => void;
     };
-    switchSelectTool: {
-        shortcut: string[];
-        handler: (editor: CoreEditor) => void;
-    };
     undo: {
         shortcut: string;
         handler: (editor: CoreEditor) => void;
@@ -111,24 +97,16 @@ export declare const hotkeysConfiguration: {
         shortcut: string[];
         handler: (editor: CoreEditor) => void;
     };
-    bondSingle: {
-        shortcut: string;
-        handler: (editor: CoreEditor) => void;
-    };
-    bondHydrogen: {
-        shortcut: string;
-        handler: (editor: CoreEditor) => void;
-    };
     clear: {
         shortcut: string[];
         handler: (editor: CoreEditor) => void;
     };
     'zoom-plus': {
-        shortcut: string[];
+        shortcut: string;
         handler: () => void;
     };
     'zoom-minus': {
-        shortcut: string[];
+        shortcut: string;
         handler: () => void;
     };
     'zoom-reset': {
@@ -157,10 +135,6 @@ export declare const hotkeysConfiguration: {
     };
     toggleMacromoleculesPropertiesVisibility: {
         shortcut: string;
-        handler: (editor: CoreEditor) => void;
-    };
-    arrangeRing: {
-        shortcut: string[];
         handler: (editor: CoreEditor) => void;
     };
 };

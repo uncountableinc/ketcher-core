@@ -1,4 +1,4 @@
+import { BackBoneSequenceNode, SubChainNode } from "../../../domain/entities";
 import { ITwoStrandedChainItem } from "../../../domain/entities/monomer-chains/ChainsCollection";
-import { SequenceNode } from "../../../domain/entities/monomer-chains/types";
-export declare function isNodeRestrictedForHydrogenBondCreation(node: SequenceNode | undefined): boolean;
+export declare function isNodeRestrictedForHydrogenBondCreation(node: SubChainNode | BackBoneSequenceNode | undefined): boolean;
 export declare function isTwoStrandedNodeRestrictedForHydrogenBondCreation(twoStrandedNode?: ITwoStrandedChainItem): boolean;

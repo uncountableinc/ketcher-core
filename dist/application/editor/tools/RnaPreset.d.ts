@@ -17,7 +17,7 @@ import { Tool, IRnaPreset } from "./Tool";
 import { CoreEditor, EditorHistory } from "../internal";
 import { MonomerItemType } from "../../../domain/types";
 declare class RnaPresetTool implements Tool {
-    private readonly editor;
+    private editor;
     rnaBase: MonomerItemType | undefined;
     sugar: MonomerItemType | undefined;
     phosphate: MonomerItemType | undefined;

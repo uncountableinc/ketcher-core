@@ -15,7 +15,7 @@
  ***************************************************************************/
 
 import { Action } from '../editor/actions';
-import { MonomerCreationState, Render } from 'application/render';
+import { Render } from 'application/render';
 import { Struct } from 'domain/entities';
 import { selectionKeys } from './shared/constants';
 import { PipelineSubscription, Subscription } from 'subscription';
@@ -62,7 +62,6 @@ export interface Editor {
   errorHandler: ((message: string) => void) | null;
   event: {
     message: Subscription;
-    tooltip: Subscription;
     elementEdit: PipelineSubscription;
     bondEdit: PipelineSubscription;
     zoomIn: PipelineSubscription;
@@ -97,10 +96,7 @@ export interface Editor {
   clearMacromoleculeConvertionError: () => void;
   serverSettings: object;
   focusCliparea: () => void;
-  closeMonomerCreationWizard: () => void;
   ketcherId: string;
-  isMonomerCreationWizardActive: boolean;
-  monomerCreationState: MonomerCreationState;
 }
 
 export type LibraryItemDragState = {

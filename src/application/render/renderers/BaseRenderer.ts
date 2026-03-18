@@ -38,13 +38,13 @@ export abstract class BaseRenderer implements IBaseRenderer {
     | D3SvgElementSelection<SVGLineElement, void>;
 
   protected hoverCircleAreaElement?: D3SvgElementSelection<
-    SVGCircleElement,
+    SVGGElement | SVGCircleElement,
     void
   >;
 
   protected canvasWrapper: D3SvgElementSelection<SVGSVGElement, void>;
 
-  protected canvas: D3SvgElementSelection<SVGGElement, void>;
+  protected canvas: D3SvgElementSelection<SVGSVGElement, void>;
   protected constructor(public drawingEntity: DrawingEntity) {
     this.canvasWrapper =
       ZoomTool.instance?.canvasWrapper || select(canvasSelector);
@@ -57,14 +57,14 @@ export abstract class BaseRenderer implements IBaseRenderer {
 
   public get rootBBox() {
     const rootNode = this.rootElement?.node();
-    if (!rootNode) return undefined;
+    if (!rootNode) return;
 
     return rootNode.getBBox();
   }
 
   public get rootBoundingClientRect() {
     const rootNode = this.rootElement?.node();
-    if (!rootNode) return undefined;
+    if (!rootNode) return;
 
     return rootNode.getBoundingClientRect();
   }

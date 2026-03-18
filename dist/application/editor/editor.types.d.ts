@@ -14,7 +14,7 @@
  * limitations under the License.
  ***************************************************************************/
 import { Action } from '../editor/actions';
-import { MonomerCreationState, Render } from "../render";
+import { Render } from "../render";
 import { Struct } from "../../domain/entities";
 import { selectionKeys } from './shared/constants';
 import { PipelineSubscription, Subscription } from 'subscription';
@@ -55,7 +55,6 @@ export interface Editor {
     errorHandler: ((message: string) => void) | null;
     event: {
         message: Subscription;
-        tooltip: Subscription;
         elementEdit: PipelineSubscription;
         bondEdit: PipelineSubscription;
         zoomIn: PipelineSubscription;
@@ -87,10 +86,7 @@ export interface Editor {
     clearMacromoleculeConvertionError: () => void;
     serverSettings: object;
     focusCliparea: () => void;
-    closeMonomerCreationWizard: () => void;
     ketcherId: string;
-    isMonomerCreationWizardActive: boolean;
-    monomerCreationState: MonomerCreationState;
 }
 export declare type LibraryItemDragState = {
     item: IRnaPreset;

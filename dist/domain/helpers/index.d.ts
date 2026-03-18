@@ -17,4 +17,3 @@ export * from './scale';
 export * from './stereoValidator';
 export * from './functionalGroupsProvider';
 export * from './saltsAndSolventsProvider';
-export { getAttachmentPointLabel, getAttachmentPointNumberFromLabel, getNextFreeAttachmentPoint, isSingleRGroupAttachmentPoint, getAttachmentPointLabelWithBinaryShift, } from './attachmentPointCalculations';

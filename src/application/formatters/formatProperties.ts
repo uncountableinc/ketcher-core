@@ -138,12 +138,6 @@ const formatProperties: FormatPropertiesMap = {
     ['.idt'],
     false,
   ),
-  axoLabs: new SupportedFormatProperties(
-    'AxoLabs',
-    ChemicalMimeType.AXOLABS,
-    ['.axolabs'],
-    true,
-  ),
   helm: new SupportedFormatProperties(
     'HELM',
     ChemicalMimeType.HELM,

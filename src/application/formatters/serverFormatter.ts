@@ -42,10 +42,10 @@ type LayoutPromise = (
 ) => Promise<LayoutResult>;
 
 export class ServerFormatter implements StructFormatter {
-  readonly #structService: StructService;
-  readonly #ketSerializer: KetSerializer;
-  readonly #format: SupportedFormat;
-  readonly #options?: StructServiceOptions;
+  #structService: StructService;
+  #ketSerializer: KetSerializer;
+  #format: SupportedFormat;
+  #options?: StructServiceOptions;
 
   constructor(
     structService: StructService,
@@ -79,13 +79,12 @@ export class ServerFormatter implements StructFormatter {
       );
 
       return convertResult.struct;
-    } catch (e: unknown) {
+    } catch (e: any) {
       let message;
-      if (e instanceof Error && e.message === 'Server is not compatible') {
+      if (e.message === 'Server is not compatible') {
         message = `${formatProperties.name} is not supported.`;
       } else {
-        const details = e instanceof Error ? e.message : String(e);
-        message = `Convert error!\n${details}`;
+        message = `Convert error!\n${e.message || e}`;
       }
       KetcherLogger.error('serverFormatter.ts::getStructureFromStructAsync', e);
       throw new Error(message);
@@ -141,14 +140,13 @@ export class ServerFormatter implements StructFormatter {
         parsedStruct.rescale();
       }
       return parsedStruct;
-    } catch (e: unknown) {
-      if (!(e instanceof Error) || e.message !== 'Server is not compatible') {
+    } catch (e: any) {
+      if (e.message !== 'Server is not compatible') {
         KetcherLogger.error(
           'serverFormatter.ts::getStructureFromStringAsync',
           e,
         );
-        const details = e instanceof Error ? e.message : String(e);
-        throw Error(`Convert error!\n${details}`);
+        throw Error(`Convert error!\n${e.message || e}`);
       }
 
       const formatError =

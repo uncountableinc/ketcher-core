@@ -47,7 +47,7 @@ export class SimpleObject extends BaseMicromoleculeEntity {
       }
     }
 
-    this.mode = attributes?.mode ?? SimpleObjectMode.line;
+    this.mode = attributes?.mode || SimpleObjectMode.line;
   }
 
   clone(): SimpleObject {
@@ -55,9 +55,12 @@ export class SimpleObject extends BaseMicromoleculeEntity {
   }
 
   center(): Vec2 {
-    if (this.mode === SimpleObjectMode.rectangle) {
-      return Vec2.centre(this.pos[0], this.pos[1]);
+    switch (this.mode) {
+      case SimpleObjectMode.rectangle: {
+        return Vec2.centre(this.pos[0], this.pos[1]);
+      }
+      default:
+        return this.pos[0];
     }
-    return this.pos[0];
   }
 }

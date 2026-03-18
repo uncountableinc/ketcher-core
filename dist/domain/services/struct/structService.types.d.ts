@@ -35,10 +35,8 @@ export declare enum ChemicalMimeType {
     DNA = "chemical/x-dna-sequence",
     PEPTIDE = "chemical/x-peptide-sequence",
     IDT = "chemical/x-idt",
-    AXOLABS = "chemical/x-axo-labs",
     HELM = "chemical/x-helm",
-    RDF = "chemical/x-rdf",
-    MonomerLibrary = "chemical/x-monomer-library"
+    RDF = "chemical/x-rdf"
 }
 export interface WithStruct {
     struct: string;

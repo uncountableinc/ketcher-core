@@ -33,8 +33,6 @@ export declare type MonomerItemType = MonomerItemBase & {
         MonomerName: string;
         MonomerFullName?: string;
         Name: string;
-        aliasHELM?: string;
-        aliasAxoLabs?: string;
         BranchMonomer?: string;
         MonomerCaps?: Partial<Record<AttachmentPointName, string>>;
         MonomerCode?: string;
@@ -43,8 +41,7 @@ export declare type MonomerItemType = MonomerItemBase & {
         isMicromoleculeFragment?: boolean;
         idtAliases?: IKetIdtAliases;
         unresolved?: boolean;
-        modificationTypes?: string[];
-        hidden?: boolean;
+        modificationType?: string;
     };
     attachmentPoints?: IKetAttachmentPoint[];
     seqId?: number;

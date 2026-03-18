@@ -29,10 +29,10 @@ interface ScrollBar {
     offsetEnd: number;
     maxWidth: number;
     maxHeight: number;
-    bar?: D3SvgElementSelection<SVGRectElement, void>;
+    bar?: D3SvgElementSelection<SVGRectElement, void> | undefined;
 }
 export declare class ZoomTool implements BaseTool {
-    canvas: D3SvgElementSelection<SVGGElement, void>;
+    canvas: D3SvgElementSelection<SVGSVGElement, void>;
     canvasWrapper: D3SvgElementSelection<SVGSVGElement, void>;
     private zoom;
     private zoomLevel;
@@ -55,7 +55,7 @@ export declare class ZoomTool implements BaseTool {
     static initInstance(drawingEntitiesManager: DrawingEntitiesManager): ZoomTool;
     private constructor();
     initActions(): void;
-    setZoomLevel(zoomLevel: number): void;
+    setZoom(zoomLevel: number): void;
     getZoomLevel(): number;
     setZoomTransform(transform: ZoomTransform): void;
     get zoomTransform(): ZoomTransform;
@@ -74,7 +74,7 @@ export declare class ZoomTool implements BaseTool {
         length: number;
     };
     dragged: (name: string) => (event: any) => void;
-    scrollTo(position: Vec2, stickToBottom?: boolean, xOffset?: any, yOffset?: any, isOffsetInPercents?: boolean, needScrollVertical?: boolean): void;
+    scrollTo(position: Vec2, stickToBottom?: boolean, xOffset?: any, yOffset?: any, isOffsetInPercents?: boolean): void;
     scrollBy(x: number, y: number): void;
     scrollToVerticalCenter(structCenterY: number): void;
     scrollToVerticalBottom(): void;
@@ -95,11 +95,7 @@ export declare class ZoomTool implements BaseTool {
     destroy(): void;
     isFitToCanvasHeight(height: any): boolean;
     zoomStructureToFitHalfOfCanvas(structureBbox: StructureBbox): void;
-    get canvasWrapperHeight(): number;
-    get canvasWrapperWidth(): number;
-    get canvasWrapperSize(): {
-        width: number;
-        height: number;
-    };
+    private get canvasWrapperHeight();
+    private get canvasWrapperSize();
 }
 export default ZoomTool;

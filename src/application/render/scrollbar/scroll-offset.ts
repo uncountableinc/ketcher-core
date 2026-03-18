@@ -3,7 +3,7 @@ import { Render } from '../raphaelRender';
 import { Scale } from 'domain/helpers';
 
 export class ScrollOffset {
-  readonly #render: Render;
+  #render: Render;
   up = 0;
   down = 0;
   left = 0;

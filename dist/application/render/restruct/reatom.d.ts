@@ -60,19 +60,16 @@ declare class ReAtom extends ReObject {
     constructor(atom: Atom);
     static isSelectable(): true;
     getVBoxObj(render: Render): Box2Abs | null;
-    drawHover(render: Render, drawOutline?: boolean): any;
-    private attachHighlightTriggerForAttachmentPointAtom;
-    private drawHoverForPotentialAttachmentPointAtomsInMonomerCreationWizard;
-    setHover(hover: boolean, render: Render, drawOutline?: boolean): boolean | undefined;
+    drawHover(render: Render): any;
+    setHover(hover: boolean, render: Render): void;
     makeMonomerAttachmentPointHighlightPlate(render: Render): any;
     getLabeledSelectionContour(render: Render, highlightPadding?: number): any;
     getUnlabeledSelectionContour(render: Render, highlightPadding?: number): any;
     getSelectionContour(render: Render, highlightPadding?: number): any;
-    private readonly isPlateShouldBeHidden;
-    private readonly makeHighlightePlate;
-    makeHoverPlate(render: Render, drawOutline?: boolean): any;
+    private isPlateShouldBeHidden;
+    private makeHighlightePlate;
+    makeHoverPlate(render: Render): any;
     makeSelectionPlate(restruct: ReStruct): any;
-    private createInvisibleAtomTarget;
     private isNeedShiftForCharge;
     private getRatio;
     /**

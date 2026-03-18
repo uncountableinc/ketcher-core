@@ -23,7 +23,6 @@ export declare const SUPERATOM_CLASS_TEXT: {
     SUGAR: string;
     PHOSPHATE: string;
 };
-export declare function paperPathFromSVGElement(element: any): any;
 declare class ReSGroup extends ReObject {
     item: SGroup | undefined;
     render: Render;
@@ -36,14 +35,14 @@ declare class ReSGroup extends ReObject {
      * @returns {*}
      */
     draw(remol: ReStruct, sgroup: SGroup): any;
-    getTextHighlightDimensions(render: Render, padding?: number): {
+    getTextHighlightDimensions(padding: number | undefined, render: Render): {
         startX: number;
         startY: number;
         width: number;
         height: number;
     };
     getContractedSelectionContour(render: Render): any;
-    makeSelectionPlate(restruct: ReStruct, _paper: RaphaelPaper, options: any): any;
+    makeSelectionPlate(restruct: ReStruct, _paper: RaphaelPaper, options: any): any | void;
     drawHover(render: Render): void;
     setHover(hover: boolean, render: Render): void;
     show(restruct: ReStruct): void;

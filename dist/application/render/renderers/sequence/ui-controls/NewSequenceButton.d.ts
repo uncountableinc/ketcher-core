@@ -1,8 +1,8 @@
 import { D3SvgElementSelection } from "../../../types";
 export declare class NewSequenceButton {
-    private readonly indexOfRowBefore;
+    private indexOfRowBefore;
     private buttonElement?;
-    private readonly canvas;
+    private canvas;
     private rootElement?;
     private bodyElement?;
     constructor(indexOfRowBefore: number);

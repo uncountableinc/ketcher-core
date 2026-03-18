@@ -19,7 +19,6 @@ export interface AtomProperties {
     radical?: AtomRadical;
     alias?: string | null;
     cip?: AtomCIP | null;
-    stereoLabel?: string | null;
 }
 export declare class Atom extends DrawingEntity {
     monomer: BaseMonomer;
@@ -40,8 +39,6 @@ export declare class Atom extends DrawingEntity {
     get hasCharge(): boolean;
     get hasExplicitValence(): boolean;
     get hasExplicitIsotope(): boolean;
-    get hasBadValence(): boolean;
-    get hasStereoLabel(): boolean;
     private get radicalAmount();
     private get valenceWithoutHydrogen();
     calculateValence(): {

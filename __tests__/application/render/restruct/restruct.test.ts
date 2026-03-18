@@ -19,8 +19,7 @@ describe('show selection', () => {
     ],
   };
   const reSimpleObject = new ReSimpleObject(ellipse);
-  reSimpleObject.showPoints = jest.fn();
-  reSimpleObject.hidePoints = jest.fn();
+  reSimpleObject.togglePoints = jest.fn();
   const option = {
     microModeScale: 20,
     width: 100,
@@ -30,44 +29,10 @@ describe('show selection', () => {
   const restruct = new ReStruct(new Struct(), render);
   it('should show selection simple objects correctly when selected', () => {
     restruct.showItemSelection(reSimpleObject, true);
-    expect(reSimpleObject.showPoints).toHaveBeenCalled();
+    expect(reSimpleObject.togglePoints).toHaveBeenCalled();
   });
   it('should show selection simple objects correctly when unselected', () => {
     restruct.showItemSelection(reSimpleObject, false);
-    expect(reSimpleObject.hidePoints).toHaveBeenCalled();
-  });
-});
-
-describe('CIP label background on selection toggle', () => {
-  const option = {
-    microModeScale: 20,
-    width: 100,
-    height: 100,
-  } as RenderOptions;
-  const render = new Render(document as unknown as HTMLElement, option);
-  const restruct = new ReStruct(new Struct(), render);
-  const cipAttrMock = jest.fn();
-  const selectionPlate = {
-    show: jest.fn(),
-    hide: jest.fn(),
-    removed: false,
-  };
-  const cipItem = {
-    selectionPlate,
-    cip: { rectangle: { attr: cipAttrMock } },
-  };
-
-  it('restores CIP label background after deselection', () => {
-    restruct.showItemSelection(cipItem, true);
-    restruct.showItemSelection(cipItem, false);
-
-    expect(cipAttrMock).toHaveBeenCalledWith({
-      fill: '#7f7',
-      stroke: '#7f7',
-    });
-    expect(cipAttrMock).toHaveBeenLastCalledWith({
-      fill: '#fff',
-      stroke: '#fff',
-    });
+    expect(reSimpleObject.togglePoints).toHaveBeenCalled();
   });
 });

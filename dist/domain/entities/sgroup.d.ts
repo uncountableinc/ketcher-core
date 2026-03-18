@@ -35,7 +35,7 @@ export declare class SGroupBracketParams {
     constructor(c: Vec2, d: Vec2, w: number, h: number);
 }
 export declare class SGroup {
-    static readonly TYPES: {
+    static TYPES: {
         SUP: string;
         MUL: string;
         SRU: string;
@@ -139,12 +139,12 @@ export declare class SGroup {
     static getBracketParameters(mol: any, crossBondsPerAtom: {
         [key: number]: Array<Bond>;
     }, atomSet: Pile<number>, bb: any, d: any, n: any): Array<any>;
-    static getObjBBox(atoms: number[], mol: Struct, useCollapsedSgroupsPosition?: boolean): Box2Abs;
-    static getAtoms(mol: Struct, sg: SGroup | undefined): number[];
+    static getObjBBox(atoms: any, mol: any, useCollapsedSgroupsPosition?: boolean): Box2Abs;
+    static getAtoms(mol: any, sg: any): Array<any>;
     static getBonds(mol: any, sg: any): Array<any>;
     static prepareMulForSaving(sgroup: any, mol: any): void;
     static getMassCentre(mol: any, atoms: any): Vec2;
-    static readonly isAtomInContractedSGroup: (atom: any, sGroups: any) => boolean;
+    static isAtomInContractedSGroup: (atom: any, sGroups: any) => boolean;
     static isBondInContractedSGroup(bond: Bond, sGroups: Map<number, ReSGroup> | Pool<SGroup>): boolean;
     static isSuperAtom(sGroup?: SGroup): boolean;
     static isDataSGroup(sGroup: SGroup): boolean;

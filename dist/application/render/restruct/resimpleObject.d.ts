@@ -26,7 +26,7 @@ interface StyledPath {
     stylesApplied: boolean;
 }
 declare class ReSimpleObject extends ReObject {
-    private readonly item;
+    private item;
     private selectionSet;
     private selectionPointsSet;
     constructor(simpleObject: any);
@@ -38,8 +38,7 @@ declare class ReSimpleObject extends ReObject {
     hoverPath(render: Render): Array<StyledPath>;
     drawHover(render: Render): Array<any>;
     makeSelectionPlate(restruct: ReStruct, paper: any, styles: any): any;
-    showPoints(): void;
-    hidePoints(): void;
+    togglePoints(displayFlag: boolean): void;
     show(restruct: ReStruct, options: any): void;
 }
 export default ReSimpleObject;

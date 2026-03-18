@@ -5,6 +5,6 @@ export declare type ModifyAminoAcidsViewParams = {
     monomersToModify: BaseMonomer[];
 };
 export declare class ModifyAminoAcidsView extends TransientView {
-    static readonly viewName = "ModifyAminoAcidsView";
+    static viewName: string;
     static show(transientLayer: D3SvgElementSelection<SVGGElement, void>, params: ModifyAminoAcidsViewParams): void;
 }

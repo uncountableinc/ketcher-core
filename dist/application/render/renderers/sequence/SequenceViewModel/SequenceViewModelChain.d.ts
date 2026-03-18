@@ -3,7 +3,7 @@ export interface ISequenceViewModelRow {
     sequenceViewModelItems: ITwoStrandedChainItem[];
 }
 export declare class SequenceViewModelChain {
-    private readonly rows;
+    private rows;
     get lastRow(): ISequenceViewModelRow;
     get lastNode(): ITwoStrandedChainItem;
     get firstRow(): ISequenceViewModelRow;

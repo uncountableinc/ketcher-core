@@ -20,11 +20,10 @@ declare type RxnArrowAddData = {
     id?: number;
     pos: Array<Vec2>;
     mode: RxnArrowMode;
-    height?: number;
 };
 declare class RxnArrowAdd extends Base {
     data: RxnArrowAddData;
-    constructor(pos?: Array<Vec2>, mode?: RxnArrowMode, id?: number, height?: number);
+    constructor(pos?: Array<Vec2>, mode?: RxnArrowMode, id?: number);
     execute(restruct: any): void;
     invert(): Base;
 }
@@ -32,7 +31,6 @@ interface RxnArrowDeleteData {
     id: number;
     pos?: Array<Vec2>;
     mode?: RxnArrowMode;
-    height?: number;
 }
 declare class RxnArrowDelete extends Base {
     data: RxnArrowDeleteData;

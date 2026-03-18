@@ -24,9 +24,9 @@ import {
 } from 'domain/entities';
 
 function paddedNum(number, width, precision) {
-  const parsedNumber = parseFloat(number);
+  number = parseFloat(number);
 
-  const numStr = parsedNumber.toFixed(precision || 0).replace(',', '.'); // Really need to replace?
+  const numStr = number.toFixed(precision || 0).replace(',', '.'); // Really need to replace?
   if (numStr.length > width) throw new Error('number does not fit');
 
   return numStr.padStart(width);
@@ -65,11 +65,9 @@ function partitionLineFixed(
 ) {
   /* reader */
   const res = [];
-  const step = withspace ? itemLength + 1 : itemLength;
-  let shift = 0;
-  while (shift < str.length) {
+  for (let shift = 0; shift < str.length; shift += itemLength) {
     res.push(str.slice(shift, shift + itemLength));
-    shift += step;
+    if (withspace) shift++;
   }
   return res;
 }
@@ -137,51 +135,53 @@ const FRAGMENT = {
 
 const SHOULD_RESCALE_MOLECULES = true;
 
-function calculateAverageBondLength(mols) {
-  const bondLengthData = { cnt: 0, totalLength: 0 };
-  for (const mol of mols) {
-    const bondLengthDataMol = mol.getBondLengthData();
-    bondLengthData.cnt += bondLengthDataMol.cnt;
-    bondLengthData.totalLength += bondLengthDataMol.totalLength;
-  }
-  return bondLengthData.cnt === 0
-    ? 1
-    : bondLengthData.totalLength / bondLengthData.cnt;
-}
-
-function rescaleMolecules(mols) {
-  const avgBondLength = calculateAverageBondLength(mols);
-  const scaleFactor = 1 / avgBondLength;
-  for (const mol of mols) {
-    mol.scale(scaleFactor);
-  }
-}
-
-function getFragmentType(index, nReactants, nProducts) {
-  if (index < nReactants) {
-    return FRAGMENT.REACTANT;
-  } else if (index < nReactants + nProducts) {
-    return FRAGMENT.PRODUCT;
-  } else {
-    return FRAGMENT.AGENT;
-  }
-}
-
-function categorizeMolecules(mols, nReactants, nProducts) {
+function rxnMerge(
+  mols,
+  nReactants,
+  nProducts,
+  nAgents,
+  shouldReactionRelayout,
+) /* Struct */ {
+  // eslint-disable-line max-statements
+  /* reader */
+  const ret = new Struct();
   const bbReact = [];
   const bbAgent = [];
   const bbProd = [];
   const molReact = [];
   const molAgent = [];
   const molProd = [];
+  let j;
+  const bondLengthData = { cnt: 0, totalLength: 0 };
+  for (j = 0; j < mols.length; ++j) {
+    var mol = mols[j];
+    const bondLengthDataMol = mol.getBondLengthData();
+    bondLengthData.cnt += bondLengthDataMol.cnt;
+    bondLengthData.totalLength += bondLengthDataMol.totalLength;
+  }
+  if (SHOULD_RESCALE_MOLECULES) {
+    const avgBondLength =
+      1 /
+      (bondLengthData.cnt === 0
+        ? 1
+        : bondLengthData.totalLength / bondLengthData.cnt);
+    for (j = 0; j < mols.length; ++j) {
+      mol = mols[j];
+      mol.scale(avgBondLength);
+    }
+  }
 
-  for (let j = 0; j < mols.length; ++j) {
-    const mol = mols[j];
+  for (j = 0; j < mols.length; ++j) {
+    mol = mols[j];
     const bb = mol.getCoordBoundingBoxObj();
     if (!bb) continue; // eslint-disable-line no-continue
 
-    const fragmentType = getFragmentType(j, nReactants, nProducts);
-
+    var fragmentType =
+      j < nReactants
+        ? FRAGMENT.REACTANT // eslint-disable-line no-nested-ternary
+        : j < nReactants + nProducts
+        ? FRAGMENT.PRODUCT
+        : FRAGMENT.AGENT;
     if (fragmentType === FRAGMENT.REACTANT) {
       bbReact.push(bb);
       molReact.push(mol);
@@ -198,162 +198,125 @@ function categorizeMolecules(mols, nReactants, nProducts) {
     });
   }
 
-  return { bbReact, bbAgent, bbProd, molReact, molAgent, molProd };
-}
+  function shiftMol(ret, mol, bb, xorig, over) {
+    // eslint-disable-line max-params
+    const d = new Vec2(
+      xorig - bb.min.x,
+      over ? 1 - bb.min.y : -(bb.min.y + bb.max.y) / 2,
+    );
+    mol.atoms.forEach((atom) => {
+      atom.pp.add_(d); // eslint-disable-line no-underscore-dangle
+    });
 
-function shiftMol(ret, mol, bb, xorig, over) {
-  // eslint-disable-line max-params
-  const d = new Vec2(
-    xorig - bb.min.x,
-    over ? 1 - bb.min.y : -(bb.min.y + bb.max.y) / 2,
-  );
-  mol.atoms.forEach((atom) => {
-    atom.pp.add_(d); // eslint-disable-line no-underscore-dangle
-  });
-
-  mol.sgroups.forEach((item) => {
-    if (item.pp) item.pp.add_(d); // eslint-disable-line no-underscore-dangle
-  });
-  bb.min.add_(d); // eslint-disable-line no-underscore-dangle
-  bb.max.add_(d); // eslint-disable-line no-underscore-dangle
-  mol.mergeInto(ret);
-  return bb.max.x - bb.min.x;
-}
-
-function layoutReactionFragments(
-  ret,
-  molReact,
-  bbReact,
-  molAgent,
-  bbAgent,
-  molProd,
-  bbProd,
-) {
-  let xorig = 0;
-  for (let j = 0; j < molReact.length; ++j) {
-    xorig += shiftMol(ret, molReact[j], bbReact[j], xorig, false) + 2.0;
+    mol.sgroups.forEach((item) => {
+      if (item.pp) item.pp.add_(d); // eslint-disable-line no-underscore-dangle
+    });
+    bb.min.add_(d); // eslint-disable-line no-underscore-dangle
+    bb.max.add_(d); // eslint-disable-line no-underscore-dangle
+    mol.mergeInto(ret);
+    return bb.max.x - bb.min.x;
   }
-  xorig += 2.0;
-  for (let j = 0; j < molAgent.length; ++j) {
-    xorig += shiftMol(ret, molAgent[j], bbAgent[j], xorig, true) + 2.0;
+
+  if (shouldReactionRelayout) {
+    // reaction fragment layout
+    let xorig = 0;
+    for (j = 0; j < molReact.length; ++j) {
+      xorig += shiftMol(ret, molReact[j], bbReact[j], xorig, false) + 2.0;
+    }
+    xorig += 2.0;
+    for (j = 0; j < molAgent.length; ++j) {
+      xorig += shiftMol(ret, molAgent[j], bbAgent[j], xorig, true) + 2.0;
+    }
+    xorig += 2.0;
+
+    for (j = 0; j < molProd.length; ++j) {
+      xorig += shiftMol(ret, molProd[j], bbProd[j], xorig, false) + 2.0;
+    }
+  } else {
+    for (j = 0; j < molReact.length; ++j) molReact[j].mergeInto(ret);
+    for (j = 0; j < molAgent.length; ++j) molAgent[j].mergeInto(ret);
+    for (j = 0; j < molProd.length; ++j) molProd[j].mergeInto(ret);
   }
-  xorig += 2.0;
 
-  for (let j = 0; j < molProd.length; ++j) {
-    xorig += shiftMol(ret, molProd[j], bbProd[j], xorig, false) + 2.0;
-  }
-}
+  let bb1;
+  let bb2;
+  let x;
+  let y;
+  let bbReactAll = null;
+  let bbProdAll = null;
+  for (j = 0; j < bbReact.length - 1; ++j) {
+    bb1 = bbReact[j];
+    bb2 = bbReact[j + 1];
 
-function mergeWithoutLayout(ret, molReact, molAgent, molProd) {
-  for (const mol of molReact) mol.mergeInto(ret);
-  for (const mol of molAgent) mol.mergeInto(ret);
-  for (const mol of molProd) mol.mergeInto(ret);
-}
-
-function addPlusSigns(ret, boundingBoxes) {
-  for (let j = 0; j < boundingBoxes.length - 1; ++j) {
-    const bb1 = boundingBoxes[j];
-    const bb2 = boundingBoxes[j + 1];
-
-    const x = (bb1.max.x + bb2.min.x) / 2;
-    const y = (bb1.max.y + bb1.min.y + bb2.max.y + bb2.min.y) / 4;
+    x = (bb1.max.x + bb2.min.x) / 2;
+    y = (bb1.max.y + bb1.min.y + bb2.max.y + bb2.min.y) / 4;
 
     ret.rxnPluses.add(new RxnPlus({ pp: new Vec2(x, y) }));
   }
-}
-
-function aggregateBoundingBoxes(boundingBoxes) {
-  if (boundingBoxes.length === 0) return null;
-
-  const bbAll = {
-    max: new Vec2(boundingBoxes[0].max),
-    min: new Vec2(boundingBoxes[0].min),
-  };
-
-  for (let j = 1; j < boundingBoxes.length; ++j) {
-    bbAll.max = Vec2.max(bbAll.max, boundingBoxes[j].max);
-    bbAll.min = Vec2.min(bbAll.min, boundingBoxes[j].min);
+  for (j = 0; j < bbReact.length; ++j) {
+    if (j === 0) {
+      bbReactAll = {};
+      bbReactAll.max = new Vec2(bbReact[j].max);
+      bbReactAll.min = new Vec2(bbReact[j].min);
+    } else {
+      bbReactAll.max = Vec2.max(bbReactAll.max, bbReact[j].max);
+      bbReactAll.min = Vec2.min(bbReactAll.min, bbReact[j].min);
+    }
   }
+  for (j = 0; j < bbProd.length - 1; ++j) {
+    bb1 = bbProd[j];
+    bb2 = bbProd[j + 1];
 
-  return bbAll;
-}
+    x = (bb1.max.x + bb2.min.x) / 2;
+    y = (bb1.max.y + bb1.min.y + bb2.max.y + bb2.min.y) / 4;
 
-function createReactionArrow(bb1, bb2) {
+    ret.rxnPluses.add(new RxnPlus({ pp: new Vec2(x, y) }));
+  }
+  for (j = 0; j < bbProd.length; ++j) {
+    if (j === 0) {
+      bbProdAll = {};
+      bbProdAll.max = new Vec2(bbProd[j].max);
+      bbProdAll.min = new Vec2(bbProd[j].min);
+    } else {
+      bbProdAll.max = Vec2.max(bbProdAll.max, bbProd[j].max);
+      bbProdAll.min = Vec2.min(bbProdAll.min, bbProd[j].min);
+    }
+  }
+  bb1 = bbReactAll;
+  bb2 = bbProdAll;
   const defaultArrowLength = 2;
-  const defaultOffset = 3;
 
   if (!bb1 && !bb2) {
-    return new RxnArrow({
-      mode: 'open-angle',
-      pos: [new Vec2(0, 0), new Vec2(defaultArrowLength, 0)],
-    });
-  }
-
-  let v1 = bb1 ? new Vec2(bb1.max.x, (bb1.max.y + bb1.min.y) / 2) : null;
-  let v2 = bb2 ? new Vec2(bb2.min.x, (bb2.max.y + bb2.min.y) / 2) : null;
-
-  if (!v1) v1 = new Vec2(v2.x - defaultOffset, v2.y);
-  if (!v2) v2 = new Vec2(v1.x + defaultOffset, v1.y);
-
-  const arrowCenter = Vec2.lc2(v1, 0.5, v2, 0.5);
-  const arrowStart = new Vec2(
-    arrowCenter.x - 0.5 * defaultArrowLength,
-    arrowCenter.y,
-    arrowCenter.z,
-  );
-  const arrowEnd = new Vec2(
-    arrowCenter.x + 0.5 * defaultArrowLength,
-    arrowCenter.y,
-    arrowCenter.z,
-  );
-
-  return new RxnArrow({
-    mode: 'open-angle',
-    pos: [arrowStart, arrowEnd],
-  });
-}
-
-function rxnMerge(
-  mols,
-  nReactants,
-  nProducts,
-  nAgents,
-  shouldReactionRelayout,
-) /* Struct */ {
-  // eslint-disable-line max-statements
-  /* reader */
-  const ret = new Struct();
-
-  if (SHOULD_RESCALE_MOLECULES) {
-    rescaleMolecules(mols);
-  }
-
-  const { bbReact, bbAgent, bbProd, molReact, molAgent, molProd } =
-    categorizeMolecules(mols, nReactants, nProducts);
-
-  if (shouldReactionRelayout) {
-    layoutReactionFragments(
-      ret,
-      molReact,
-      bbReact,
-      molAgent,
-      bbAgent,
-      molProd,
-      bbProd,
+    ret.rxnArrows.add(
+      new RxnArrow({
+        mode: 'open-angle',
+        pos: [new Vec2(0, 0), new Vec2(defaultArrowLength, 0)],
+      }),
     );
   } else {
-    mergeWithoutLayout(ret, molReact, molAgent, molProd);
+    let v1 = bb1 ? new Vec2(bb1.max.x, (bb1.max.y + bb1.min.y) / 2) : null;
+    let v2 = bb2 ? new Vec2(bb2.min.x, (bb2.max.y + bb2.min.y) / 2) : null;
+    const defaultOffset = 3;
+    if (!v1) v1 = new Vec2(v2.x - defaultOffset, v2.y);
+    if (!v2) v2 = new Vec2(v1.x + defaultOffset, v1.y);
+    const arrowCenter = Vec2.lc2(v1, 0.5, v2, 0.5);
+    const arrowStart = new Vec2(
+      arrowCenter.x - 0.5 * defaultArrowLength,
+      arrowCenter.y,
+      arrowCenter.z,
+    );
+    const arrowEnd = new Vec2(
+      arrowCenter.x + 0.5 * defaultArrowLength,
+      arrowCenter.y,
+      arrowCenter.z,
+    );
+    ret.rxnArrows.add(
+      new RxnArrow({
+        mode: 'open-angle',
+        pos: [arrowStart, arrowEnd],
+      }),
+    );
   }
-
-  addPlusSigns(ret, bbReact);
-  addPlusSigns(ret, bbProd);
-
-  const bbReactAll = aggregateBoundingBoxes(bbReact);
-  const bbProdAll = aggregateBoundingBoxes(bbProd);
-
-  const arrow = createReactionArrow(bbReactAll, bbProdAll);
-  ret.rxnArrows.add(arrow);
-
   ret.isReaction = true;
   return ret;
 }
@@ -367,7 +330,8 @@ function rgMerge(scaffold, rgroups) /* Struct */ {
   Object.keys(rgroups).forEach((id) => {
     const rgid = parseInt(id, 10);
 
-    for (const ctab of rgroups[rgid]) {
+    for (let j = 0; j < rgroups[rgid].length; ++j) {
+      const ctab = rgroups[rgid][j];
       ctab.rgroups.set(rgid, new RGroup());
       const frag = new Fragment();
       const frid = ctab.frags.add(frag);

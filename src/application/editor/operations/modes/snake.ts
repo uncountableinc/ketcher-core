@@ -4,8 +4,8 @@ import { RenderersManager } from 'application/render/renderers/RenderersManager'
 export class RecalculateCanvasMatrixOperation implements Operation {
   public priority = 1;
   constructor(
-    private readonly recalculateCanvasMatrixModelChange: () => void,
-    private readonly invertRecalculateCanvasMatrixModelChange: () => void,
+    private recalculateCanvasMatrixModelChange: () => void,
+    private invertRecalculateCanvasMatrixModelChange: () => void,
   ) {}
 
   public execute(renderersManager: RenderersManager) {

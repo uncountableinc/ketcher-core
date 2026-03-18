@@ -28,7 +28,6 @@ import {
   CalculateResult,
   CheckData,
   CheckResult,
-  ChemicalMimeType,
   CleanData,
   CleanResult,
   ConvertData,
@@ -46,7 +45,7 @@ import {
   StructService,
   StructServiceOptions,
 } from 'domain/services';
-import { KetcherLogger, normalizeError } from 'utilities';
+import { KetcherLogger } from 'utilities';
 import { getLabelRenderModeForIndigo } from 'infrastructure/services/helpers';
 import { ketcherProvider } from 'application/utils';
 
@@ -60,13 +59,13 @@ function pollDeferred(process, complete, timeGap, startTimeGap) {
             else setTimeout(iterate, timeGap);
           } catch (error) {
             KetcherLogger.error('remoteStructService.ts::pollDeferred', error);
-            reject(normalizeError(error));
+            reject(error);
           }
         },
-        (err) => reject(normalizeError(err)),
+        (err) => reject(err),
       );
     }
-    setTimeout(iterate, startTimeGap ?? 0);
+    setTimeout(iterate, startTimeGap || 0);
   });
 }
 
@@ -85,10 +84,12 @@ function request(
   if (data && method === 'GET') requestUrl = parametrizeUrl(url, data);
   let response: any = fetch(requestUrl, {
     method,
-    headers: {
-      Accept: 'application/json',
-      ...(headers || {}),
-    },
+    headers: Object.assign(
+      {
+        Accept: 'application/json',
+      },
+      headers,
+    ),
     body: method !== 'GET' ? data : undefined,
     credentials: 'same-origin',
   });
@@ -99,9 +100,7 @@ function request(
     response = response.then((response) =>
       response
         .json()
-        .then((res) =>
-          response.ok ? res : Promise.reject(new Error(res.error)),
-        ),
+        .then((res) => (response.ok ? res : Promise.reject(res.error))),
     );
   }
 
@@ -120,12 +119,8 @@ function indigoCall(
     options,
     responseHandler?: (promise: Promise<any>) => Promise<any>,
   ) {
-    const body = { ...(data || {}) };
-    body.options = {
-      ...(body.options || {}),
-      ...(defaultOptions || {}),
-      ...(options || {}),
-    };
+    const body = Object.assign({}, data);
+    body.options = Object.assign(body.options || {}, defaultOptions, options);
     return request(
       method,
       baseUrl + url,
@@ -190,7 +185,7 @@ export class RemoteStructService implements StructService {
     )(
       {
         struct,
-        output_format: ChemicalMimeType.InChIKey,
+        output_format: 'chemical/x-inchi',
       },
       {},
     );
@@ -201,7 +196,7 @@ export class RemoteStructService implements StructService {
       return this.defaultOptions;
     }
     if (!this.ketcherId) {
-      throw new Error('ketcherId is missed when options getting');
+      throw Error('ketcherId is missed when options getting');
     }
 
     return pickStandardServerOptions(this.ketcherId, options);
@@ -252,9 +247,6 @@ export class RemoteStructService implements StructService {
         options?.['reaction-component-margin-size'],
       'image-resolution': options?.['image-resolution'],
       'molfile-saving-mode': options?.['molfile-saving-mode'],
-      'monomer-library-saving-mode': options?.['monomer-library-saving-mode'],
-      'molfile-saving-skip-date': options?.['molfile-saving-skip-date'],
-      'output-content-type': options?.['output-content-type'],
       'sequence-type': options?.['sequence-type'],
     };
 
@@ -392,7 +384,7 @@ export class RemoteStructService implements StructService {
       this.apiPath + `imago/uploads${parVersion}`,
       blob,
       {
-        'Content-Type': blob.type ?? 'application/octet-stream',
+        'Content-Type': blob.type || 'application/octet-stream',
       },
     );
     const status = request.bind(
@@ -405,8 +397,7 @@ export class RemoteStructService implements StructService {
         pollDeferred(
           status.bind(null, { id: data.upload_id }),
           (response: any) => {
-            if (response.state === 'FAILURE')
-              throw new Error(JSON.stringify(response));
+            if (response.state === 'FAILURE') throw response;
             return response.state === 'SUCCESS';
           },
           500,
@@ -420,7 +411,7 @@ export class RemoteStructService implements StructService {
     data: string,
     options?: GenerateImageOptions,
   ): Promise<string> {
-    const outputFormat: OutputFormatType = options?.outputFormat ?? 'png';
+    const outputFormat: OutputFormatType = options?.outputFormat || 'png';
     const stereoStyle: undefined | string = options?.stereoStyle;
     const stereoStyleOption =
       stereoStyle != null ? { 'render-stereo-style': stereoStyle } : {};
@@ -449,7 +440,6 @@ export class RemoteStructService implements StructService {
         'render-stereo-bond-width': options?.['render-stereo-bond-width'],
         'render-stereo-bond-width-unit':
           options?.['render-stereo-bond-width-unit'],
-        'render-stereo-style': options?.['render-stereo-style'],
         'render-hash-spacing': options?.['render-hash-spacing'],
         'render-hash-spacing-unit': options?.['render-hash-spacing-unit'],
         'render-output-sheet-width': options?.['render-output-sheet-width'],

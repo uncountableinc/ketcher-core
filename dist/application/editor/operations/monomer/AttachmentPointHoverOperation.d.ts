@@ -18,8 +18,8 @@ import { BaseMonomer } from "../../../../domain/entities";
 import { AttachmentPointName } from "../../../../domain/types";
 import { RenderersManager } from "../../../render/renderers/RenderersManager";
 export declare class AttachmentPointHoverOperation implements Operation {
-    private readonly peptide;
-    private readonly attachmentPointName;
+    private peptide;
+    private attachmentPointName;
     constructor(peptide: BaseMonomer, attachmentPointName: AttachmentPointName);
     execute(renderersManager: RenderersManager): void;
     invert(): void;

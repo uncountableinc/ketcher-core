@@ -36,7 +36,7 @@ export class RemoteStructServiceProvider implements StructServiceProvider {
       currentApiPath = params.get('api_path')!;
     }
     this.apiPath =
-      !currentApiPath || currentApiPath.endsWith('/')
+      !currentApiPath || /\/$/.test(currentApiPath)
         ? currentApiPath
         : currentApiPath + '/';
   }

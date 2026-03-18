@@ -1,7 +1,7 @@
 import { Chain } from "./Chain";
 import { AmbiguousMonomer, BaseMonomer, Chem, Peptide, Phosphate, RNABase, SubChainNode, Sugar, UnresolvedMonomer, UnsplitNucleotide } from "./..";
-import { SequenceNode } from "./types";
 import { BaseSubChain } from "./BaseSubChain";
+import { BackBoneSequenceNode } from "../BackBoneSequenceNode";
 export interface ComplimentaryChainsWithData {
     complimentaryChain: Chain;
     chain: Chain;
@@ -14,10 +14,10 @@ export declare type GrouppedChain = {
     chain: Chain;
 };
 export interface ITwoStrandedChainItem {
-    senseNode?: SequenceNode;
+    senseNode?: SubChainNode | BackBoneSequenceNode;
     senseNodeIndex: number;
     chain: Chain;
-    antisenseNode?: SequenceNode;
+    antisenseNode?: SubChainNode | BackBoneSequenceNode;
     antisenseNodeIndex?: number;
     antisenseChain?: Chain;
 }

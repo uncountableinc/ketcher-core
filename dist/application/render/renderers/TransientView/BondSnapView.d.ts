@@ -2,6 +2,6 @@ import { D3SvgElementSelection } from "../../types";
 import { PolymerBond } from "../../../../domain/entities";
 import { TransientView } from './TransientView';
 export declare class BondSnapView extends TransientView {
-    static readonly viewName = "BondSnapView";
+    static viewName: string;
     static show<P extends PolymerBond>(transientLayer: D3SvgElementSelection<SVGGElement, void>, bond: P): void;
 }

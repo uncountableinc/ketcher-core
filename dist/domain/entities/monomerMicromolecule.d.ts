@@ -24,5 +24,5 @@ export declare class MonomerMicromolecule extends SGroup {
         position: import("./vec2").Vec2;
         atomId: number;
     };
-    static clone(monomerMicromolecule: MonomerMicromolecule, atomIdMap?: Map<number, number>, needCloneAttachmentPoints?: boolean): MonomerMicromolecule;
+    static clone(monomerMicromolecule: MonomerMicromolecule, atomIdMap?: Map<number, number>): MonomerMicromolecule;
 }

@@ -19,7 +19,7 @@ import { MultitailArrow } from "../../../domain/entities/CoreMultitailArrow";
 import { RxnPlus } from "../../../domain/entities/CoreRxnPlus";
 declare type FlexModeOrSnakeModePolymerBondRenderer = FlexModePolymerBondRenderer | SnakeModePolymerBondRenderer;
 export declare class RenderersManager {
-    private readonly theme;
+    private theme;
     monomers: Map<number, BaseMonomerRenderer | AmbiguousMonomerRenderer>;
     polymerBonds: Map<number, FlexModeOrSnakeModePolymerBondRenderer>;
     atoms: Map<number, AtomRenderer>;
@@ -62,11 +62,8 @@ export declare class RenderersManager {
     deleteMultitailArrow(arrow: MultitailArrow): void;
     addRxnPlus(rxnPlus: RxnPlus): void;
     deleteRxnPlus(rxnPlus: RxnPlus): void;
-    private renderAromaticCircles;
-    private calculateDashedPolygonPath;
-    private calculateLoopCenterAndRadius;
     runPostRenderMethods(): void;
-    static getRenderedStructuresBbox(drawingEntities?: DrawingEntity[]): {
+    static getRenderedStructuresBbox(monomers?: BaseMonomer[]): {
         left: any;
         right: any;
         top: any;

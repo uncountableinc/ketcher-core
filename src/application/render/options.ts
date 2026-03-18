@@ -129,7 +129,7 @@ function defaultOptions(renderOptions: RenderOptions): RenderOptions {
     viewOnlyMode: false,
   };
 
-  return { ...(defaultOptions || {}), ...(options || {}) };
+  return Object.assign({}, defaultOptions, options);
 }
 
 const measureMap = {

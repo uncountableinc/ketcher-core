@@ -1,6 +1,6 @@
 import { BaseMonomer } from "./..";
-import { ISnakeLayoutMonomersNode } from './types';
-export declare class SingleMonomerSnakeLayoutNode implements ISnakeLayoutMonomersNode {
+import { SnakeLayoutNode } from "./SnakeLayoutModel";
+export declare class SingleMonomerSnakeLayoutNode implements SnakeLayoutNode {
     monomer: BaseMonomer;
     constructor(monomer: BaseMonomer);
     get monomers(): BaseMonomer[];

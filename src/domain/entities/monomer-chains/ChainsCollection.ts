@@ -12,7 +12,6 @@ import {
   UnresolvedMonomer,
   UnsplitNucleotide,
 } from 'domain/entities';
-import { SequenceNode } from 'domain/entities/monomer-chains/types';
 import {
   getNextMonomerInChain,
   getPreviousMonomerInChain,
@@ -24,6 +23,7 @@ import {
 import { BaseSubChain } from 'domain/entities/monomer-chains/BaseSubChain';
 import { MonomerToAtomBond } from 'domain/entities/MonomerToAtomBond';
 import { isMonomerSgroupWithAttachmentPoints } from '../../../utilities/monomers';
+import { BackBoneSequenceNode } from 'domain/entities/BackBoneSequenceNode';
 
 export interface ComplimentaryChainsWithData {
   complimentaryChain: Chain;
@@ -39,10 +39,10 @@ export type GrouppedChain = {
 };
 
 export interface ITwoStrandedChainItem {
-  senseNode?: SequenceNode;
+  senseNode?: SubChainNode | BackBoneSequenceNode;
   senseNodeIndex: number;
   chain: Chain;
-  antisenseNode?: SequenceNode;
+  antisenseNode?: SubChainNode | BackBoneSequenceNode;
   antisenseNodeIndex?: number;
   antisenseChain?: Chain;
 }

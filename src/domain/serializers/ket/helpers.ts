@@ -17,14 +17,7 @@
 import { Axis, Axises, Struct, Vec2 } from 'domain/entities';
 import { cloneDeep, cloneDeepWith } from 'lodash';
 import { EditorSelection } from 'application/editor';
-import {
-  KetMonomerClass,
-  KetTemplateType,
-  MonomerTransformation,
-} from 'application/formatters';
-import { MONOMER_CONST, RNA_DNA_NON_MODIFIED_PART } from 'domain/constants';
-import { MonomerItemType } from 'domain/types';
-import { getMonomerUniqueKey } from 'domain/helpers/monomers';
+import { MonomerTransformation } from 'application/formatters';
 
 const customizer = (value: any) => {
   if (typeof value === 'object' && value.y) {
@@ -41,9 +34,6 @@ export const setMonomerTemplatePrefix = (templateName: string) =>
   `monomerTemplate-${templateName}`;
 export const setMonomerPrefix = (monomerId: number) => `monomer${monomerId}`;
 
-export const setMonomerGroupTemplatePrefix = (templateName: string) =>
-  `${KetTemplateType.MONOMER_GROUP_TEMPLATE}-${templateName}`;
-
 export const setAmbiguousMonomerTemplatePrefix = (templateName: string) =>
   `ambiguousMonomerTemplate-${templateName}`;
 
@@ -52,51 +42,6 @@ export const setAmbiguousMonomerPrefix = (monomerId: number) =>
 
 export const getKetRef = (entityId: string) => {
   return { $ref: entityId };
-};
-
-export const getMonomerTemplateRefFromMonomerItem = (
-  monomerItem: MonomerItemType,
-) => {
-  const { props } = monomerItem;
-
-  if (props.id) {
-    return setMonomerTemplatePrefix(props.id);
-  }
-
-  return setMonomerTemplatePrefix(getMonomerUniqueKey(monomerItem));
-};
-
-export const getHELMClassByKetMonomerClass = (
-  monomerClass: KetMonomerClass,
-) => {
-  if (monomerClass === KetMonomerClass.AminoAcid) {
-    return MONOMER_CONST.PEPTIDE;
-  }
-
-  if (monomerClass === KetMonomerClass.CHEM) {
-    return MONOMER_CONST.CHEM;
-  }
-
-  return MONOMER_CONST.RNA;
-};
-
-export const fillNaturalAnalogueForPhosphateAndSugar = (
-  naturalAnalogue: string,
-  monomerClass: KetMonomerClass,
-) => {
-  if (naturalAnalogue !== '') {
-    return naturalAnalogue;
-  }
-
-  if (monomerClass === KetMonomerClass.Sugar) {
-    return RNA_DNA_NON_MODIFIED_PART.SUGAR_RNA;
-  }
-
-  if (monomerClass === KetMonomerClass.Phosphate) {
-    return RNA_DNA_NON_MODIFIED_PART.PHOSPHATE;
-  }
-
-  return naturalAnalogue;
 };
 
 const rotateCoordAxisBy180Degrees = (position: Vec2, axis: Axises): Vec2 => {
@@ -155,8 +100,10 @@ export const populateStructWithSelection = (
           value.setInitiallySelected(
             selectedEntities.includes(key) || undefined,
           );
-        } else if (selectedEntities.includes(key)) {
-          value.setInitiallySelected(true);
+        } else {
+          if (selectedEntities.includes(key)) {
+            value.setInitiallySelected(true);
+          }
         }
       }
     });

@@ -23,9 +23,9 @@ export interface MultitailArrowClosestReferencePosition {
 }
 export declare class ReMultitailArrow extends ReObject {
     multitailArrow: MultitailArrow;
-    static readonly CUBIC_BEZIER_OFFSET = 6;
-    static readonly FRAME_OFFSET = 0.175;
-    static readonly SELECTION_POINT_OFFSET_FROM_SPINE = 0.1;
+    static CUBIC_BEZIER_OFFSET: number;
+    static FRAME_OFFSET: number;
+    static SELECTION_POINT_OFFSET_FROM_SPINE: number;
     static isSelectable(): boolean;
     static getTailIdFromRefName(name: string): number | null;
     constructor(multitailArrow: MultitailArrow);

@@ -93,7 +93,7 @@ export interface AtomAttributes {
 }
 export declare type AtomPropertiesInContextMenu = SubsetOfFields<AtomAttributes, 'hCount' | 'ringBondCount' | 'substitutionCount' | 'unsaturatedAtom' | 'implicitHCount'>;
 export declare class Atom extends BaseMicromoleculeEntity {
-    static readonly PATTERN: {
+    static PATTERN: {
         RADICAL: {
             NONE: number;
             SINGLET: number;
@@ -107,7 +107,7 @@ export declare class Atom extends BaseMicromoleculeEntity {
             EITHER: number;
         };
     };
-    static readonly attrlist: {
+    static attrlist: {
         alias: null;
         label: string;
         isotope: null;
@@ -186,7 +186,7 @@ export declare class Atom extends BaseMicromoleculeEntity {
      */
     setRGAttachmentPointForDisplayPurpose(): void;
     static getConnectedBondIds(struct: Struct, atomId: number): number[];
-    static getAttrHash(atom: Atom): Partial<Record<"hCount" | "ringBondCount" | "substitutionCount" | "unsaturatedAtom" | "implicitHCount" | "stereoParity" | "stereoLabel" | "exactChangeFlag" | "invRet" | "aam" | "isPreview" | "queryProperties" | "explicitValence" | "attachmentPoints" | "rglabel" | "charge" | "radical" | "cip" | "isotope" | "alias" | "atomList" | "label", unknown>>;
+    static getAttrHash(atom: Atom): any;
     static attrGetDefault(attr: string): any;
     static isHeteroAtom(label: string): boolean;
     static isInAromatizedRing(struct: Struct, atomId: number): boolean;
@@ -197,25 +197,13 @@ export declare class Atom extends BaseMicromoleculeEntity {
     isPseudo(): boolean;
     hasRxnProps(): boolean;
     calcValence(connectionCount: number): boolean;
-    private calculateValenceResult;
-    private calculateUndefinedGroupValence;
-    private calculateGroup1Valence;
-    private calculateGroup2Valence;
-    private calculateGroup3Valence;
-    private calculateGroup4Valence;
-    private calculateGroup5Valence;
-    private calculateGroup6Valence;
-    private calculateGroup7Valence;
-    private calculateGroup8Valence;
-    private overrideHydrogenCountIfNeeded;
-    private applyValenceResult;
     calcValenceMinusHyd(conn: number): number;
-    static getSuperAtomAttachmentPointByAttachmentAtom(struct: Struct, atomId: number, searchBySgroups?: boolean): import("./sGroupAttachmentPoint").SGroupAttachmentPoint | undefined;
-    static getSuperAtomAttachmentPointByLeavingGroup(structOrSgroup: Struct | SGroup, atomId: number, searchBySgroups?: boolean): import("./sGroupAttachmentPoint").SGroupAttachmentPoint | undefined;
-    static isSuperatomLeavingGroupAtom(structOrSgroup: Struct | SGroup, atomId?: number, searchBySgroups?: boolean): boolean;
+    static getSuperAtomAttachmentPointByAttachmentAtom(struct: Struct, atomId: number): import("./sGroupAttachmentPoint").SGroupAttachmentPoint | undefined;
+    static getSuperAtomAttachmentPointByLeavingGroup(structOrSgroup: Struct | SGroup, atomId: number): import("./sGroupAttachmentPoint").SGroupAttachmentPoint | undefined;
+    static isSuperatomLeavingGroupAtom(structOrSgroup: Struct | SGroup, atomId?: number): boolean;
     static isSuperatomAttachmentAtom(struct: Struct, atomId?: number): boolean;
-    static getAttachmentAtomExternalConnections(struct: Struct, attachmentAtomId?: number, leavingGroupAtomid?: number, searchBySgroups?: boolean): import("./pool").Pool<import("./bond").Bond> | undefined;
-    static isHiddenLeavingGroupAtom(struct: Struct, atomId: number, searchBySgroups?: boolean, includeAtomsInCollapsedSgroups?: boolean): number | false | null | undefined;
+    static getAttachmentAtomExternalConnections(struct: Struct, attachmentAtomId?: number, leavingGroupAtomid?: number): import("./pool").Pool<import("./bond").Bond> | undefined;
+    static isHiddenLeavingGroupAtom(struct: Struct, atomId: number): number | false | null | undefined;
 }
-export declare function radicalElectrons(radical: unknown): 0 | 1 | 2;
+export declare function radicalElectrons(radical: any): 0 | 1 | 2;
 export {};

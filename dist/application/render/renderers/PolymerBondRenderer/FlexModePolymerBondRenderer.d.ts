@@ -3,7 +3,7 @@ import { PolymerBond } from "../../../../domain/entities/PolymerBond";
 import { BaseRenderer } from '../BaseRenderer';
 export declare class FlexModePolymerBondRenderer extends BaseRenderer {
     readonly polymerBond: PolymerBond;
-    private readonly editorEvents;
+    private editorEvents;
     private selectionElement;
     private previousStateOfIsMonomersOnSameHorizontalLine;
     private path;

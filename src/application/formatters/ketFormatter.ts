@@ -21,7 +21,7 @@ import { DrawingEntitiesManager } from 'domain/entities/DrawingEntitiesManager';
 import { EditorSelection } from 'application/editor';
 
 export class KetFormatter implements StructFormatter {
-  readonly #ketSerializer: KetSerializer;
+  #ketSerializer: KetSerializer;
 
   constructor(serializer: KetSerializer) {
     this.#ketSerializer = serializer;

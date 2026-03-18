@@ -11,9 +11,7 @@ export class Command {
   }
 
   public merge(command: Command) {
-    // hot spot in large sequences, avoid allocations
-    // safe as long as no one compares this.operations reference (e.g. redux-like shallow compare)
-    this.operations.push(...command.operations);
+    this.operations = [...this.operations, ...command.operations];
     this.setUndoOperationByPriority = command.setUndoOperationByPriority;
   }
 
@@ -32,7 +30,7 @@ export class Command {
       : [...this.operations];
 
     if (this.setUndoOperationByPriority) {
-      operations.sort((a, b) => (a.priority ?? 0) - (b.priority ?? 0));
+      operations.sort((a, b) => (a.priority || 0) - (b.priority || 0));
     }
 
     operations.forEach((operation) => operation.invert(renderersManagers));

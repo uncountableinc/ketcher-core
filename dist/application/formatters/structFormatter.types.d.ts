@@ -46,7 +46,6 @@ export declare enum SupportedFormat {
     sequence = "sequence",
     sequence3Letter = "sequence-3-letter",
     idt = "idt",
-    axoLabs = "axoLabs",
     helm = "helm",
     unknown = "unknown",
     rdf = "rdf",

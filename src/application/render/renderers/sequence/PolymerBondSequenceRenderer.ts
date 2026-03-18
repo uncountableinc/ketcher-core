@@ -13,8 +13,8 @@ export class PolymerBondSequenceRenderer extends BaseSequenceRenderer {
 
   constructor(
     public polymerBond: PolymerBond,
-    private readonly firstNode?: SubChainNode,
-    private readonly secondNode?: SubChainNode,
+    private firstNode?: SubChainNode,
+    private secondNode?: SubChainNode,
   ) {
     super(polymerBond);
   }

@@ -22,7 +22,7 @@ import { ReStruct } from '../../render';
 export class Action {
   operations: BaseOperation[];
 
-  constructor(operations: BaseOperation[] = []) {
+  constructor(operations = []) {
     this.operations = operations;
   }
 

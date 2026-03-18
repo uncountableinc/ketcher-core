@@ -17,23 +17,6 @@ import { Struct, Vec2 } from "../../domain/entities";
 import { RaphaelPaper } from 'raphael';
 import { ReStruct } from './restruct';
 import { RenderOptions, ViewBox } from './render.types';
-import { AttachmentPointName } from "../../domain/types";
-import { KetMonomerClass } from "../formatters/types/ket";
-import { RnaPresetComponentKey } from "../editor/shared/customEvents";
-export declare type RnaComponentAtoms = Map<RnaPresetComponentKey, {
-    atoms: number[];
-    bonds: number[];
-}>;
-export declare type MonomerCreationState = {
-    assignedAttachmentPoints: Map<AttachmentPointName, [number, number]>;
-    potentialAttachmentPoints: Map<number, Set<number>>;
-    problematicAttachmentPoints: Set<AttachmentPointName>;
-    clickedAttachmentPoint?: AttachmentPointName | null;
-    selectedMonomerClass?: KetMonomerClass | 'rnaPreset';
-    hasDefaultAttachmentPoints?: boolean;
-    rnaComponentAtoms?: RnaComponentAtoms;
-    isRnaPresetMode?: boolean;
-} | null;
 export declare class Render {
     skipRaphaelInitialization: boolean;
     readonly clientArea: HTMLElement;
@@ -46,7 +29,6 @@ export declare class Render {
     private oldCb;
     private scrollbar;
     private resizeObserver;
-    private _monomerCreationState;
     constructor(clientArea: HTMLElement, options: RenderOptions, currentRender?: Render, reuseRestructIfExist?: boolean);
     observeCanvasResize: () => void;
     unobserveCanvasResize: () => void;
@@ -71,6 +53,4 @@ export declare class Render {
     setViewBox(viewBox: ViewBox): void;
     setMolecule(struct: Struct, forceUpdateWithTimeout?: boolean): void;
     update(force?: boolean, viewSz?: Vec2 | null): void;
-    get monomerCreationState(): MonomerCreationState;
-    set monomerCreationState(state: MonomerCreationState);
 }

@@ -5,11 +5,11 @@ import { MultitailArrowRenderer } from "../../application/render/renderers/Multi
 export declare class MultitailArrow extends DrawingEntity {
     private spineTopX;
     private spineTopY;
-    private readonly height;
-    private readonly headOffsetX;
-    private readonly headOffsetY;
-    private readonly tailLength;
-    private readonly tailsYOffset;
+    private height;
+    private headOffsetX;
+    private headOffsetY;
+    private tailLength;
+    private tailsYOffset;
     renderer?: MultitailArrowRenderer;
     constructor(spineTopX: FixedPrecisionCoordinates, spineTopY: FixedPrecisionCoordinates, height: FixedPrecisionCoordinates, headOffsetX: FixedPrecisionCoordinates, headOffsetY: FixedPrecisionCoordinates, tailLength: FixedPrecisionCoordinates, tailsYOffset: Pool<FixedPrecisionCoordinates>);
     get center(): Vec2;

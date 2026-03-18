@@ -32,7 +32,7 @@ class ReObject {
     this.visel = new Visel(viselType);
   }
 
-  changeSelectionStyle(options: any, drawOutline = true) {
+  changeSelectionStyle(options: any) {
     const { hoverStyle } = options;
     if (['simpleObject', IMAGE_KEY].includes(this.visel.type)) {
       this.hovering?.attr({
@@ -42,7 +42,6 @@ class ReObject {
       this.hovering?.attr({
         fill: hoverStyle.fill,
         'fill-opacity': this.selected ? 1 : 0,
-        stroke: drawOutline ? hoverStyle.stroke : 'none',
       });
     }
   }
@@ -56,7 +55,7 @@ class ReObject {
     return vbox.transform(Scale.canvasToModel, render.options);
   }
 
-  setHover(hover: boolean, render: Render, drawOutline = true): void {
+  setHover(hover: boolean, render: Render): void {
     // TODO render should be field
     const { options } = render;
     if (hover) {
@@ -70,22 +69,22 @@ class ReObject {
         }
       }
       if (noredraw) {
-        this.changeSelectionStyle(options, drawOutline);
+        this.changeSelectionStyle(options);
         this.hovering.show();
       } else {
         render.paper.setStart();
-        this.drawHover(render, drawOutline);
+        this.drawHover(render);
         this.hovering = render.paper.setFinish();
       }
     } else if (this.hovering) {
-      this.changeSelectionStyle(options, drawOutline);
+      this.changeSelectionStyle(options);
       this.hovering.hide();
     }
 
     this.hover = hover;
   }
 
-  drawHover(_render: Render, _drawOutline?: boolean): any {
+  drawHover(_render: Render): any {
     throw new Error('ReObject.drawHover is not overridden.');
   }
 

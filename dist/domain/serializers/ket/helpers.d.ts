@@ -15,20 +15,15 @@
  ***************************************************************************/
 import { Struct, Vec2 } from "../../entities";
 import { EditorSelection } from "../../../application/editor";
-import { KetMonomerClass, MonomerTransformation } from "../../../application/formatters";
-import { MonomerItemType } from "../../types";
+import { MonomerTransformation } from "../../../application/formatters";
 export declare const getNodeWithInvertedYCoord: <T>(node: T) => T;
 export declare const setMonomerTemplatePrefix: (templateName: string) => string;
 export declare const setMonomerPrefix: (monomerId: number) => string;
-export declare const setMonomerGroupTemplatePrefix: (templateName: string) => string;
 export declare const setAmbiguousMonomerTemplatePrefix: (templateName: string) => string;
 export declare const setAmbiguousMonomerPrefix: (monomerId: number) => string;
 export declare const getKetRef: (entityId: string) => {
     $ref: string;
 };
-export declare const getMonomerTemplateRefFromMonomerItem: (monomerItem: MonomerItemType) => string;
-export declare const getHELMClassByKetMonomerClass: (monomerClass: KetMonomerClass) => string;
-export declare const fillNaturalAnalogueForPhosphateAndSugar: (naturalAnalogue: string, monomerClass: KetMonomerClass) => string;
 /**
  *
  * System coordinates for browser and for chemistry files format (mol, ket, etc.) area are different.

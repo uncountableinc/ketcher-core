@@ -7,6 +7,6 @@ export declare type AngleSnapViewParams = {
     isBondLengthSnapped: boolean;
 };
 export declare class AngleSnapView extends TransientView {
-    static readonly viewName = "AngleSnapView";
+    static viewName: string;
     static show(transientLayer: D3SvgElementSelection<SVGGElement, void>, params: AngleSnapViewParams): void;
 }

@@ -21,9 +21,7 @@ export declare class EditorHistory {
     historyPointer: number;
     editor: CoreEditor;
     private static _instance;
-    private constructor();
-    static getInstance(editor: CoreEditor): EditorHistory;
-    private static isInstance;
+    constructor(editor: CoreEditor);
     update(command: Command, megreWithLatestHistoryCommand?: boolean): void;
     undo(): void;
     redo(): void;

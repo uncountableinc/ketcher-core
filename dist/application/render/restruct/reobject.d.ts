@@ -24,10 +24,10 @@ declare class ReObject {
     selected: boolean;
     selectionPlate: any;
     constructor(viselType: string);
-    changeSelectionStyle(options: any, drawOutline?: boolean): void;
+    changeSelectionStyle(options: any): void;
     getVBoxObj(render: Render): Box2Abs | null;
-    setHover(hover: boolean, render: Render, drawOutline?: boolean): void;
-    drawHover(_render: Render, _drawOutline?: boolean): any;
+    setHover(hover: boolean, render: Render): void;
+    drawHover(_render: Render): any;
     makeSelectionPlate(_restruct: ReStruct, _paper: any, _styles: any): any;
 }
 export default ReObject;

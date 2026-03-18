@@ -50,18 +50,9 @@ export function replaceMonomer(
       return bond.monomer === monomer;
     })
     .map(([id, bond]) => {
-      const attachmentPointEntry = Object.entries(
+      const attachmentPoint = Object.entries(
         monomer.attachmentPointsToBonds,
-      ).find(
-        (entry): entry is [AttachmentPointName, MonomerToAtomBond | null] =>
-          entry[1] === bond,
-      );
-      if (!attachmentPointEntry) {
-        throw new Error(
-          'Monomer to atom bond requires an attachment point reference',
-        );
-      }
-      const [attachmentPoint] = attachmentPointEntry;
+      ).find(([_ap, apBond]) => apBond === bond)?.[0] as AttachmentPointName;
       return {
         id,
         monomer: bond.monomer,
@@ -135,7 +126,7 @@ export function replaceMonomer(
       drawingEntitiesManager.addMonomerToAtomBond(
         monomerToAtomBondInfo.monomer,
         monomerToAtomBondInfo.atom,
-        monomerToAtomBondInfo.attachmentPoint,
+        monomerToAtomBondInfo.attachmentPoint as AttachmentPointName,
       ),
     );
   }

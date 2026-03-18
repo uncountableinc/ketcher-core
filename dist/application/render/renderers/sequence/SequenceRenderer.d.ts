@@ -1,12 +1,14 @@
 import { ChainsCollection, ITwoStrandedChainItem } from "../../../../domain/entities/monomer-chains/ChainsCollection";
 import { BaseMonomer, Vec2 } from "../../../../domain/entities";
-import { IBaseRenderer } from "../BaseRenderer";
+import { BaseSequenceItemRenderer } from "./BaseSequenceItemRenderer";
 import { Chain } from "../../../../domain/entities/monomer-chains/Chain";
 import { SubChainNode } from "../../../../domain/entities/monomer-chains/types";
 import { RestoreSequenceCaretPositionOperation } from "../../../editor/operations/modes";
 import { Command } from "../../../../domain/entities/Command";
 import { SequenceViewModel } from "./SequenceViewModel/SequenceViewModel";
 import { SequenceViewModelChain } from "./SequenceViewModel/SequenceViewModelChain";
+export declare type SequencePointer = number;
+export declare type SequenceLastCaretPosition = number;
 declare type BaseNodeSelection = {
     nodeIndexOverall: number;
     isNucleosideConnectedAndSelectedWithPhosphate?: boolean;
@@ -22,22 +24,12 @@ export declare type TwoStrandedNodeSelection = BaseNodeSelection & {
 export declare type TwoStrandedNodesSelection = TwoStrandedNodeSelection[][];
 export declare type NodesSelection = NodeSelection[][];
 export declare class SequenceRenderer {
-    private static caretPositionValue;
-    private static lastUserDefinedCaretPositionValue;
-    private static chainsCollectionValue;
-    private static lastChainStartPositionValue;
-    private static sequenceViewModelValue;
+    static caretPosition: SequencePointer;
+    static lastUserDefinedCaretPosition: SequenceLastCaretPosition;
+    static chainsCollection: ChainsCollection;
+    static lastChainStartPosition: Vec2;
     private static newSequenceButtons;
-    static get caretPosition(): number;
-    private static set caretPosition(value);
-    static get lastUserDefinedCaretPosition(): number;
-    private static set lastUserDefinedCaretPosition(value);
-    static get chainsCollection(): ChainsCollection;
-    private static set chainsCollection(value);
-    static get lastChainStartPosition(): Vec2;
-    private static set lastChainStartPosition(value);
-    static get sequenceViewModel(): SequenceViewModel;
-    private static set sequenceViewModel(value);
+    static sequenceViewModel: SequenceViewModel;
     static show(chainsCollection: ChainsCollection, chainBeforeNewEmptyChainIndex?: number): void;
     private static setCaretToLastNodeInChain;
     static removeNewSequenceButtons(): void;
@@ -45,7 +37,7 @@ export declare class SequenceRenderer {
     private static showNodes;
     static getNextChainPosition(currentChainStartPosition?: Vec2, previousChainLength?: number): Vec2;
     private static showBonds;
-    static setCaretPosition(caretPosition: number): void;
+    static setCaretPosition(caretPosition: SequencePointer): void;
     static rerenderCaret(): void;
     static forEachNode(forEachCallback: (params: {
         chainIndex: number;
@@ -54,11 +46,11 @@ export declare class SequenceRenderer {
         nodeIndexOverall: number;
         twoStrandedNode: ITwoStrandedChainItem;
     }) => void): void;
-    static setCaretPositionBySequenceItemRenderer(sequenceItemRenderer: IBaseRenderer): void;
+    static setCaretPositionBySequenceItemRenderer(sequenceItemRenderer: BaseSequenceItemRenderer): void;
     static setCaretPositionByMonomer(monomer: BaseMonomer): void;
     static setCaretPositionNextToMonomer(monomer: BaseMonomer): void;
     static setCaretPositionByNode(nodeToCompare: ITwoStrandedChainItem): void;
-    static getMonomersByCaretPositionRange(startCaretPosition: number, endCaretPosition: any): BaseMonomer[];
+    static getMonomersByCaretPositionRange(startCaretPosition: SequencePointer, endCaretPosition: any): BaseMonomer[];
     static resetLastUserDefinedCaretPosition(): void;
     private static get nodesGroupedByRows();
     private static getNodeIndexInRowByGlobalIndex;
@@ -70,8 +62,8 @@ export declare class SequenceRenderer {
     static moveCaretForward(): RestoreSequenceCaretPositionOperation;
     static moveCaretBack(): RestoreSequenceCaretPositionOperation;
     static get currentChainIndex(): number;
-    static get lastNodeCaretPosition(): number | undefined;
-    static getNodeByPointer(sequencePointer?: number): ITwoStrandedChainItem | undefined;
+    static get lastNodeCaretPosition(): SequencePointer | undefined;
+    static getNodeByPointer(sequencePointer?: SequencePointer): ITwoStrandedChainItem | undefined;
     static get currentEdittingNode(): ITwoStrandedChainItem | undefined;
     static get previousFromCurrentEdittingMonomer(): ITwoStrandedChainItem | undefined;
     static get currentChain(): Chain;
@@ -109,7 +101,6 @@ export declare class SequenceRenderer {
     static isEmptyCanvas(): boolean;
     static get isCaretAtChainEnd(): boolean;
     static clear(): void;
-    private static attachDelegatedEvents;
-    private static removeDelegatedEvents;
 }
+export declare function sequenceReplacer(key: string, value: unknown): unknown;
 export {};

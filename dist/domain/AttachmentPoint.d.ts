@@ -6,15 +6,15 @@ import { Coordinates } from './helpers/attachmentPointCalculations';
 import { AttachmentPointConstructorParams, AttachmentPointName } from './types';
 import { MonomerToAtomBond } from "./entities/MonomerToAtomBond";
 export declare class AttachmentPoint {
-    static readonly attachmentPointVector = 6;
-    static readonly attachmentPointLength: number;
-    static readonly labelOffset = 3.5;
-    static readonly radius = 3;
-    static readonly labelSize: {
+    static attachmentPointVector: number;
+    static attachmentPointLength: number;
+    static labelOffset: number;
+    static radius: number;
+    static labelSize: {
         x: number;
         y: number;
     };
-    static readonly colors: {
+    static colors: {
         fillUsed: string;
         fill: string;
         fillPotentially: string;
@@ -33,10 +33,10 @@ export declare class AttachmentPoint {
     protected element: Selection<SVGGElement, this, HTMLElement, never> | undefined;
     private hoverableArea;
     protected initialAngle: number;
-    private readonly isUsed;
-    private readonly isSnake;
-    private readonly editorEvents;
-    private readonly applyZoomForPositionCalculation;
+    private isUsed;
+    private isSnake;
+    private editorEvents;
+    private applyZoomForPositionCalculation;
     constructor(constructorParams: AttachmentPointConstructorParams, skipInit?: boolean);
     private get fill();
     protected get stroke(): string;

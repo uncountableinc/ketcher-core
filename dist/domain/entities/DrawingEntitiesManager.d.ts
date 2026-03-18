@@ -36,15 +36,10 @@ declare type RnaPresetAdditionParams = {
     phosphatePosition: Vec2 | undefined;
     existingNode?: Nucleotide | Nucleoside | LinkerSequenceNode;
 };
-interface MonomerConnectedToSelection {
-    monomerFromSelection: BaseMonomer;
-    monomerConnectedToSelection: BaseMonomer;
-    bond: PolymerBond;
-}
 export declare class DrawingEntitiesManager {
     monomers: Map<number, BaseMonomer>;
     polymerBonds: Map<number, PolymerBond | HydrogenBond>;
-    private readonly bondsMonomersOverlaps;
+    private bondsMonomersOverlaps;
     atoms: Map<number, Atom>;
     bonds: Map<number, Bond>;
     monomerToAtomBonds: Map<number, MonomerToAtomBond>;
@@ -56,14 +51,9 @@ export declare class DrawingEntitiesManager {
     snakeLayoutMatrix?: Matrix<Cell>;
     antisenseMonomerToSenseChain: Map<BaseMonomer, Chain>;
     get bottomRightMonomerPosition(): Vec2;
-    get bottomLeftMonomerPosition(): Vec2;
     get selectedEntitiesArr(): DrawingEntity[];
     get selectedEntities(): [number, DrawingEntity][];
-    get selectedMonomers(): BaseMonomer[];
-    get selectedMicromoleculeEntities(): DrawingEntity[];
-    get externalConnectionsToSelection(): MonomerConnectedToSelection[];
     get allEntities(): [number, DrawingEntity][];
-    get allEntitiesArray(): DrawingEntity[];
     get hasDrawingEntities(): boolean;
     get hasMonomers(): boolean;
     get allBondsToMonomers(): ([number, PolymerBond] | [number, MonomerToAtomBond])[];
@@ -73,9 +63,8 @@ export declare class DrawingEntitiesManager {
     createMonomer(monomerItem: MonomerOrAmbiguousType, position: Vec2, generateId?: boolean): AmbiguousMonomer | Chem | Sugar | import("./").Peptide | RNABase | Phosphate;
     updateMonomerItem(monomer: BaseMonomer, monomerItemNew: MonomerItemType): BaseMonomer;
     addMonomer(monomerItem: MonomerItemType, position: Vec2, _monomer?: BaseMonomer): Command;
-    deleteDrawingEntity(drawingEntity: DrawingEntity, needToDeleteConnectedEntities?: boolean, force?: boolean): Command;
+    deleteDrawingEntity(drawingEntity: DrawingEntity, needToDeleteConnectedEntities?: boolean): Command;
     selectDrawingEntity(drawingEntity: DrawingEntity): Command;
-    private selectDrawingEntitiesModelChange;
     selectDrawingEntities(drawingEntities: DrawingEntity[]): Command;
     createDrawingEntitySelectionCommand(drawingEntity: DrawingEntity): Command;
     unselectAllDrawingEntities(): Command;
@@ -85,24 +74,12 @@ export declare class DrawingEntitiesManager {
     moveDrawingEntityModelChange(drawingEntity: DrawingEntity, offset?: Vec2): DrawingEntity;
     private moveChemAtomsPoint;
     moveSelectedDrawingEntities(partOfMovementOffset: Vec2, fullMovementOffset?: Vec2): Command;
-    rotateSelectedDrawingEntities(center: Vec2, angleInDegrees: number, isPartialRotation?: boolean): Command;
-    flipSelectedDrawingEntities(flipDirection: 'horizontal' | 'vertical'): Command;
-    getSelectedEntitiesBoundingBox(): {
-        left: number;
-        right: number;
-        top: number;
-        bottom: number;
-        width: number;
-        height: number;
-    } | null;
-    getSelectedEntitiesCenter(): Vec2 | null;
     createDrawingEntityMovingCommand(drawingEntity: DrawingEntity, partOfMovementOffset: Vec2, fullMovementOffset?: Vec2): Command;
     createDrawingEntityRedrawCommand(drawingEntityRedrawModelChange: () => DrawingEntity, invertDrawingEntityRedrawModelChange: () => DrawingEntity): Command;
     private deleteMonomerChangeModel;
-    deleteMonomer(monomer: BaseMonomer, needToDeleteConnectedBonds?: boolean, force?: boolean): Command;
+    deleteMonomer(monomer: BaseMonomer, needToDeleteConnectedBonds?: boolean): Command;
     modifyMonomerItem(monomer: BaseMonomer, monomerItemNew: MonomerItemType): Command;
     selectIfLocatedInRectangle(rectangleTopLeftPoint: Vec2, rectangleBottomRightPoint: Vec2, previousSelectedEntities: [number, DrawingEntity][], shiftKey?: boolean): Command;
-    selectIfLocatedInPolygon(polygonPoints: Vec2[], previousSelectedEntities: [number, DrawingEntity][], shiftKey?: boolean): Command;
     private checkBondSelectionForSequenceMode;
     startPolymerBondCreationChangeModel(firstMonomer: any, startPosition: any, endPosition: any, bondType?: MACROMOLECULES_BOND_TYPES, _polymerBond?: PolymerBond | HydrogenBond): PolymerBond | HydrogenBond;
     startPolymerBondCreation(firstMonomer: BaseMonomer, startPosition: Vec2, endPosition: Vec2, bondType: MACROMOLECULES_BOND_TYPES): {
@@ -112,7 +89,7 @@ export declare class DrawingEntitiesManager {
     deletePolymerBondChangeModel(polymerBond: PolymerBond | HydrogenBond): void;
     deletePolymerBond(polymerBond: PolymerBond | HydrogenBond): Command;
     cancelPolymerBondCreation(polymerBond: PolymerBond, secondMonomer?: BaseMonomer): Command;
-    movePolymerBond(polymerBond: PolymerBond, position?: Vec2): Command;
+    movePolymerBond(polymerBond: PolymerBond, position: Vec2): Command;
     finishPolymerBondCreationModelChange(firstMonomer: BaseMonomer, secondMonomer: BaseMonomer, firstMonomerAttachmentPoint: AttachmentPointName, secondMonomerAttachmentPoint: AttachmentPointName, bondType?: MACROMOLECULES_BOND_TYPES, _polymerBond?: PolymerBond): PolymerBond | HydrogenBond;
     finishPolymerBondCreation(polymerBond: PolymerBond, secondMonomer: BaseMonomer, firstMonomerAttachmentPoint: AttachmentPointName, secondMonomerAttachmentPoint: AttachmentPointName, bondType?: MACROMOLECULES_BOND_TYPES): Command;
     createPolymerBond(firstMonomer: BaseMonomer, secondMonomer: BaseMonomer, firstMonomerAttachmentPoint: AttachmentPointName, secondMonomerAttachmentPoint: AttachmentPointName, bondType?: MACROMOLECULES_BOND_TYPES): Command;
@@ -122,9 +99,7 @@ export declare class DrawingEntitiesManager {
     intendToFinishAttachmenPointBondCreation(monomer: BaseMonomer, bond: PolymerBond, attachmentPointName: AttachmentPointName, shouldCalculateBonds: boolean): Command;
     cancelIntentionToFinishBondCreation(monomer: BaseMonomer, polymerBond?: PolymerBond): Command;
     intendToSelectDrawingEntity(drawingEntity: DrawingEntity): Command;
-    intendToSelectAllConnectedDrawingEntities(startEntity: DrawingEntity): Command;
     cancelIntentionToSelectDrawingEntity(drawingEntity: DrawingEntity): Command;
-    cancelIntentionToSelectAllConnectedDrawingEntities(startEntity: DrawingEntity): Command;
     showPolymerBondInformation(polymerBond: PolymerBond): Command;
     hidePolymerBondInformation(polymerBond: PolymerBond): Command;
     hideAllMonomersHoverAndAttachmentPoints(): Command;
@@ -140,9 +115,13 @@ export declare class DrawingEntitiesManager {
     private calculateSnakeLayoutMatrix;
     private rearrangeSingleMonomerSnakeLayoutNode;
     private rearrangeSugarWithBaseSnakeLayoutNode;
-    applySnakeLayout(isSnakeMode: boolean, needRedrawBonds?: boolean, needRepositionMonomers?: boolean, needRecalculateOldAntisense?: boolean, needRepositionMolecules?: boolean): Command;
+    applySnakeLayout(isSnakeMode: boolean, needRedrawBonds?: boolean, needRepositionMonomers?: boolean, needRecalculateOldAntisense?: boolean): Command;
     private redrawBondsModelChange;
     redrawBonds(): Command;
+    getNextPositionAndDistance(lastPosition: Vec2, height: number, canvasWidth: number, width: number | undefined, restOfRowsWithAntisense: number): {
+        maxVerticalDistance: number;
+        lastPosition: Vec2;
+    };
     isNucleosideAndPhosphateConnectedAsNucleotide(nucleoside: Nucleoside, phosphate: Phosphate): boolean;
     setMicromoleculesHiddenEntities(struct: Struct): void;
     clearMicromoleculesHiddenEntities(): void;
@@ -186,7 +165,7 @@ export declare class DrawingEntitiesManager {
     private deleteMonomerToAtomBondChangeModel;
     deleteMonomerToAtomBond(monomerAtomBond: MonomerToAtomBond): Command;
     addMonomerToAtomBond(monomer: BaseMonomer, atom: Atom, attachmentPoint: AttachmentPointName): Command;
-    static getStructureBbox(drawingEntities: DrawingEntity[]): {
+    static getStructureBbox(monomers: BaseMonomer[]): {
         left: number;
         right: number;
         top: number;
@@ -200,7 +179,7 @@ export declare class DrawingEntitiesManager {
     recalculateAntisenseChains(needRecalculateOldAntisense?: boolean): Command;
     get hasAntisenseChains(): boolean;
     static getAntisenseBaseLabel(rnaBaseMonomerOrLabel: RNABase | AmbiguousMonomer | string, isDnaAntisense: boolean): any;
-    static createAntisenseNode(node: Nucleoside | Nucleotide, isDnaAntisense: boolean, needAddPhosphate?: boolean): {
+    static createAntisenseNode(node: Nucleoside | Nucleotide, needAddPhosphate: boolean | undefined, isDnaAntisense: boolean): {
         modelChanges: Command;
         node: Nucleotide;
     } | {
@@ -225,9 +204,5 @@ export declare class DrawingEntitiesManager {
     private addRxnPlusModelChange;
     addRxnPlus(position: Vec2, initiallySelected?: initiallySelectedType): Command;
     deleteRxnPlus(rxnPlus: RxnPlus): Command;
-    selectAllConnectedEntities(startEntity: DrawingEntity): Command;
-    private visitAllConnectedEntities;
-    getConnectedMolecule(startEntity: DrawingEntity, entitiesToReturn?: Array<typeof Atom | typeof Bond>): (Atom | Bond)[];
-    createRotationHistoryCommand(initialPositions: Map<number, Vec2>): Command;
 }
 export {};

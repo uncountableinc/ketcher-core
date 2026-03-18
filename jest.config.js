@@ -21,5 +21,4 @@ module.exports = {
     },
     ketcher: {},
   },
-  setupFiles: ['./jest.setup.js'],
 };

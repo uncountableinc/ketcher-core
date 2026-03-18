@@ -26,6 +26,6 @@ export declare const DefaultStructServiceOptions: {
 };
 export declare class KetcherBuilder {
     #private;
-    withStructServiceProvider(structServiceProvider: StructServiceProvider): this;
+    withStructServiceProvider(structServiceProvider: StructServiceProvider): KetcherBuilder;
     build(serviceOptions?: StructServiceOptions): Ketcher;
 }

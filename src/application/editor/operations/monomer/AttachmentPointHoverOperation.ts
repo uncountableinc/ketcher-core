@@ -21,8 +21,8 @@ import { RenderersManager } from 'application/render/renderers/RenderersManager'
 
 export class AttachmentPointHoverOperation implements Operation {
   constructor(
-    private readonly peptide: BaseMonomer,
-    private readonly attachmentPointName: AttachmentPointName,
+    private peptide: BaseMonomer,
+    private attachmentPointName: AttachmentPointName,
   ) {}
 
   public execute(renderersManager: RenderersManager) {

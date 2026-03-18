@@ -7,10 +7,10 @@ declare class ReRGroupAttachmentPoint extends ReObject {
     item: RGroupAttachmentPoint;
     reAtom: ReAtom;
     lineDirectionVector: Vec2;
-    static readonly LINE_OUTLINE_WIDTH = 0.36;
-    static readonly OUTLINE_PADDING = 0.15;
-    static readonly CURVE_OUTLINE_WIDTH = 1;
-    static readonly CURVE_OUTLINE_HEIGHT = 0.42;
+    static LINE_OUTLINE_WIDTH: number;
+    static OUTLINE_PADDING: number;
+    static CURVE_OUTLINE_WIDTH: number;
+    static CURVE_OUTLINE_HEIGHT: number;
     constructor(item: RGroupAttachmentPoint, reAtom: ReAtom);
     get normalizedLineDirectionVector(): Vec2;
     get normalizedCurveDirectionVector(): Vec2;
@@ -21,7 +21,7 @@ declare class ReRGroupAttachmentPoint extends ReObject {
     static isSelectable(): boolean;
     getOutlinePoints(isHighlight?: boolean): readonly [Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2, Vec2];
     getDistanceTo(destination: Vec2): number;
-    private readonly makeHighlightePlate;
+    private makeHighlightePlate;
     show(restruct: ReStruct, rgroupAttachmentPointId: number): void;
     private getHoverPlatePath;
     makeHoverPlate(render: Render): any;

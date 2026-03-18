@@ -25,10 +25,10 @@ export class PolymerBondAddOperation implements Operation {
   public polymerBond;
   public priority = 1;
   constructor(
-    private readonly addPolymerBondChangeModel: (
+    private addPolymerBondChangeModel: (
       polymerBond?: PolymerBond | HydrogenBond,
     ) => PolymerBond | HydrogenBond,
-    private readonly deletePolymerBondChangeModel: (polymerBond) => void,
+    private deletePolymerBondChangeModel: (polymerBond) => void,
   ) {
     this.polymerBond = this.addPolymerBondChangeModel();
   }
@@ -48,8 +48,8 @@ export class PolymerBondDeleteOperation implements Operation {
   public priority = -1;
   constructor(
     public polymerBond: PolymerBond | HydrogenBond,
-    private readonly deletePolymerBondChangeModel: () => void,
-    private readonly finishPolymerBondCreationModelChange: (
+    private deletePolymerBondChangeModel: () => void,
+    private finishPolymerBondCreationModelChange: (
       polymerBond?: PolymerBond | HydrogenBond,
     ) => PolymerBond | HydrogenBond,
   ) {
@@ -92,7 +92,7 @@ export class PolymerBondShowInfoOperation implements Operation {
 export class PolymerBondCancelCreationOperation implements Operation {
   constructor(
     public polymerBond: PolymerBond,
-    private readonly secondMonomer?: BaseMonomer,
+    private secondMonomer?: BaseMonomer,
   ) {}
 
   public execute(renderersManager: RenderersManager) {
@@ -109,12 +109,10 @@ export class PolymerBondFinishCreationOperation implements Operation {
   public polymerBond;
   public priority = 1;
   constructor(
-    private readonly finishPolymerBondCreationModelChange: (
+    private finishPolymerBondCreationModelChange: (
       polymerBond?: PolymerBond,
     ) => PolymerBond,
-    private readonly deletePolymerBondCreationModelChange: (
-      polymerBond,
-    ) => void,
+    private deletePolymerBondCreationModelChange: (polymerBond) => void,
   ) {
     this.polymerBond = this.finishPolymerBondCreationModelChange();
   }
@@ -133,8 +131,8 @@ export class PolymerBondFinishCreationOperation implements Operation {
 }
 
 export class SelectLayoutModeOperation implements Operation {
-  private readonly onExecute;
-  private readonly onInvert;
+  private onExecute;
+  private onInvert;
 
   constructor(
     public _onExecute: () => void,
@@ -158,8 +156,8 @@ export class SelectLayoutModeOperation implements Operation {
 export class ReconnectPolymerBondOperation implements Operation {
   public polymerBond;
   constructor(
-    private readonly reconnectPolymerBondModelChange: () => PolymerBond,
-    private readonly revertReconnectPolymerBondModelChange: () => PolymerBond,
+    private reconnectPolymerBondModelChange: () => PolymerBond,
+    private revertReconnectPolymerBondModelChange: () => PolymerBond,
   ) {}
 
   public execute(renderersManager: RenderersManager) {
